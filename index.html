@@ -632,7 +632,7 @@
   .twitter-editor>.back-btn{grid-column:1/-1}
   .twitter-editor .panel{min-width:0;width:100%;overflow:hidden}
   .twitter-preview-wrap{width:100%;height:calc(100vh - 180px);max-height:none;overflow:auto;background:#dedbd2;padding:20px;box-sizing:border-box;display:flex;justify-content:center;align-items:flex-start;min-width:0;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-x pan-y}
-  .twitter-canvas{width:1500px;max-width:100%;min-width:0;height:auto;min-height:843.75px;flex:0 1 auto;background:#fff;color:#0f1419;display:grid;grid-template-columns:20% 58% 22%;font-family:'Pretendard',sans-serif;letter-spacing:-.03em;overflow:hidden}
+  .twitter-canvas{width:1580px;max-width:100%;min-width:0;height:auto;min-height:888.75px;flex:0 1 auto;background:#fff;color:#0f1419;display:grid;grid-template-columns:20% 58.5% 21.5%;font-family:'Pretendard',sans-serif;letter-spacing:-.03em;overflow:hidden}
   .tw-left{border-right:1px solid #eff3f4;padding:16px 20px;box-sizing:border-box;min-width:0}
   .tw-logo{width:40px;height:40px;margin:0 0 12px 8px;display:flex;align-items:center;justify-content:center}.tw-logo img{width:18px;height:18px;display:block;object-fit:contain}
   .tw-nav{display:flex;flex-direction:column;gap:8px}
@@ -640,6 +640,15 @@
   .tw-nav-item.active{font-weight:750}
   .tw-ico{width:34px;height:34px;display:flex;align-items:center;justify-content:center;flex:0 0 34px}.tw-ico img{width:34px;height:34px;display:block;object-fit:contain}
   .tw-post-btn{width:190px;max-width:100%;height:54px;border:0;border-radius:30px;background:#0f1419;color:#fff;font:700 18px 'Pretendard',sans-serif;margin:8px 0 0 4px}
+  .tw-action-bookmark{margin-left:auto}
+  .tw-action-bookmark + .tw-action-share{margin-left:-30px}
+  .tw-profile{display:flex;align-items:center;gap:10px;margin:24px 4px 0;padding:8px 8px;border-radius:28px;min-width:0}
+  .tw-profile-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:0 0 40px;background:#ddd}
+  .tw-profile-info{min-width:0;flex:1;line-height:1.25}
+  .tw-profile-name{font-size:15px;font-weight:700;display:flex;align-items:center;gap:4px;white-space:nowrap}
+  .tw-profile-handle{font-size:14px;color:#536471;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+  .tw-profile-more{font-size:20px;line-height:1;color:#536471;flex:0 0 auto;padding-bottom:6px}
+
   .tw-feed{border-right:1px solid #eff3f4;overflow:visible;min-width:0}
   .tw-tabs{height:72px;border-bottom:1px solid #eff3f4;display:grid;grid-template-columns:1fr 1fr;align-items:center;text-align:center;font-size:17px;font-weight:650;color:#536471;position:relative}
   .tw-tabs span{height:72px;display:flex;align-items:center;justify-content:center;position:relative}
@@ -648,9 +657,9 @@
 .tw-post{display:flex;gap:12px;padding:15px 18px 17px;border-bottom:1px solid #eff3f4;min-width:0}
   .tw-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#ddd;flex:0 0 44px}
   .tw-post-main{min-width:0;flex:1}.tw-post-head{font-size:15px;line-height:20px}.tw-name{font-weight:600}.tw-handle,.tw-date{color:#536471}.tw-post-text{font-size:17px;line-height:1.38;margin-top:2px;white-space:pre-wrap;word-break:break-word}
-  .tw-actions{display:flex;align-items:center;justify-content:space-between;color:#4b5560;font-size:13px;margin-top:13px;max-width:610px;padding-right:2px}
+  .tw-actions{display:flex;align-items:center;justify-content:flex-start;color:#4b5560;font-size:13px;margin-top:13px;max-width:100%;padding-right:2px;gap:clamp(24px,3vw,38px)}
   .tw-action{display:flex;align-items:center;justify-content:flex-start;gap:4px;min-width:0;height:28px;cursor:default}
-  .tw-action img,.tw-action svg{width:17px;height:17px;display:block;flex:0 0 17px;object-fit:contain}.tw-action img.tw-icon-img{width:20px;height:20px;object-fit:contain}
+  .tw-action img,.tw-action svg{width:17px;height:17px;display:block;flex:0 0 17px;object-fit:contain}.tw-action img.tw-icon-img{width:17px;height:17px;object-fit:contain}
   .tw-action.is-toggle{cursor:pointer}
   .tw-action svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   .tw-action.active-like{color:#f91880}.tw-action.active-like svg{stroke:#f91880;fill:#f91880}
@@ -794,7 +803,7 @@
   }
 
 </style>
-</head>
+<style>.tw-profile-lock{width:14px!important;height:14px!important;display:inline-block!important;vertical-align:-2px;object-fit:contain}</style></head>
 <body>
 
 <div class="top-disclaimer">가상 소스 생성기 · 여기서 만든 콘텐츠는 실제가 아닙니다</div>
@@ -958,6 +967,14 @@ window.showScreen = window.showScreen || function(name) {
           <div class="tw-nav-item"><span class="tw-ico"><img src="이미지/img-97c374be9cde.webp" alt=""></span>더 보기</div>
         </div>
         <button class="tw-post-btn">게시하기</button>
+        <div class="tw-profile">
+          <img class="tw-profile-avatar" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADkAAAA5CAYAAACMGIOFAAACiklEQVR4nO2azWsTQRyG30pOOdWL9WQPjWAJogU9ePADqhYExQ8ExbNFIVgsUgq9FEpFGkJEEEp7K2la/KjirbSHtDnZWEIaQoXsHlKoZHtpTnsKpKeCMrtJmsw7k2x9/oCZ5+G3GZbZdFQqlQo8zgndAir4H+kVjkWkT+fmRctCOp1BNpeDYZgoFHZQtPawXyrBtm2Uy2Up+yiPTKwlsbyyisR6Etvbv5XsqSQyb5iYX1jE56/fsLv7R8WW/0CN3EhtYnpmFkvffzC3qQklMm+YCEei+PRlibH8kZEeORWJ4u27sOxlm0JaZGYri5HRMfxM/ZK1pDSkRM7F4nj1+o2MpSg0HTk+MYn3Hz7KcKHRVGRoaBix+KIsFxoNRw6+DLXM6VmLht5dQ0PDbRMINBA5PjHZFo/o3xwpci4Wb/lDxomOeq8/MltZXO8fYPtQqHuSI6NjTA8qdUVORaIt+SZTLzUf17xh4vKVq6p8KNScZDgSVeFBpeokN1KbuH3nrkofClUnOT0zq8qDiuskvfBbPMR1kvML7fVWUw3XSQYvXtJy6cTAcZKJtaRnAgGXyOWVVdUeVJwnuZ5U7UFFiCxalrKbbVUIkel0RocHFSEym8vp8KAiRBqGqcODihBZKOzo8KDicPDs6fCgIkTul0oaNLgIkbZt6/CgIkTK+oTdSgiRPp/WvxFQECL9fr8ODypC5MnOTg0aXITI012ndHhQESK7u8/o8KAiRAYCPTo8qAiR54NBHR5UhMi+vgs6PKg4HDxd6O09p8OFhuP1x41r3rhvPcQxcuDWTdUeVI7vvSsAPH70QKUHFdfIZ0+fqPSg4hp5NtCDh/fvqXShUfXT3YvB56o8qBwAms/AYqP3aFwAAAAASUVORK5CYII=" alt="">
+          <div class="tw-profile-info">
+            <div class="tw-profile-name">춘삼이 <img class="tw-profile-lock" src="images/img-f028c6992e04.webp" alt=""> <span class="tw-lock">🔒</span></div>
+            <div class="tw-profile-handle">@cnstkarla</div>
+          </div>
+          <div class="tw-profile-more">···</div>
+        </div>
       </aside>
       <main class="tw-feed">
         <div class="tw-tabs"><span id="twTabRecommend">추천</span><span id="twTabFollowing">팔로잉</span></div>
@@ -3707,8 +3724,8 @@ function twRender(){
         <span class="tw-action is-toggle ${p.privateAccount?'private-repost':(p.reposted?'active-repost':'')}" ${p.privateAccount?'':'data-tw-preview-toggle="reposted"'} data-i="${i}">${twIcon('repost',p.reposted && !p.privateAccount)}<span>${p.reposts||''}</span></span>
         <span class="tw-action is-toggle ${p.liked?'active-like':''}" data-tw-preview-toggle="liked" data-i="${i}">${twIcon('like',p.liked)}<span>${p.likes||''}</span></span>
         <span class="tw-action">${twIcon('views')}<span>${p.views||''}</span></span>
-        <span class="tw-action is-toggle ${p.bookmarked?'active-bookmark':''}" data-tw-preview-toggle="bookmarked" data-i="${i}">${twIcon('bookmark',p.bookmarked)}</span>
-        <span class="tw-action">${twIcon('share')}</span>
+        <span class="tw-action tw-action-bookmark is-toggle ${p.bookmarked?'active-bookmark':''}" data-tw-preview-toggle="bookmarked" data-i="${i}">${twIcon('bookmark',p.bookmarked)}</span>
+        <span class="tw-action tw-action-share">${twIcon('share')}</span>
       </div>
     </div>
   </article>`).join('');
