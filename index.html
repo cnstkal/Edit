@@ -803,7 +803,32 @@
   }
 
 </style>
-<style>.tw-profile-lock{width:14px!important;height:14px!important;display:inline-block!important;vertical-align:-2px;object-fit:contain}</style></head>
+<style>.tw-profile-lock{width:14px!important;height:14px!important;display:inline-block!important;vertical-align:-2px;object-fit:contain}</style>
+<style>
+@media(max-width:700px){
+  .phone .reaction-image{width:54px;}
+  .phone .reaction-item{flex-basis:54px;width:54px;}
+  .phone .title{font-weight:700;}
+}
+</style>
+
+<style>
+.gpt-assistant{font-size:13px;}
+</style>
+
+<style>
+.tw-action.private-repost{color:#cfd5da !important;}
+.tw-action.private-repost img{opacity:.45;}
+.tw-lock{width:12px !important;height:12px !important;margin:0 2px !important;vertical-align:-1px;}
+</style>
+<style>
+.source-subnav{width:100%;display:flex;margin:10px 0 18px;border:1px solid #dcd7ca;border-radius:6px;overflow:hidden;background:#fff}
+.source-subnav-btn{flex:1;border:0;border-right:1px solid #e8e4db;background:#fff;color:#888;padding:10px 12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.source-subnav-btn:last-child{border-right:0}
+.source-subnav-btn.active{background:#a23b2e;color:#fff;font-weight:700}
+.article-subnav{margin-top:10px}
+</style>
+</head>
 <body>
 
 <div class="top-disclaimer">가상 소스 생성기 · 여기서 만든 콘텐츠는 실제가 아닙니다</div>
@@ -824,13 +849,8 @@ window.showScreen = window.showScreen || function(name) {
   <div class="home-grid">
     <button type="button" class="home-card" data-goto="news" onclick="showScreen('news'); return false;">
       <span class="home-card-emoji">📰</span>
-      <span class="home-card-name">일반 뉴스기사</span>
-      <span class="home-card-desc">포털 뉴스 · 모바일/PC · 댓글·이모티콘 반응</span>
-    </button>
-    <button type="button" class="home-card" data-goto="dispatch" onclick="showScreen('dispatch'); return false;">
-      <span class="home-card-emoji">📸</span>
-      <span class="home-card-name">디스패치 기사</span>
-      <span class="home-card-desc">Dispatch 스타일 · PC 전용</span>
+      <span class="home-card-name">기사</span>
+      <span class="home-card-desc">일반 뉴스 · 디스패치 · 모바일/PC</span>
     </button>
     <button type="button" class="home-card" data-goto="dcinside" onclick="showScreen('dcinside'); return false;">
       <span class="home-card-emoji">💬</span>
@@ -864,12 +884,7 @@ window.showScreen = window.showScreen || function(name) {
     <button type="button" class="home-card" data-goto="google" onclick="showScreen('google'); return false;">
       <span class="home-card-emoji">G</span>
       <span class="home-card-name">구글 검색</span>
-      <span class="home-card-desc">Google 검색창 · 기본/검색기록 화면</span>
-    </button>
-    <button type="button" class="home-card" data-goto="googleResults" onclick="showScreen('googleResults'); return false;">
-      <span class="home-card-emoji">G</span>
-      <span class="home-card-name">구글 검색 결과</span>
-      <span class="home-card-desc">Google 검색 후 결과 화면</span>
+      <span class="home-card-desc">Google 검색 · 검색기록 · 검색결과 화면</span>
     </button>
     <button type="button" class="home-card" data-goto="twitter" onclick="showScreen('twitter'); return false;">
       <span class="home-card-emoji">𝕏</span>
@@ -884,6 +899,10 @@ window.showScreen = window.showScreen || function(name) {
 
 <div class="app hidden google-editor" id="googleApp">
   <button type="button" class="back-btn" data-goto="menu" onclick="showScreen('menu'); return false;">← 소스 선택으로</button>
+  <div class="source-subnav">
+  <button type="button" class="source-subnav-btn active" onclick="showScreen('google');">구글 검색</button>
+  <button type="button" class="source-subnav-btn" onclick="showScreen('googleResults');">검색 결과</button>
+</div>
   <div class="panel">
     <h2>구글 검색창 설정</h2>
     <div class="field"><label>검색어</label><input type="text" id="googleQuery" placeholder="" /></div>
@@ -904,15 +923,22 @@ window.showScreen = window.showScreen || function(name) {
     <div class="google-preview-wrap">
       <div class="google-canvas" id="googleCanvas">
         <img id="googlePreviewImage" class="google-preview-image" src="이미지/img-ba7e95ee024a.webp" alt="Google 검색 화면">
+        <input id="googleSearchInput" class="google-search-hit" type="text" aria-label="Google 검색어 미리보기" autocomplete="off">
+        <div id="googleHistoryOverlay" class="google-history-overlay"></div>
       </div>
     </div>
     <button type="button" class="btn btn-primary" id="googleSaveBtn" style="margin-top:12px;">PNG로 저장</button>
+    <button type="button" class="btn btn-ghost" id="googleResultsOpenBtn" style="margin-top:8px;">검색결과 설정 열기</button>
   </div>
 </div>
 
 
 <div class="app hidden google-results-editor" id="googleResultsApp">
   <button type="button" class="back-btn" data-goto="menu" onclick="showScreen('menu'); return false;">← 소스 선택으로</button>
+  <div class="source-subnav">
+  <button type="button" class="source-subnav-btn" onclick="showScreen('google');">구글 검색</button>
+  <button type="button" class="source-subnav-btn active" onclick="showScreen('googleResults');">검색 결과</button>
+</div>
   <div class="panel gr-controls">
     <h2>구글 검색 결과 설정</h2>
     <div class="field"><label>검색어</label><input type="text" id="grQuery" placeholder="검색어를 입력하세요" /></div>
@@ -967,14 +993,7 @@ window.showScreen = window.showScreen || function(name) {
           <div class="tw-nav-item"><span class="tw-ico"><img src="이미지/img-97c374be9cde.webp" alt=""></span>더 보기</div>
         </div>
         <button class="tw-post-btn">게시하기</button>
-        <div class="tw-profile">
-          <img class="tw-profile-avatar" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADkAAAA5CAYAAACMGIOFAAACiklEQVR4nO2azWsTQRyG30pOOdWL9WQPjWAJogU9ePADqhYExQ8ExbNFIVgsUgq9FEpFGkJEEEp7K2la/KjirbSHtDnZWEIaQoXsHlKoZHtpTnsKpKeCMrtJmsw7k2x9/oCZ5+G3GZbZdFQqlQo8zgndAir4H+kVjkWkT+fmRctCOp1BNpeDYZgoFHZQtPawXyrBtm2Uy2Up+yiPTKwlsbyyisR6Etvbv5XsqSQyb5iYX1jE56/fsLv7R8WW/0CN3EhtYnpmFkvffzC3qQklMm+YCEei+PRlibH8kZEeORWJ4u27sOxlm0JaZGYri5HRMfxM/ZK1pDSkRM7F4nj1+o2MpSg0HTk+MYn3Hz7KcKHRVGRoaBix+KIsFxoNRw6+DLXM6VmLht5dQ0PDbRMINBA5PjHZFo/o3xwpci4Wb/lDxomOeq8/MltZXO8fYPtQqHuSI6NjTA8qdUVORaIt+SZTLzUf17xh4vKVq6p8KNScZDgSVeFBpeokN1KbuH3nrkofClUnOT0zq8qDiuskvfBbPMR1kvML7fVWUw3XSQYvXtJy6cTAcZKJtaRnAgGXyOWVVdUeVJwnuZ5U7UFFiCxalrKbbVUIkel0RocHFSEym8vp8KAiRBqGqcODihBZKOzo8KDicPDs6fCgIkTul0oaNLgIkbZt6/CgIkTK+oTdSgiRPp/WvxFQECL9fr8ODypC5MnOTg0aXITI012ndHhQESK7u8/o8KAiRAYCPTo8qAiR54NBHR5UhMi+vgs6PKg4HDxd6O09p8OFhuP1x41r3rhvPcQxcuDWTdUeVI7vvSsAPH70QKUHFdfIZ0+fqPSg4hp5NtCDh/fvqXShUfXT3YvB56o8qBwAms/AYqP3aFwAAAAASUVORK5CYII=" alt="">
-          <div class="tw-profile-info">
-            <div class="tw-profile-name">춘삼이 <img class="tw-profile-lock" src="images/img-f028c6992e04.webp" alt=""> <span class="tw-lock">🔒</span></div>
-            <div class="tw-profile-handle">@cnstkarla</div>
-          </div>
-          <div class="tw-profile-more">···</div>
-        </div>
+        
       </aside>
       <main class="tw-feed">
         <div class="tw-tabs"><span id="twTabRecommend">추천</span><span id="twTabFollowing">팔로잉</span></div>
@@ -2159,7 +2178,10 @@ function googleSetOpen(open){
   img.src=!!open ? "이미지/img-8f436381ecb6.webp" : "이미지/img-ba7e95ee024a.webp";
 }
 function googleSync(){
-  return;
+  const q=document.getElementById('googleQuery');
+  const hit=document.getElementById('googleSearchInput');
+  if(hit && q && hit.value!==q.value) hit.value=q.value;
+  googleApplyTypography();
 }
 Object.entries({
   googleQuerySize:GOOGLE_DEFAULTS.querySize, googleHistorySize:GOOGLE_DEFAULTS.historySize,
@@ -2174,17 +2196,18 @@ const gq=document.getElementById('googleQuery');
 const ghi=document.getElementById('googleHistory');
 const gsi=document.getElementById('googleSearchInput');
 if(gq){gq.addEventListener('input',googleSync);}
-if(ghi){ghi.addEventListener('input',()=>{googleRenderDropdown();});}
+if(ghi){ghi.addEventListener('input',()=>{googleRenderDropdown(); googleSetOpen(true);});}
 ['googleQuerySize','googleHistorySize','googleQueryX','googleQueryY','googleHistoryX','googleHistoryY','googleLetterSpacing','googleQueryWeight','googleHistoryWeight','googleHistoryLineGap'].forEach(id=>{
   const el=document.getElementById(id); if(el) el.addEventListener('input',googleApplyTypography);
 });
 googleRenderDropdown();
-googleApplyTypography();
+googleSync();
 if(gsi){
   gsi.addEventListener('focus',()=>googleSetOpen(true));
-  gsi.addEventListener('input',e=>{if(gq)gq.value=e.target.value;});
+  gsi.addEventListener('input',e=>{if(gq){gq.value=e.target.value;googleSync();} else googleApplyTypography();});
 }
 document.getElementById('googleOpenBtn')?.addEventListener('click',()=>googleSetOpen(true));
+document.getElementById('googleResultsOpenBtn')?.addEventListener('click',()=>showScreen('googleResults'));
 document.getElementById('googleCloseBtn')?.addEventListener('click',()=>googleSetOpen(false));
 document.getElementById('googleDefaultState')?.addEventListener('change',e=>googleSetOpen(e.target.value==='open'));
 document.getElementById('googleSaveBtn')?.addEventListener('click',()=>{
