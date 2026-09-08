@@ -26,14 +26,8 @@ body{padding:0 14px 50px}
 </main>
 <script>
 const items=[
- {icon:'📰',name:'일반 뉴스기사',desc:'포털 뉴스 · 모바일/PC · 댓글·어디리콘 반응',url:'editor.html?type=news'},
- {icon:'📸',name:'디스패치 기사',desc:'Dispatch 스타일 · PC 전용',url:'editor.html?type=dispatch'},
- {icon:'💬',name:'디시인사이드',desc:'갤러리 게시글 스타일',url:'editor.html?type=dc'},
- {icon:'📱',name:'인스타그램',desc:'피드 · 게시물 · 댓글 스타일',url:'editor.html?type=instagram'},
- {icon:'🌐',name:'네이버 포스트',desc:'네이버 콘텐츠 스타일',url:'editor.html?type=naver'},
- {icon:'🐦',name:'X / 트위터',desc:'게시물 · 답글 스타일',url:'editor.html?type=x'},
- {icon:'▶️',name:'유튜브',desc:'영상 · 댓글 · 채널 스타일',url:'editor.html?type=youtube'},
- {icon:'💌',name:'카카오톡',desc:'대화방 · 메시지 스타일',url:'editor.html?type=kakao'}
+ {icon:'📰',name:'일반 뉴스기사',desc:'포털 뉴스 · 모바일/PC · 댓글',url:'editor.html?type=news'},
+ {icon:'📸',name:'디스패치 기사',desc:'Dispatch 스타일 · PC 전용',url:'editor.html?type=dispatch'}
 ];
 const grid=document.getElementById('grid');
 items.forEach(x=>{const b=document.createElement('button');b.className='card';b.type='button';b.innerHTML='<div class="icon">'+x.icon+'</div><div class="name">'+x.name+'</div><div class="desc">'+x.desc+'</div>';b.onclick=()=>location.href=x.url;grid.appendChild(b)});
