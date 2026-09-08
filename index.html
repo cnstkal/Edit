@@ -6250,3 +6250,164 @@ html body * {
   /* 기존 저장 시 줄자/편집용 요소가 PNG에 섞이지 않도록 줄자는 캔버스 밖에 둔다. */
 })();
 </script>
+<style id="nv-direct-editor-recovery-style">
+/* 직접 편집 패널 복구 */
+.nv-direct-editor-recovery{display:block!important;margin:0 0 16px;padding:12px;border:1px solid #ddd;border-radius:10px;background:#fff;box-sizing:border-box}
+.nv-direct-editor-recovery h3{margin:0 0 8px;font-size:15px}
+.nv-direct-editor-recovery .nv-recovery-row{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:7px 0}
+.nv-direct-editor-recovery label{display:inline-flex;align-items:center;gap:5px;font-size:12px}
+.nv-direct-editor-recovery input[type=number]{width:72px;box-sizing:border-box}
+.nv-direct-editor-recovery input[type=range]{width:110px}
+.nv-direct-editor-recovery output{min-width:38px;text-align:right;font-size:11px}
+.nv-direct-editor-recovery button{border:1px solid #ddd;background:#fff;border-radius:6px;padding:6px 9px;cursor:pointer}
+.nv-direct-editor-recovery button.active{background:#03c75a;color:#fff;border-color:#03c75a}
+.nv-direct-editor-recovery .nv-recovery-help{font-size:11px;color:#777;line-height:1.5}
+#naverCanvas.nv-recovery-editing .nv-edit-overlay:not(.nv-fixed-text){pointer-events:auto!important;opacity:1!important;cursor:move!important;user-select:none!important;touch-action:none!important}
+#naverCanvas.nv-recovery-editing .nv-edit-overlay.nv-fixed-text{pointer-events:none!important}
+#naverCanvas .nv-recovery-selected{outline:2px solid #03c75a!important;outline-offset:2px;z-index:10050!important}
+.nv-recovery-handle{position:absolute!important;right:-9px!important;bottom:-9px!important;width:18px!important;height:18px!important;border-radius:50%!important;background:#03c75a!important;border:2px solid #fff!important;box-sizing:border-box!important;cursor:nwse-resize!important;z-index:10060!important}
+</style>
+<script id="nv-direct-editor-recovery-js">
+(function(){
+  const canvas=document.getElementById('naverCanvas');
+  const panel=document.querySelector('#naverApp .naver-settings');
+  if(!canvas||!panel)return;
+  const $=id=>document.getElementById(id);
+
+  /* 기존에 동적으로 생성되던 직접편집 패널 대신 항상 존재하는 패널을 만든다. */
+  let box=$('nvDirectEditorRecovery');
+  if(!box){
+    box=document.createElement('div');
+    box.id='nvDirectEditorRecovery';
+    box.className='nv-direct-editor-recovery';
+    box.innerHTML=`
+      <h3>프리뷰에서 글자 직접 편집</h3>
+      <div class="nv-recovery-row"><button type="button" id="nvRecoveryToggle" class="active">편집모드 켜짐</button><span class="nv-recovery-help">글자를 클릭한 뒤 드래그하면 이동 · 초록 점을 드래그하면 크기 조절</span></div>
+      <div class="nv-recovery-row"><strong id="nvRecoveryName">선택한 글자 없음</strong></div>
+      <div class="nv-recovery-row">
+        <label>X <input id="nvRecoveryX" type="number" step="1"></label>
+        <label>Y <input id="nvRecoveryY" type="number" step="1"></label>
+        <label>크기 <input id="nvRecoverySize" type="number" min="1" step="1"></label>
+        <button type="button" id="nvRecoveryApply">적용</button>
+      </div>
+      <div class="nv-recovery-row">
+        <label>두께 <input id="nvRecoveryWeight" type="range" min="100" max="900" step="10" value="400"><output id="nvRecoveryWeightVal">400</output></label>
+        <label>자간 <input id="nvRecoverySpacing" type="range" min="-10" max="30" step="0.1" value="0"><output id="nvRecoverySpacingVal">0px</output></label>
+        <label>줄간격 <input id="nvRecoveryLineHeight" type="range" min="0.8" max="3" step="0.05" value="1.5"><output id="nvRecoveryLineHeightVal">1.5</output></label>
+      </div>
+      <div class="nv-recovery-row">
+        <button type="button" id="nvRecoveryUp">↑</button><button type="button" id="nvRecoveryDown">↓</button><button type="button" id="nvRecoveryLeft">←</button><button type="button" id="nvRecoveryRight">→</button>
+      </div>`;
+    panel.insertBefore(box,panel.children[1]||panel.firstChild);
+  }
+
+  let editing=true,selected=null,drag=null;
+  canvas.classList.add('nv-recovery-editing');
+
+  const overlays=()=>[...canvas.querySelectorAll('.nv-edit-overlay')].filter(el=>{
+    const s=getComputedStyle(el); return !el.classList.contains('nv-fixed-text') && s.display!=='none' && s.visibility!=='hidden';
+  });
+  const mark=el=>{el.classList.add('nv-edited');};
+  const pos=el=>({x:parseFloat(el.style.left)||0,y:parseFloat(el.style.top)||0});
+  const point=e=>{const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*(canvas.offsetWidth/r.width),y:(e.clientY-r.top)*(canvas.offsetHeight/r.height)};};
+  const clamp=el=>{
+    let {x,y}=pos(el); const w=Math.min(el.offsetWidth||0,2048),h=Math.min(el.offsetHeight||0,1151);
+    x=Math.max(0,Math.min(2048-w,x)); y=Math.max(0,Math.min(1151-h,y));
+    el.style.left=Math.round(x)+'px';el.style.top=Math.round(y)+'px';
+  };
+  function handle(el){
+    let h=el.querySelector(':scope > .nv-recovery-handle');
+    if(!h){h=document.createElement('span');h.className='nv-recovery-handle';h.setAttribute('aria-hidden','true');el.appendChild(h);}
+    return h;
+  }
+  function panelUpdate(el){
+    if(!el)return;
+    const cs=getComputedStyle(el),fs=parseFloat(cs.fontSize)||16,wt=parseFloat(cs.fontWeight)||400,sp=parseFloat(cs.letterSpacing);
+    let lh=parseFloat(cs.lineHeight); if(!Number.isFinite(lh))lh=1.5; else if(lh>6)lh/=fs;
+    const p=pos(el);
+    $('nvRecoveryName').textContent=el.id||'텍스트'; $('nvRecoveryX').value=Math.round(p.x); $('nvRecoveryY').value=Math.round(p.y); $('nvRecoverySize').value=Math.round(fs);
+    $('nvRecoveryWeight').value=Math.max(100,Math.min(900,wt)); $('nvRecoveryWeightVal').textContent=Math.round(wt);
+    $('nvRecoverySpacing').value=Number.isFinite(sp)?Math.max(-10,Math.min(30,sp)):0; $('nvRecoverySpacingVal').textContent=(Number.isFinite(sp)?sp:0).toFixed(1).replace(/\.0$/,'')+'px';
+    $('nvRecoveryLineHeight').value=Math.max(.8,Math.min(3,lh)); $('nvRecoveryLineHeightVal').textContent=String(Math.round(Math.max(.8,Math.min(3,lh))*100)/100);
+  }
+  function select(el){
+    if(!el||el.classList.contains('nv-fixed-text'))return;
+    overlays().forEach(x=>x.classList.remove('nv-recovery-selected'));
+    selected=el;el.classList.add('nv-recovery-selected');handle(el);panelUpdate(el);
+  }
+
+  /* 기존 편집 엔진보다 먼저 이벤트를 가로채서 충돌을 없앤다. */
+  canvas.addEventListener('pointerdown',e=>{
+    if(!editing)return;
+    const h=e.target.closest?.('.nv-recovery-handle');
+    let el=e.target.closest?.('.nv-edit-overlay');
+    if(!el||el.classList.contains('nv-fixed-text')){
+      el=document.elementsFromPoint(e.clientX,e.clientY).find(x=>x.classList?.contains('nv-edit-overlay')&&!x.classList.contains('nv-fixed-text'));
+    }
+    if(!el||!overlays().includes(el))return;
+    e.preventDefault();e.stopImmediatePropagation();
+    select(el); const p=point(e);
+    if(h){
+      const fs=parseFloat(getComputedStyle(el).fontSize)||16;
+      drag={type:'resize',el,startX:p.x,startY:p.y,startSize:fs};
+    }else{
+      const xy=pos(el);drag={type:'move',el,startX:p.x,startY:p.y,startLeft:xy.x,startTop:xy.y};
+    }
+  },true);
+
+  window.addEventListener('pointermove',e=>{
+    if(!drag||!editing)return;
+    e.preventDefault();
+    const p=point(e),d=drag;
+    if(d.type==='move'){
+      d.el.style.left=Math.round(d.startLeft+p.x-d.startX)+'px';
+      d.el.style.top=Math.round(d.startTop+p.y-d.startY)+'px';
+      clamp(d.el);
+    }else{
+      const size=Math.max(6,Math.min(120,d.startSize+(p.x-d.startX)*0.35+(p.y-d.startY)*0.35));
+      d.el.style.fontSize=size.toFixed(1)+'px';
+    }
+    mark(d.el);panelUpdate(d.el);
+  },true);
+  window.addEventListener('pointerup',()=>{drag=null},true);
+  window.addEventListener('pointercancel',()=>{drag=null},true);
+
+  $('nvRecoveryToggle').addEventListener('click',()=>{
+    editing=!editing;canvas.classList.toggle('nv-recovery-editing',editing);$('nvRecoveryToggle').classList.toggle('active',editing);$('nvRecoveryToggle').textContent=editing?'편집모드 켜짐':'편집모드 꺼짐';
+  });
+  function apply(){
+    if(!selected)return;
+    const x=parseFloat($('nvRecoveryX').value),y=parseFloat($('nvRecoveryY').value),s=parseFloat($('nvRecoverySize').value);
+    if(Number.isFinite(x))selected.style.left=Math.round(x)+'px';if(Number.isFinite(y))selected.style.top=Math.round(y)+'px';if(Number.isFinite(s))selected.style.fontSize=Math.max(1,s)+'px';clamp(selected);mark(selected);panelUpdate(selected);
+  }
+  ['nvRecoveryX','nvRecoveryY','nvRecoverySize'].forEach(id=>$(id).addEventListener('change',apply));
+  $('nvRecoveryApply').addEventListener('click',apply);
+  function move(dx,dy){if(!selected)return;selected.style.left=((parseFloat(selected.style.left)||0)+dx)+'px';selected.style.top=((parseFloat(selected.style.top)||0)+dy)+'px';clamp(selected);mark(selected);panelUpdate(selected);}
+  $('nvRecoveryUp').addEventListener('click',()=>move(0,-1));$('nvRecoveryDown').addEventListener('click',()=>move(0,1));$('nvRecoveryLeft').addEventListener('click',()=>move(-1,0));$('nvRecoveryRight').addEventListener('click',()=>move(1,0));
+  $('nvRecoveryWeight').addEventListener('input',e=>{if(!selected)return;selected.style.fontWeight=e.target.value;mark(selected);$('nvRecoveryWeightVal').textContent=e.target.value;});
+  $('nvRecoverySpacing').addEventListener('input',e=>{if(!selected)return;selected.style.letterSpacing=e.target.value+'px';mark(selected);$('nvRecoverySpacingVal').textContent=Number(e.target.value).toFixed(1).replace(/\.0$/,'')+'px';});
+  $('nvRecoveryLineHeight').addEventListener('input',e=>{if(!selected)return;selected.style.lineHeight=e.target.value;mark(selected);$('nvRecoveryLineHeightVal').textContent=String(Math.round(Number(e.target.value)*100)/100);});
+})();
+</script>
+<style id="nv-direct-editor-topmost">
+.naver-settings{position:relative!important;}
+.naver-settings > .nv-edit-toggle,
+.naver-settings > .nv-coord-panel{order:-9999!important;}
+.naver-settings > h2{order:-9990!important;}
+</style>
+<script id="nv-direct-editor-topmost-js">
+(function(){
+  const panel=document.querySelector('.naver-settings');
+  if(!panel)return;
+  const moveTop=()=>{
+    const tools=panel.querySelector(':scope > .nv-edit-toggle');
+    const coord=panel.querySelector(':scope > .nv-coord-panel');
+    const h2=panel.querySelector(':scope > h2');
+    if(tools) panel.insertBefore(tools,panel.firstElementChild);
+    if(coord) panel.insertBefore(coord,panel.firstElementChild?.nextElementSibling||panel.firstElementChild);
+  };
+  moveTop();
+  setTimeout(moveTop,50);
+  setTimeout(moveTop,200);
+})();
+</script>
