@@ -8,29 +8,14 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 *{box-sizing:border-box;letter-spacing:-.04em;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;background:#f3efe7;color:#222;font-family:Pretendard,sans-serif}
-body{padding:0 14px 50px}
-.notice{height:34px;margin:0 -14px;background:#202020;color:#e8c965;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
-.wrap{width:min(760px,100%);margin:0 auto;padding:58px 0 0}
-.head{text-align:center;margin-bottom:30px}.head h1{font-size:30px;margin:0 0 8px;font-weight:750}.head p{margin:0;color:#999;font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.card{appearance:none;width:100%;min-height:154px;border:1px solid #ddd7cc;border-radius:13px;background:#fffdf9;box-shadow:0 2px 8px #7771;padding:25px 14px 21px;text-align:center;color:#222;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease}
-.card:active{transform:scale(.98);box-shadow:0 1px 4px #7772;background:#faf7f0}.icon{font-size:27px;height:36px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}.name{font-size:16px;font-weight:700;margin-bottom:7px}.desc{font-size:11px;color:#999;line-height:1.45}
-@media(min-width:700px){body{padding-left:24px;padding-right:24px}.notice{margin-left:-24px;margin-right:-24px}.wrap{padding-top:70px}.head h1{font-size:34px}.grid{gap:18px}.card{min-height:170px}.name{font-size:17px}}
+body{padding:0 14px 50px}.notice{height:34px;margin:0 -14px;background:#202020;color:#e8c965;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}.wrap{width:min(760px,100%);margin:0 auto;padding:58px 0 0}.head{text-align:center;margin-bottom:30px}.head h1{font-size:30px;margin:0 0 8px;font-weight:750}.head p{margin:0;color:#999;font-size:13px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{appearance:none;width:100%;min-height:154px;border:1px solid #ddd7cc;border-radius:13px;background:#fffdf9;box-shadow:0 2px 8px #7771;padding:25px 14px 21px;text-align:center;color:#222;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease}.card:active{transform:scale(.98);box-shadow:0 1px 4px #7772;background:#faf7f0}.icon{font-size:27px;height:36px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}.name{font-size:16px;font-weight:700;margin-bottom:7px}.desc{font-size:11px;color:#999;line-height:1.45}@media(min-width:700px){body{padding-left:24px;padding-right:24px}.notice{margin-left:-24px;margin-right:-24px}.wrap{padding-top:70px}.head h1{font-size:34px}.grid{gap:18px}.card{min-height:170px}.name{font-size:17px}}
 </style>
 </head>
 <body>
 <div class="notice">가상 소스 생성기 · 여기서 만든 콘텐츠는 실제가 아닙니다</div>
-<main class="wrap">
-<header class="head"><h1>에딧 소스 생성기</h1><p>만들 소스 종류를 선택하세요</p></header>
-<section class="grid" id="grid"></section>
-</main>
-<script>
-const items=[
- {icon:'📰',name:'일반 뉴스기사',desc:'포털 뉴스 · 모바일/PC · 댓글',url:'editor.html'},
- {icon:'📸',name:'디스패치 기사',desc:'Dispatch 스타일 · PC 전용',url:'dispatch.html'}
-];
-const grid=document.getElementById('grid');
-items.forEach(x=>{const b=document.createElement('button');b.className='card';b.type='button';b.innerHTML='<div class="icon">'+x.icon+'</div><div class="name">'+x.name+'</div><div class="desc">'+x.desc+'</div>';b.onclick=()=>location.href=x.url;grid.appendChild(b)});
-</script>
+<main class="wrap"><header class="head"><h1>에딧 소스 생성기</h1><p>만들 소스 종류를 선택하세요</p></header><section class="grid">
+<button class="card" type="button" onclick="location.href='editor.html?news=1&v=20260909'"><div class="icon">📰</div><div class="name">일반 뉴스기사</div><div class="desc">포털 뉴스 · 모바일/PC · 댓글</div></button>
+<button class="card" type="button" onclick="location.href='dispatch.html?dispatch=1&v=20260909'"><div class="icon">📸</div><div class="name">디스패치 기사</div><div class="desc">Dispatch 스타일 · PC 전용</div></button>
+</section></main>
 </body>
 </html>
