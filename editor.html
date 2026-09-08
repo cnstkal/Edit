@@ -1,1 +1,27 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>뉴스 편집기</title><style>body{margin:0;background:#f3efe7;font-family:sans-serif}#loading{padding:40px;text-align:center;color:#777}</style></head><body><div id="loading">편집기를 불러오는 중…</div><script>(async()=>{try{const r=await fetch('https://raw.githubusercontent.com/cnstkal/edit/3a99693edf9abeb6f31786195803263c5dd55dc9/index.html',{cache:'no-store'});if(!r.ok)throw 0;const html=await r.text();document.open();document.write(html);document.close()}catch(e){document.getElementById('loading').textContent='편집기를 불러오지 못했습니다. 새로고침해주세요.'}})()</script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>뉴스 편집기</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f3efe7;font-family:sans-serif}
+#editor{border:0;width:100%;height:100%;display:block}
+#homeBtn{position:fixed;top:14px;left:14px;z-index:99999;border:1px solid #d8d2c8;border-radius:10px;background:rgba(255,253,249,.96);color:#333;padding:9px 13px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);backdrop-filter:blur(8px)}
+#homeBtn:active{transform:scale(.97)}
+#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#777;font-size:13px;z-index:1}
+</style>
+</head>
+<body>
+<div id="loading">편집기를 불러오는 중…</div>
+<button id="homeBtn" type="button">← 홈으로</button>
+<iframe id="editor" title="뉴스 편집기"></iframe>
+<script>
+const btn=document.getElementById('homeBtn');
+btn.onclick=()=>{location.href='index.html'};
+const frame=document.getElementById('editor');
+frame.onload=()=>document.getElementById('loading').style.display='none';
+frame.src='https://raw.githubusercontent.com/cnstkal/edit/3a99693edf9abeb6f31786195803263c5dd55dc9/index.html';
+</script>
+</body>
+</html>
