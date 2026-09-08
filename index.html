@@ -1200,7 +1200,7 @@
 .naver-image-template{position:relative!important;width:2048px!important;height:1151px!important;overflow:hidden!important;background:#fff!important;font-family:Arial,"Noto Sans KR",sans-serif!important;}
 .naver-template-image{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:fill;z-index:1;user-select:none;pointer-events:none;}
 .nv-edit-overlay{opacity:0;pointer-events:none;transition:none;}
-.nv-edit-overlay.nv-edited{opacity:1;pointer-events:auto;}
+.nv-edit-overlay.nv-edited{opacity:1!important;pointer-events:none;}
 .nv-feature-upload-overlay{position:absolute;z-index:10;left:344px;top:604px;width:304px;height:199px;object-fit:cover;object-position:center;display:none;background:transparent;}
 .nv-press-logo-upload-overlay{position:absolute;z-index:10;left:346px;top:541px;width:45px;height:45px;object-fit:cover;object-position:center;display:none;background:transparent;}
 </style>
@@ -5610,6 +5610,7 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
       const h=document.createElement('span');h.className='nv-resize-handle';h.setAttribute('aria-hidden','true');el.appendChild(h);
     }
   }
+  function markEdited(el){ if(el && !el.classList.contains('nv-fixed-text')) el.classList.add('nv-edited'); }
   function updateCoord(){
     if(!selected)return;
     const x=parseFloat(selected.style.left)||0, y=parseFloat(selected.style.top)||0;
@@ -5652,7 +5653,7 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
   }
   function onMove(e){
     if(!drag)return;
-    const p=localPoint(e);drag.el.style.left=Math.round(drag.left+p.x-drag.startX)+'px';drag.el.style.top=Math.round(drag.top+p.y-drag.startY)+'px';clamp(drag.el);updateCoord();
+    const p=localPoint(e);drag.el.style.left=Math.round(drag.left+p.x-drag.startX)+'px';drag.el.style.top=Math.round(drag.top+p.y-drag.startY)+'px';clamp(drag.el);markEdited(drag.el);updateCoord();
   }
   function onUp(){drag=null;window.removeEventListener('pointermove',onMove);}
   function onResizeDown(e){
@@ -5664,7 +5665,7 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
   function onResizeMove(e){
     if(!resize)return;
     const p=localPoint(e);const delta=p.y-resize.startY;const size=Math.max(6,Math.min(120,resize.startSize*(1+delta/120)));
-    resize.el.style.fontSize=size.toFixed(1)+'px';
+    resize.el.style.fontSize=size.toFixed(1)+'px'; markEdited(resize.el);
     // 크기에 맞춰 박스 폭도 살짝 비례 조정하되, 좌표는 유지
     const ratio=size/resize.startSize;resize.el.style.width=Math.max(30,Math.round(resize.startWidth*ratio))+'px';
     updateCoord();
@@ -5694,18 +5695,18 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
     if(Number.isFinite(x))selected.style.left=Math.round(x)+'px';
     if(Number.isFinite(y))selected.style.top=Math.round(y)+'px';
     if(Number.isFinite(s))selected.style.fontSize=Math.max(1,s)+'px';
-    clamp(selected);updateCoord();
+    clamp(selected);markEdited(selected);updateCoord();
   });
-  const moveSelected=(dx,dy)=>{if(!selected)return;selected.style.left=Math.round((parseFloat(selected.style.left)||0)+dx)+'px';selected.style.top=Math.round((parseFloat(selected.style.top)||0)+dy)+'px';clamp(selected);updateCoord();};
+  const moveSelected=(dx,dy)=>{if(!selected)return;selected.style.left=Math.round((parseFloat(selected.style.left)||0)+dx)+'px';selected.style.top=Math.round((parseFloat(selected.style.top)||0)+dy)+'px';clamp(selected);markEdited(selected);updateCoord();};
   document.getElementById('nvMoveUp').addEventListener('click',()=>moveSelected(0,-1));
   document.getElementById('nvMoveDown').addEventListener('click',()=>moveSelected(0,1));
   document.getElementById('nvMoveLeft').addEventListener('click',()=>moveSelected(-1,0));
   document.getElementById('nvMoveRight').addEventListener('click',()=>moveSelected(1,0));
   const sw=document.getElementById('nvSelectedWeight'),sv=document.getElementById('nvSelectedWeightVal');
-  sw.addEventListener('input',()=>{if(!selected)return;selected.style.fontWeight=sw.value;sv.textContent=sw.value;});
+  sw.addEventListener('input',()=>{if(!selected)return;selected.style.fontWeight=sw.value;markEdited(selected);sv.textContent=sw.value;});
   const ss=document.getElementById('nvSelectedSpacing'),ssv=document.getElementById('nvSelectedSpacingVal');
-  ss.addEventListener('input',()=>{if(!selected)return;selected.style.letterSpacing=ss.value+'px';ssv.textContent=Number(ss.value).toFixed(1).replace(/\.0$/,'')+'px';});
-  [document.getElementById('nvCoordX'),document.getElementById('nvCoordY'),document.getElementById('nvCoordSize')].forEach(inp=>inp.addEventListener('input',()=>{if(!selected)return;const x=parseFloat(document.getElementById('nvCoordX').value),y=parseFloat(document.getElementById('nvCoordY').value),z=parseFloat(document.getElementById('nvCoordSize').value);if(Number.isFinite(x))selected.style.left=Math.round(x)+'px';if(Number.isFinite(y))selected.style.top=Math.round(y)+'px';if(Number.isFinite(z))selected.style.fontSize=Math.max(1,z)+'px';clamp(selected);}));
+  ss.addEventListener('input',()=>{if(!selected)return;selected.style.letterSpacing=ss.value+'px';markEdited(selected);ssv.textContent=Number(ss.value).toFixed(1).replace(/\.0$/,'')+'px';});
+  [document.getElementById('nvCoordX'),document.getElementById('nvCoordY'),document.getElementById('nvCoordSize')].forEach(inp=>inp.addEventListener('input',()=>{if(!selected)return;const x=parseFloat(document.getElementById('nvCoordX').value),y=parseFloat(document.getElementById('nvCoordY').value),z=parseFloat(document.getElementById('nvCoordSize').value);if(Number.isFinite(x))selected.style.left=Math.round(x)+'px';if(Number.isFinite(y))selected.style.top=Math.round(y)+'px';if(Number.isFinite(z))selected.style.fontSize=Math.max(1,z)+'px';clamp(selected);markEdited(selected);}));
   // 기존 렌더링으로 요소가 다시 만들어지거나 display가 바뀌어도 핸들을 복구
   const observer=new MutationObserver(()=>{if(editing)wire();});
   observer.observe(canvas,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']});
@@ -5811,5 +5812,131 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
   toggle?.addEventListener('click',()=>{setTimeout(()=>{active=null;els().forEach(x=>x.classList.remove('nv-selected'));},0);},true);
 
   // 시작 시 검색어가 선택된 상태가 아니라도 직접 클릭해서 선택 가능.
+})();
+</script>
+
+<script>
+/* 네이버 메인 직접 편집용 Ctrl+Z / Ctrl+Y 히스토리 */
+(function(){
+  const canvas=document.getElementById('naverCanvas');
+  if(!canvas)return;
+  const getEls=()=>[...canvas.querySelectorAll('.nv-edit-overlay')];
+  const keys=['left','top','fontSize','fontWeight','letterSpacing','width','height'];
+  const snapshot=()=>getEls().map(el=>({id:el.id, s:Object.fromEntries(keys.map(k=>[k,el.style[k]||'']))}));
+  const restore=snap=>{
+    snap.forEach(item=>{
+      const el=document.getElementById(item.id); if(!el)return;
+      keys.forEach(k=>el.style[k]=item.s[k]||'');
+    });
+  };
+  let undo=[], redo=[], last=snapshot(), timer=null, restoring=false;
+  const changed=()=>{
+    if(restoring)return;
+    clearTimeout(timer);
+    timer=setTimeout(()=>{
+      const now=snapshot();
+      if(JSON.stringify(now)!==JSON.stringify(last)){
+        undo.push(last); if(undo.length>100)undo.shift(); redo=[]; last=now;
+      }
+    },80);
+  };
+  const mo=new MutationObserver(changed);
+  mo.observe(canvas,{subtree:true,attributes:true,attributeFilter:['style']});
+
+  document.addEventListener('keydown',e=>{
+    if(!(e.ctrlKey||e.metaKey)||e.altKey)return;
+    const tag=(e.target?.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea'||tag==='select'||e.target?.isContentEditable)return;
+    if(e.key.toLowerCase()==='z'){
+      e.preventDefault();
+      if(!undo.length)return;
+      redo.push(snapshot());
+      const prev=undo.pop();
+      restoring=true; restore(prev); restoring=false; last=snapshot();
+      document.getElementById('nvCoordX')?.dispatchEvent(new Event('input'));
+      document.getElementById('nvSelectedName')?.dispatchEvent(new Event('change'));
+    }else if(e.key.toLowerCase()==='y'){
+      e.preventDefault();
+      if(!redo.length)return;
+      undo.push(snapshot());
+      const next=redo.pop();
+      restoring=true; restore(next); restoring=false; last=snapshot();
+    }
+  });
+})();
+</script>
+
+<style>
+/* ===== 네이버 메인 편집용 줄자 / 격자 ===== */
+#naverCanvas{--nv-grid-size:50px;--nv-grid-opacity:.22;}
+#naverCanvas.nv-show-grid{background-image:linear-gradient(to right,rgba(3,199,90,var(--nv-grid-opacity)) 1px,transparent 1px),linear-gradient(to bottom,rgba(3,199,90,var(--nv-grid-opacity)) 1px,transparent 1px);background-size:var(--nv-grid-size) var(--nv-grid-size);}
+.nv-guide-tools{margin-top:10px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;background:#fff;font-size:12px;box-sizing:border-box;display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:100%;}
+.nv-guide-tools strong{font-size:13px;color:#222;}
+.nv-guide-tools label{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.nv-guide-tools input[type=range]{width:110px;max-width:22vw;}
+.nv-guide-tools output{min-width:38px;text-align:right;color:#555;}
+.nv-ruler-wrap{position:absolute;inset:0;pointer-events:none;z-index:9980;display:none;}
+#naverCanvas.nv-show-ruler .nv-ruler-wrap{display:block;}
+.nv-ruler-top,.nv-ruler-left{position:absolute;background:rgba(255,255,255,.92);color:#555;font:10px Arial,sans-serif;box-sizing:border-box;overflow:hidden;}
+.nv-ruler-top{left:0;top:0;width:100%;height:22px;border-bottom:1px solid #bbb;background-image:repeating-linear-gradient(to right,#999 0,#999 1px,transparent 1px,transparent var(--nv-grid-size));}
+.nv-ruler-left{left:0;top:0;width:32px;height:100%;border-right:1px solid #bbb;background-image:repeating-linear-gradient(to bottom,#999 0,#999 1px,transparent 1px,transparent var(--nv-grid-size));}
+.nv-ruler-label{position:absolute;line-height:12px;white-space:nowrap;}
+.nv-ruler-corner{position:absolute;left:0;top:0;width:32px;height:22px;background:#f7f7f7;border-right:1px solid #bbb;border-bottom:1px solid #bbb;}
+</style>
+<script>
+(function(){
+  const canvas=document.getElementById('naverCanvas');
+  if(!canvas)return;
+  const panel=document.querySelector('.naver-settings');
+  if(!panel)return;
+
+  const tools=document.createElement('div');
+  tools.className='nv-guide-tools';
+  tools.innerHTML=`<strong>줄자 / 격자</strong>
+    <label><input type="checkbox" id="nvGridToggle"> 격자 표시</label>
+    <label><input type="checkbox" id="nvRulerToggle"> 줄자 표시</label>
+    <label>간격 <input id="nvGridSize" type="range" min="5" max="200" step="5" value="50"><output id="nvGridSizeVal">50px</output></label>
+    <label>투명도 <input id="nvGridOpacity" type="range" min="0" max="100" step="1" value="22"><output id="nvGridOpacityVal">22%</output></label>`;
+  panel.insertBefore(tools,panel.firstChild);
+
+  const wrap=document.createElement('div');
+  wrap.className='nv-ruler-wrap';
+  wrap.innerHTML='<div class="nv-ruler-top"></div><div class="nv-ruler-left"></div><div class="nv-ruler-corner"></div>';
+  canvas.appendChild(wrap);
+
+  const gridToggle=tools.querySelector('#nvGridToggle');
+  const rulerToggle=tools.querySelector('#nvRulerToggle');
+  const size=tools.querySelector('#nvGridSize'), sizeVal=tools.querySelector('#nvGridSizeVal');
+  const opacity=tools.querySelector('#nvGridOpacity'), opacityVal=tools.querySelector('#nvGridOpacityVal');
+
+  function drawLabels(){
+    const top=wrap.querySelector('.nv-ruler-top'), left=wrap.querySelector('.nv-ruler-left');
+    top.querySelectorAll('.nv-ruler-label').forEach(x=>x.remove());
+    left.querySelectorAll('.nv-ruler-label').forEach(x=>x.remove());
+    const step=Math.max(5,Number(size.value)||50);
+    for(let x=0;x<=2048;x+=step){
+      const n=document.createElement('span'); n.className='nv-ruler-label'; n.textContent=x;
+      n.style.left=(x+2)+'px'; n.style.top='5px'; top.appendChild(n);
+    }
+    for(let y=0;y<=1151;y+=step){
+      const n=document.createElement('span'); n.className='nv-ruler-label'; n.textContent=y;
+      n.style.left='4px'; n.style.top=(y+24)+'px'; left.appendChild(n);
+    }
+  }
+  function update(){
+    const s=Math.max(5,Number(size.value)||50);
+    const o=Math.max(0,Math.min(100,Number(opacity.value)||0))/100;
+    canvas.style.setProperty('--nv-grid-size',s+'px');
+    canvas.style.setProperty('--nv-grid-opacity',o);
+    canvas.classList.toggle('nv-show-grid',gridToggle.checked);
+    canvas.classList.toggle('nv-show-ruler',rulerToggle.checked);
+    sizeVal.textContent=s+'px'; opacityVal.textContent=Math.round(o*100)+'%';
+    drawLabels();
+  }
+  gridToggle.addEventListener('change',update);
+  rulerToggle.addEventListener('change',update);
+  size.addEventListener('input',update);
+  opacity.addEventListener('input',update);
+  update();
 })();
 </script>
