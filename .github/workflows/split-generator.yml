@@ -1,0 +1,47 @@
+name: Split generator assets
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  split:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Split index.html
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html'); text=p.read_text(encoding='utf-8')
+          sp=re.compile(r'<style\b[^>]*>(.*?)</style>',re.I|re.S)
+          xp=re.compile(r'<script\b([^>]*)>(.*?)</script>',re.I|re.S)
+          styles=[m.group(1) for m in sp.finditer(text)]
+          scripts=[m for m in xp.finditer(text) if not re.search(r'\bsrc\s*=',m.group(1),re.I) and m.group(2).strip()]
+          cg={'common':[0,2,3,5],'twitter':[1,4,6,7],'windows':[8],'tinder':[9],'discord':[10],'instagram-story':[11],'instagram':[12],'kakao':[13],'google-results':[14],'naver':[15,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36],'naver-blog':[16],'naver-search':[17],'youtube':[18],'netflix':[19]}
+          Path('css').mkdir(exist_ok=True)
+          for n,ii in cg.items(): Path('css',n+'.css').write_text('\n\n'.join(styles[i] for i in ii),encoding='utf-8')
+          g=scripts[2].group(2); marks=[('google',17445),('google-results',22898),('dispatch',27573),('dcinside',35646),('instagram-story',45368),('kakao',73295),('everytime',88909),('notification',97385),('gpt',104793),('twitter',107519)]
+          js={'core.js':scripts[0].group(2)+'\n'+scripts[1].group(2)+'\n'+g[:17445]}
+          for i,(n,a) in enumerate(marks): js[n+'.js']=g[a:(marks[i+1][1] if i+1<len(marks) else len(g))]
+          names=['windows','tinder','discord','instagram-dm','tinder-extra','discord-extra','instagram','naver','naver-blog','naver-search','youtube','netflix','naver-extra1','zoom','naver-extra2','naver-extra3','naver-extra4','naver-extra5','naver-extra6','naver-extra7','naver-extra8','naver-extra9','naver-extra10','naver-extra11','naver-extra12']
+          for n,m in zip(names,scripts[3:]): js[n+'.js']=m.group(2)
+          js['tinder.js']+='\n'+js.pop('tinder-extra.js'); js['discord.js']+='\n'+js.pop('discord-extra.js')
+          ne=[k for k in list(js) if k.startswith('naver-extra') or k=='zoom.js']; js['naver.js']+='\n'+'\n'.join(js.pop(k) for k in ne)
+          Path('js').mkdir(exist_ok=True)
+          for n,v in js.items(): Path('js',n).write_text(v,encoding='utf-8')
+          new=sp.sub('',text); new=xp.sub(lambda m:m.group(0) if re.search(r'\bsrc\s*=',m.group(1),re.I) else '',new)
+          cssnames=['common','twitter','windows','tinder','discord','instagram-story','instagram','kakao','google-results','naver','naver-blog','naver-search','youtube','netflix']
+          new=new.replace('</head>',''.join(f'<link rel="stylesheet" href="css/{n}.css">\n' for n in cssnames)+'</head>',1)
+          jsnames=['core','google','google-results','dispatch','dcinside','instagram-story','kakao','everytime','notification','gpt','twitter','windows','tinder','discord','instagram-dm','instagram','naver','naver-blog','naver-search','youtube','netflix']
+          new=new.replace('</body>',''.join(f'<script src="js/{n}.js" defer></script>\n' for n in jsnames)+'</body>',1)
+          p.write_text(new,encoding='utf-8')
+          PY
+      - name: Commit split files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html css js
+          git diff --cached --quiet || (git commit -m 'perf: split index CSS and JS by generator' && git push)
