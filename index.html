@@ -5517,198 +5517,8 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
 </script>
 </body>
 </html>
-<style id="nv-direct-editor-fixed">
-/* ===== 네이버 메인 직접 편집: 단일 편집 엔진 ===== */
-#naverCanvas.nv-direct-editing .nv-edit-overlay:not(.nv-fixed-text){
-  pointer-events:auto !important;
-  opacity:1 !important;
-  cursor:move !important;
-  user-select:none !important;
-  touch-action:none !important;
-}
-#naverCanvas.nv-direct-editing .nv-edit-overlay.nv-fixed-text{pointer-events:none !important;}
-#naverCanvas .nv-edit-overlay.nv-selected{outline:2px solid #03c75a !important;outline-offset:2px;z-index:10050 !important;}
-.nv-resize-handle{position:absolute !important;right:-8px !important;bottom:-8px !important;width:16px !important;height:16px !important;border-radius:50% !important;background:#03c75a !important;border:2px solid #fff !important;box-sizing:border-box !important;cursor:nwse-resize !important;z-index:10060 !important;}
-.nv-coord-panel{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;background:#fff;font-size:12px;box-sizing:border-box;}
-.nv-coord-panel strong{font-size:13px;color:#222}.nv-coord-panel input{width:72px;box-sizing:border-box}.nv-coord-panel .nv-help{color:#777;flex-basis:100%;line-height:1.5}.nv-arrow-group{display:inline-flex;gap:3px}.nv-arrow-group button{width:30px;height:30px;padding:0!important;font-size:16px!important}.nv-inline-style{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.nv-inline-style input[type=range]{width:100px;min-width:70px}.nv-inline-style output{min-width:38px;text-align:right;font-size:11px;color:#555}.nv-edit-toggle{margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.nv-edit-toggle button{border:1px solid #ddd;background:#fff;border-radius:6px;padding:7px 10px;cursor:pointer}.nv-edit-toggle button.active{background:#03c75a;color:#fff;border-color:#03c75a}
-</style>
-<script id="nv-direct-editor-fixed-js">
-(function(){
-  const canvas=document.getElementById('naverCanvas');
-  const panel=document.querySelector('.naver-settings');
-  if(!canvas||!panel)return;
-  const q=id=>document.getElementById(id);
-
-  // 기존 편집 패널이 있으면 중복 생성하지 않고, 없으면 생성한다.
-  let toggle=q('nvDirectEditToggle');
-  let coord=q('nvCoordX');
-  if(!toggle||!coord){
-    const tools=document.createElement('div');
-    tools.className='nv-edit-toggle';
-    tools.innerHTML='<button type="button" id="nvDirectEditToggle">편집모드 켜짐 · 다시 누르면 끄기</button><span style="font-size:12px;color:#777">텍스트를 클릭한 뒤 드래그하세요. 초록 점을 드래그하면 글자 크기가 바뀝니다.</span>';
-    const cp=document.createElement('div');
-    cp.className='nv-coord-panel';
-    cp.innerHTML='<strong>선택한 글자</strong><span id="nvSelectedName">없음</span><span>X</span><input id="nvCoordX" type="number" step="1"><span>Y</span><input id="nvCoordY" type="number" step="1"><span>크기</span><input id="nvCoordSize" type="number" min="1" step="1"><span>px</span><div class="nv-arrow-group"><button type="button" id="nvMoveUp">↑</button><button type="button" id="nvMoveDown">↓</button><button type="button" id="nvMoveLeft">←</button><button type="button" id="nvMoveRight">→</button></div><label class="nv-inline-style">두께 <input id="nvSelectedWeight" type="range" min="100" max="900" step="10" value="400"><output id="nvSelectedWeightVal">400</output></label><label class="nv-inline-style">자간 <input id="nvSelectedSpacing" type="range" min="-5" max="20" step="0.1" value="0"><output id="nvSelectedSpacingVal">0px</output></label><label class="nv-inline-style">줄간격 <input id="nvSelectedLineHeight" type="range" min="0.8" max="3" step="0.05" value="1.5"><output id="nvSelectedLineHeightVal">1.5</output></label><button type="button" id="nvApplyCoord">좌표/크기 적용</button><div class="nv-help">좌표는 네이버 원본 2048×1151 기준입니다. 프리뷰를 확대해도 실제 좌표 기준으로 이동/크기조절됩니다.</div>';
-    panel.insertBefore(cp,tools.nextSibling);panel.insertBefore(tools,panel.firstChild);
-    toggle=q('nvDirectEditToggle');coord=q('nvCoordX');
-  }
-
-  let editing=true, selected=null, pointerState=null;
-  canvas.classList.add('nv-direct-editing');
-  toggle?.classList.add('active');
-  if(toggle)toggle.textContent='편집모드 켜짐 · 다시 누르면 끄기';
-
-  const isVisible=el=>{
-    const s=getComputedStyle(el);
-    return s.display!=='none'&&s.visibility!=='hidden'&&el.offsetParent!==null&&!el.classList.contains('nv-fixed-text');
-  };
-  const textEls=()=>[...canvas.querySelectorAll('.nv-edit-overlay')].filter(isVisible);
-  const point=e=>{const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*(canvas.offsetWidth/r.width),y:(e.clientY-r.top)*(canvas.offsetHeight/r.height)};};
-  const clamp=el=>{
-    let x=parseFloat(el.style.left)||0,y=parseFloat(el.style.top)||0;
-    x=Math.max(0,Math.min(x,2048-Math.min(el.offsetWidth,2048)));
-    y=Math.max(0,Math.min(y,1151-Math.min(el.offsetHeight,1151)));
-    el.style.left=Math.round(x)+'px';el.style.top=Math.round(y)+'px';
-  };
-  const edited=el=>el.classList.add('nv-edited');
-
-  function updatePanel(el){
-    if(!el)return;
-    const size=parseFloat(getComputedStyle(el).fontSize)||16;
-    const wt=parseFloat(getComputedStyle(el).fontWeight)||400;
-    const sp=parseFloat(getComputedStyle(el).letterSpacing); let lh=parseFloat(getComputedStyle(el).lineHeight); if(!Number.isFinite(lh))lh=1.5; else if(lh>6)lh/=size;
-    q('nvSelectedName').textContent=el.id||'텍스트';q('nvCoordX').value=Math.round(parseFloat(el.style.left)||0);q('nvCoordY').value=Math.round(parseFloat(el.style.top)||0);q('nvCoordSize').value=Math.round(size);
-    q('nvSelectedWeight').value=Math.min(900,Math.max(100,wt));q('nvSelectedWeightVal').textContent=String(Math.round(wt));
-    q('nvSelectedSpacing').value=Number.isFinite(sp)?Math.max(-5,Math.min(20,sp)):0;q('nvSelectedSpacingVal').textContent=(Number.isFinite(sp)?sp:0).toFixed(1).replace(/\.0$/,'')+'px';
-    q('nvSelectedLineHeight').value=Math.max(.8,Math.min(3,lh));q('nvSelectedLineHeightVal').textContent=(Math.round(Math.max(.8,Math.min(3,lh))*100)/100).toString();
-  }
-  function select(el){
-    if(!el||!isVisible(el))return;
-    textEls().forEach(x=>x.classList.remove('nv-selected'));
-    selected=el;el.classList.add('nv-selected');ensureHandle(el);updatePanel(el);
-  }
-  function ensureHandle(el){
-    let h=el.querySelector(':scope > .nv-resize-handle');
-    if(!h){h=document.createElement('span');h.className='nv-resize-handle';h.setAttribute('aria-hidden','true');el.appendChild(h);}
-    bindHandle(h);
-  }
-  const bound=new WeakSet();
-  function bindHandle(h){
-    if(bound.has(h))return;bound.add(h);
-    h.addEventListener('pointerdown',e=>{
-      if(!editing)return;e.preventDefault();e.stopPropagation();
-      const el=h.parentElement;if(!el||el.classList.contains('nv-fixed-text'))return;
-      select(el);const p=point(e);const fs=parseFloat(getComputedStyle(el).fontSize)||16;
-      pointerState={type:'resize',el,startX:p.x,startY:p.y,startSize:fs,startWidth:parseFloat(getComputedStyle(el).width)||el.offsetWidth,pointerId:e.pointerId};
-      try{h.setPointerCapture(e.pointerId)}catch(_){ }
-    });
-  }
-
-  function bindText(el){
-    if(el.dataset.nvDirectBound==='1'){ensureHandle(el);return;}
-    el.dataset.nvDirectBound='1';ensureHandle(el);
-    el.addEventListener('pointerdown',e=>{
-      if(!editing||e.target.closest('.nv-resize-handle')||el.classList.contains('nv-fixed-text'))return;
-      e.preventDefault();e.stopPropagation();select(el);
-      const p=point(e);pointerState={type:'drag',el,startX:p.x,startY:p.y,startLeft:parseFloat(el.style.left)||0,startTop:parseFloat(el.style.top)||0,pointerId:e.pointerId};
-      try{el.setPointerCapture(e.pointerId)}catch(_){ }
-    });
-  }
-  function wire(){textEls().forEach(bindText);}
-  wire();
-  new MutationObserver(()=>{if(editing)wire();}).observe(canvas,{childList:true,subtree:true});
-
-  // 캔버스 위에서 실제 대상 요소를 직접 찾아 선택/이동한다. 확대 배율과 무관하게 2048×1151 좌표로 계산.
-  canvas.addEventListener('pointerdown',e=>{
-    if(!editing)return;
-    const el=e.target.closest?.('.nv-edit-overlay');
-    if(el&&!el.classList.contains('nv-fixed-text')&&isVisible(el)&&!e.target.closest('.nv-resize-handle'))select(el);
-  },true);
-  window.addEventListener('pointermove',e=>{
-    if(!pointerState)return;
-    const st=pointerState,p=point(e);
-    if(st.type==='drag'){
-      st.el.style.left=Math.round(st.startLeft+p.x-st.startX)+'px';st.el.style.top=Math.round(st.startTop+p.y-st.startY)+'px';clamp(st.el);edited(st.el);updatePanel(st.el);
-    }else{
-      const delta=p.y-st.startY;const size=Math.max(6,Math.min(120,st.startSize*(1+delta/120)));st.el.style.fontSize=size.toFixed(1)+'px';
-      st.el.style.width=Math.max(30,Math.round(st.startWidth*(size/st.startSize)))+'px';edited(st.el);updatePanel(st.el);
-    }
-  },true);
-  window.addEventListener('pointerup',()=>{pointerState=null;},true);
-  window.addEventListener('pointercancel',()=>{pointerState=null;},true);
-
-  toggle?.addEventListener('click',()=>{editing=!editing;canvas.classList.toggle('nv-direct-editing',editing);toggle.classList.toggle('active',editing);toggle.textContent=editing?'편집모드 켜짐 · 다시 누르면 끄기':'프리뷰에서 글자 직접 이동/크기조절';if(editing)wire();});
-
-  function applyFields(){
-    if(!selected)return;
-    const x=parseFloat(q('nvCoordX').value),y=parseFloat(q('nvCoordY').value),z=parseFloat(q('nvCoordSize').value);
-    if(Number.isFinite(x))selected.style.left=Math.round(x)+'px';if(Number.isFinite(y))selected.style.top=Math.round(y)+'px';if(Number.isFinite(z))selected.style.fontSize=Math.max(1,z)+'px';clamp(selected);edited(selected);updatePanel(selected);
-  }
-  ['nvCoordX','nvCoordY','nvCoordSize'].forEach(id=>q(id)?.addEventListener('input',applyFields));
-  q('nvApplyCoord')?.addEventListener('click',applyFields);
-  const move=(dx,dy)=>{if(!selected)return;selected.style.left=Math.round((parseFloat(selected.style.left)||0)+dx)+'px';selected.style.top=Math.round((parseFloat(selected.style.top)||0)+dy)+'px';clamp(selected);edited(selected);updatePanel(selected);};
-  q('nvMoveUp')?.addEventListener('click',()=>move(0,-1));q('nvMoveDown')?.addEventListener('click',()=>move(0,1));q('nvMoveLeft')?.addEventListener('click',()=>move(-1,0));q('nvMoveRight')?.addEventListener('click',()=>move(1,0));
-  q('nvSelectedWeight')?.addEventListener('input',e=>{if(!selected)return;selected.style.fontWeight=e.target.value;edited(selected);q('nvSelectedWeightVal').textContent=e.target.value;});
-  q('nvSelectedSpacing')?.addEventListener('input',e=>{if(!selected)return;selected.style.letterSpacing=e.target.value+'px';edited(selected);q('nvSelectedSpacingVal').textContent=Number(e.target.value).toFixed(1).replace(/\.0$/,'')+'px';});
-  q('nvSelectedLineHeight')?.addEventListener('input',e=>{if(!selected)return;selected.style.lineHeight=e.target.value;edited(selected);q('nvSelectedLineHeightVal').textContent=(Math.round(Number(e.target.value)*100)/100).toString();});
-})();
-</script>
-
-<script>
-/* 네이버 메인 직접 편집용 Ctrl+Z / Ctrl+Y 히스토리 */
-(function(){
-  const canvas=document.getElementById('naverCanvas');
-  if(!canvas)return;
-  const getEls=()=>[...canvas.querySelectorAll('.nv-edit-overlay')];
-  const keys=['left','top','fontSize','fontWeight','letterSpacing','width','height'];
-  const snapshot=()=>getEls().map(el=>({id:el.id, s:Object.fromEntries(keys.map(k=>[k,el.style[k]||'']))}));
-  const restore=snap=>{
-    snap.forEach(item=>{
-      const el=document.getElementById(item.id); if(!el)return;
-      keys.forEach(k=>el.style[k]=item.s[k]||'');
-    });
-  };
-  let undo=[], redo=[], last=snapshot(), timer=null, restoring=false;
-  const changed=()=>{
-    if(restoring)return;
-    clearTimeout(timer);
-    timer=setTimeout(()=>{
-      const now=snapshot();
-      if(JSON.stringify(now)!==JSON.stringify(last)){
-        undo.push(last); if(undo.length>100)undo.shift(); redo=[]; last=now;
-      }
-    },80);
-  };
-  const mo=new MutationObserver(changed);
-  mo.observe(canvas,{subtree:true,attributes:true,attributeFilter:['style']});
-
-  document.addEventListener('keydown',e=>{
-    if(!(e.ctrlKey||e.metaKey)||e.altKey)return;
-    const tag=(e.target?.tagName||'').toLowerCase();
-    if(tag==='input'||tag==='textarea'||tag==='select'||e.target?.isContentEditable)return;
-    if(e.key.toLowerCase()==='z'){
-      e.preventDefault();
-      if(!undo.length)return;
-      redo.push(snapshot());
-      const prev=undo.pop();
-      restoring=true; restore(prev); restoring=false; last=snapshot();
-      document.getElementById('nvCoordX')?.dispatchEvent(new Event('input'));
-      document.getElementById('nvSelectedName')?.dispatchEvent(new Event('change'));
-    }else if(e.key.toLowerCase()==='y'){
-      e.preventDefault();
-      if(!redo.length)return;
-      undo.push(snapshot());
-      const next=redo.pop();
-      restoring=true; restore(next); restoring=false; last=snapshot();
-    }
-  });
-})();
-</script>
-
 <style>
 /* ===== 네이버 메인 편집용 줄자 / 격자 ===== */
-#naverCanvas{--nv-grid-size:50px;--nv-grid-opacity:.22;}
-#naverCanvas.nv-show-grid{background-image:linear-gradient(to right,rgba(3,199,90,var(--nv-grid-opacity)) 1px,transparent 1px),linear-gradient(to bottom,rgba(3,199,90,var(--nv-grid-opacity)) 1px,transparent 1px);background-size:var(--nv-grid-size) var(--nv-grid-size);}
 .nv-guide-tools{margin-top:10px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;background:#fff;font-size:12px;box-sizing:border-box;display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:100%;}
 .nv-guide-tools strong{font-size:13px;color:#222;}
 .nv-guide-tools label{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
@@ -5731,11 +5541,9 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
 
   const tools=document.createElement('div');
   tools.className='nv-guide-tools';
-  tools.innerHTML=`<strong>줄자 / 격자</strong>
-    <label><input type="checkbox" id="nvGridToggle"> 격자 표시</label>
+  tools.innerHTML=`<strong>줄자</strong>
     <label><input type="checkbox" id="nvRulerToggle"> 줄자 표시</label>
-    <label>간격 <input id="nvGridSize" type="range" min="5" max="200" step="5" value="50"><output id="nvGridSizeVal">50px</output></label>
-    <label>투명도 <input id="nvGridOpacity" type="range" min="0" max="100" step="1" value="22"><output id="nvGridOpacityVal">22%</output></label>`;
+    <label>간격 <input id="nvGridSize" type="range" min="5" max="200" step="5" value="50"><output id="nvGridSizeVal">50px</output></label>`;
   panel.insertBefore(tools,panel.firstChild);
 
   const wrap=document.createElement('div');
@@ -5743,10 +5551,8 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
   wrap.innerHTML='<div class="nv-ruler-top"></div><div class="nv-ruler-left"></div><div class="nv-ruler-corner"></div>';
   canvas.appendChild(wrap);
 
-  const gridToggle=tools.querySelector('#nvGridToggle');
   const rulerToggle=tools.querySelector('#nvRulerToggle');
   const size=tools.querySelector('#nvGridSize'), sizeVal=tools.querySelector('#nvGridSizeVal');
-  const opacity=tools.querySelector('#nvGridOpacity'), opacityVal=tools.querySelector('#nvGridOpacityVal');
 
   function drawLabels(){
     const top=wrap.querySelector('.nv-ruler-top'), left=wrap.querySelector('.nv-ruler-left');
@@ -5764,18 +5570,13 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
   }
   function update(){
     const s=Math.max(5,Number(size.value)||50);
-    const o=Math.max(0,Math.min(100,Number(opacity.value)||0))/100;
     canvas.style.setProperty('--nv-grid-size',s+'px');
-    canvas.style.setProperty('--nv-grid-opacity',o);
-    canvas.classList.toggle('nv-show-grid',gridToggle.checked);
     canvas.classList.toggle('nv-show-ruler',rulerToggle.checked);
-    sizeVal.textContent=s+'px'; opacityVal.textContent=Math.round(o*100)+'%';
+    sizeVal.textContent=s+'px';
     drawLabels();
   }
-  gridToggle.addEventListener('change',update);
   rulerToggle.addEventListener('change',update);
   size.addEventListener('input',update);
-  opacity.addEventListener('input',update);
   update();
 })();
 </script>
@@ -6250,164 +6051,306 @@ html body * {
   /* 기존 저장 시 줄자/편집용 요소가 PNG에 섞이지 않도록 줄자는 캔버스 밖에 둔다. */
 })();
 </script>
-<style id="nv-direct-editor-recovery-style">
-/* 직접 편집 패널 복구 */
-.nv-direct-editor-recovery{display:block!important;margin:0 0 16px;padding:12px;border:1px solid #ddd;border-radius:10px;background:#fff;box-sizing:border-box}
-.nv-direct-editor-recovery h3{margin:0 0 8px;font-size:15px}
-.nv-direct-editor-recovery .nv-recovery-row{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:7px 0}
-.nv-direct-editor-recovery label{display:inline-flex;align-items:center;gap:5px;font-size:12px}
-.nv-direct-editor-recovery input[type=number]{width:72px;box-sizing:border-box}
-.nv-direct-editor-recovery input[type=range]{width:110px}
-.nv-direct-editor-recovery output{min-width:38px;text-align:right;font-size:11px}
-.nv-direct-editor-recovery button{border:1px solid #ddd;background:#fff;border-radius:6px;padding:6px 9px;cursor:pointer}
-.nv-direct-editor-recovery button.active{background:#03c75a;color:#fff;border-color:#03c75a}
-.nv-direct-editor-recovery .nv-recovery-help{font-size:11px;color:#777;line-height:1.5}
-#naverCanvas.nv-recovery-editing .nv-edit-overlay:not(.nv-fixed-text){pointer-events:auto!important;opacity:1!important;cursor:move!important;user-select:none!important;touch-action:none!important}
-#naverCanvas.nv-recovery-editing .nv-edit-overlay.nv-fixed-text{pointer-events:none!important}
-#naverCanvas .nv-recovery-selected{outline:2px solid #03c75a!important;outline-offset:2px;z-index:10050!important}
-.nv-recovery-handle{position:absolute!important;right:-9px!important;bottom:-9px!important;width:18px!important;height:18px!important;border-radius:50%!important;background:#03c75a!important;border:2px solid #fff!important;box-sizing:border-box!important;cursor:nwse-resize!important;z-index:10060!important}
+
+
+<style id="nv-direct-editor-single">
+/* ===== 네이버 메인 직접 편집: 단일 엔진 ===== */
+#naverCanvas.nv-direct-single .nv-edit-overlay:not(.nv-fixed-text){
+  pointer-events:auto !important;
+  opacity:1 !important;
+  cursor:move !important;
+  user-select:none !important;
+  touch-action:none !important;
+}
+#naverCanvas.nv-direct-single .nv-edit-overlay.nv-fixed-text{pointer-events:none !important;cursor:default !important;}
+#naverCanvas .nv-single-selected{outline:2px solid #03c75a !important;outline-offset:2px;z-index:10050 !important;}
+.nv-single-handle{position:absolute !important;right:-9px !important;bottom:-9px !important;width:18px !important;height:18px !important;border-radius:50% !important;background:#03c75a !important;border:2px solid #fff !important;box-sizing:border-box !important;cursor:nwse-resize !important;z-index:10060 !important;}
+.nv-single-editor{display:block!important;margin:0 0 16px;padding:12px;border:1px solid #ddd;border-radius:10px;background:#fff;box-sizing:border-box;}
+.nv-single-editor h3{margin:0 0 8px;font-size:15px;}
+.nv-single-editor .nv-se-row{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:7px 0;}
+.nv-single-editor label{display:inline-flex;align-items:center;gap:5px;font-size:12px;}
+.nv-single-editor input[type=number]{width:72px;box-sizing:border-box;}
+.nv-single-editor input[type=range]{width:105px;}
+.nv-single-editor output{min-width:38px;text-align:right;font-size:11px;color:#555;}
+.nv-single-editor button{border:1px solid #ddd;background:#fff;border-radius:6px;padding:6px 9px;cursor:pointer;}
+.nv-single-editor button.active{background:#03c75a;color:#fff;border-color:#03c75a;}
+.nv-single-help{font-size:11px;color:#777;line-height:1.5;flex-basis:100%;}
 </style>
-<script id="nv-direct-editor-recovery-js">
+<script id="nv-direct-editor-single-js">
 (function(){
   const canvas=document.getElementById('naverCanvas');
   const panel=document.querySelector('#naverApp .naver-settings');
   if(!canvas||!panel)return;
+
+  /* 혹시 이전 버전이 동적으로 남아 있을 경우 제거 */
+  panel.querySelectorAll('.nv-edit-toggle,.nv-coord-panel,.nv-direct-editor-recovery').forEach(el=>el.remove());
+
+  const box=document.createElement('div');
+  box.id='nvDirectEditorSingle';
+  box.className='nv-single-editor';
+  box.innerHTML=`
+    <h3>프리뷰에서 글자 직접 편집</h3>
+    <div class="nv-se-row"><button type="button" id="nvSingleToggle" class="active">편집모드 켜짐</button><span class="nv-single-help">글자를 클릭하면 선택됩니다. 선택한 글자를 드래그하면 이동하고, 초록 점을 드래그하면 크기가 바뀝니다.</span></div>
+    <div class="nv-se-row"><strong id="nvSingleName">선택한 글자 없음</strong></div>
+    <div class="nv-se-row">
+      <label>X <input id="nvSingleX" type="number" step="1"></label>
+      <label>Y <input id="nvSingleY" type="number" step="1"></label>
+      <label>크기 <input id="nvSingleSize" type="number" min="1" step="1"> px</label>
+      <button type="button" id="nvSingleApply">적용</button>
+      <button type="button" id="nvSingleUp">↑</button><button type="button" id="nvSingleDown">↓</button><button type="button" id="nvSingleLeft">←</button><button type="button" id="nvSingleRight">→</button>
+    </div>
+    <div class="nv-se-row">
+      <label>두께 <input id="nvSingleWeight" type="range" min="100" max="900" step="10" value="400"><output id="nvSingleWeightVal">400</output></label>
+      <label>자간 <input id="nvSingleSpacing" type="range" min="-10" max="30" step="0.1" value="0"><output id="nvSingleSpacingVal">0px</output></label>
+      <label>줄간격 <input id="nvSingleLineHeight" type="range" min="0.8" max="3" step="0.05" value="1.5"><output id="nvSingleLineHeightVal">1.5</output></label>
+    </div>`;
+  panel.insertBefore(box,panel.firstElementChild);
+
   const $=id=>document.getElementById(id);
+  let editing=true, selected=null, drag=null;
+  canvas.classList.add('nv-direct-single');
 
-  /* 기존에 동적으로 생성되던 직접편집 패널 대신 항상 존재하는 패널을 만든다. */
-  let box=$('nvDirectEditorRecovery');
-  if(!box){
-    box=document.createElement('div');
-    box.id='nvDirectEditorRecovery';
-    box.className='nv-direct-editor-recovery';
-    box.innerHTML=`
-      <h3>프리뷰에서 글자 직접 편집</h3>
-      <div class="nv-recovery-row"><button type="button" id="nvRecoveryToggle" class="active">편집모드 켜짐</button><span class="nv-recovery-help">글자를 클릭한 뒤 드래그하면 이동 · 초록 점을 드래그하면 크기 조절</span></div>
-      <div class="nv-recovery-row"><strong id="nvRecoveryName">선택한 글자 없음</strong></div>
-      <div class="nv-recovery-row">
-        <label>X <input id="nvRecoveryX" type="number" step="1"></label>
-        <label>Y <input id="nvRecoveryY" type="number" step="1"></label>
-        <label>크기 <input id="nvRecoverySize" type="number" min="1" step="1"></label>
-        <button type="button" id="nvRecoveryApply">적용</button>
-      </div>
-      <div class="nv-recovery-row">
-        <label>두께 <input id="nvRecoveryWeight" type="range" min="100" max="900" step="10" value="400"><output id="nvRecoveryWeightVal">400</output></label>
-        <label>자간 <input id="nvRecoverySpacing" type="range" min="-10" max="30" step="0.1" value="0"><output id="nvRecoverySpacingVal">0px</output></label>
-        <label>줄간격 <input id="nvRecoveryLineHeight" type="range" min="0.8" max="3" step="0.05" value="1.5"><output id="nvRecoveryLineHeightVal">1.5</output></label>
-      </div>
-      <div class="nv-recovery-row">
-        <button type="button" id="nvRecoveryUp">↑</button><button type="button" id="nvRecoveryDown">↓</button><button type="button" id="nvRecoveryLeft">←</button><button type="button" id="nvRecoveryRight">→</button>
-      </div>`;
-    panel.insertBefore(box,panel.children[1]||panel.firstChild);
-  }
-
-  let editing=true,selected=null,drag=null;
-  canvas.classList.add('nv-recovery-editing');
-
-  const overlays=()=>[...canvas.querySelectorAll('.nv-edit-overlay')].filter(el=>{
-    const s=getComputedStyle(el); return !el.classList.contains('nv-fixed-text') && s.display!=='none' && s.visibility!=='hidden';
-  });
-  const mark=el=>{el.classList.add('nv-edited');};
-  const pos=el=>({x:parseFloat(el.style.left)||0,y:parseFloat(el.style.top)||0});
-  const point=e=>{const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*(canvas.offsetWidth/r.width),y:(e.clientY-r.top)*(canvas.offsetHeight/r.height)};};
-  const clamp=el=>{
-    let {x,y}=pos(el); const w=Math.min(el.offsetWidth||0,2048),h=Math.min(el.offsetHeight||0,1151);
-    x=Math.max(0,Math.min(2048-w,x)); y=Math.max(0,Math.min(1151-h,y));
-    el.style.left=Math.round(x)+'px';el.style.top=Math.round(y)+'px';
+  const visible=el=>{
+    if(!el||el.classList.contains('nv-fixed-text'))return false;
+    const s=getComputedStyle(el); return s.display!=='none'&&s.visibility!=='hidden';
   };
-  function handle(el){
-    let h=el.querySelector(':scope > .nv-recovery-handle');
-    if(!h){h=document.createElement('span');h.className='nv-recovery-handle';h.setAttribute('aria-hidden','true');el.appendChild(h);}
-    return h;
-  }
-  function panelUpdate(el){
+  const overlays=()=>[...canvas.querySelectorAll('.nv-edit-overlay')].filter(visible);
+  const pos=el=>({x:parseFloat(el.style.left)||0,y:parseFloat(el.style.top)||0});
+  const scale=()=>{
+    const r=canvas.getBoundingClientRect();
+    return {x:canvas.offsetWidth/r.width,y:canvas.offsetHeight/r.height};
+  };
+  const point=e=>{const r=canvas.getBoundingClientRect(),sc=scale();return {x:(e.clientX-r.left)*sc.x,y:(e.clientY-r.top)*sc.y};};
+  function panelSync(el){
     if(!el)return;
-    const cs=getComputedStyle(el),fs=parseFloat(cs.fontSize)||16,wt=parseFloat(cs.fontWeight)||400,sp=parseFloat(cs.letterSpacing);
+    const cs=getComputedStyle(el), fs=parseFloat(cs.fontSize)||16, wt=parseFloat(cs.fontWeight)||400;
+    let sp=parseFloat(cs.letterSpacing); if(!Number.isFinite(sp))sp=0;
     let lh=parseFloat(cs.lineHeight); if(!Number.isFinite(lh))lh=1.5; else if(lh>6)lh/=fs;
     const p=pos(el);
-    $('nvRecoveryName').textContent=el.id||'텍스트'; $('nvRecoveryX').value=Math.round(p.x); $('nvRecoveryY').value=Math.round(p.y); $('nvRecoverySize').value=Math.round(fs);
-    $('nvRecoveryWeight').value=Math.max(100,Math.min(900,wt)); $('nvRecoveryWeightVal').textContent=Math.round(wt);
-    $('nvRecoverySpacing').value=Number.isFinite(sp)?Math.max(-10,Math.min(30,sp)):0; $('nvRecoverySpacingVal').textContent=(Number.isFinite(sp)?sp:0).toFixed(1).replace(/\.0$/,'')+'px';
-    $('nvRecoveryLineHeight').value=Math.max(.8,Math.min(3,lh)); $('nvRecoveryLineHeightVal').textContent=String(Math.round(Math.max(.8,Math.min(3,lh))*100)/100);
+    $('nvSingleName').textContent=el.id||'텍스트';
+    $('nvSingleX').value=Math.round(p.x); $('nvSingleY').value=Math.round(p.y); $('nvSingleSize').value=Math.round(fs);
+    $('nvSingleWeight').value=Math.max(100,Math.min(900,wt)); $('nvSingleWeightVal').textContent=Math.round(wt);
+    $('nvSingleSpacing').value=Math.max(-10,Math.min(30,sp)); $('nvSingleSpacingVal').textContent=(Math.round(sp*10)/10)+'px';
+    $('nvSingleLineHeight').value=Math.max(.8,Math.min(3,lh)); $('nvSingleLineHeightVal').textContent=(Math.round(Math.max(.8,Math.min(3,lh))*100)/100);
+  }
+  function handle(el){
+    let h=el.querySelector(':scope > .nv-single-handle');
+    if(!h){h=document.createElement('span');h.className='nv-single-handle';h.setAttribute('aria-hidden','true');el.appendChild(h);}
+    return h;
   }
   function select(el){
-    if(!el||el.classList.contains('nv-fixed-text'))return;
-    overlays().forEach(x=>x.classList.remove('nv-recovery-selected'));
-    selected=el;el.classList.add('nv-recovery-selected');handle(el);panelUpdate(el);
+    if(!visible(el))return;
+    overlays().forEach(x=>x.classList.remove('nv-single-selected'));
+    selected=el; el.classList.add('nv-single-selected'); handle(el); panelSync(el);
+  }
+  function hit(e){
+    /* pointer-events/overlap에 의존하지 않고 실제 화면상의 bounding box로 찾는다. */
+    const candidates=overlays().map(el=>({el,r:el.getBoundingClientRect()})).filter(o=>
+      e.clientX>=o.r.left && e.clientX<=o.r.right && e.clientY>=o.r.top && e.clientY<=o.r.bottom
+    );
+    candidates.sort((a,b)=>{
+      const za=parseInt(getComputedStyle(a.el).zIndex)||0, zb=parseInt(getComputedStyle(b.el).zIndex)||0;
+      return zb-za;
+    });
+    return candidates[0]?.el||null;
+  }
+  function startMove(el,e){
+    const p=point(e), xy=pos(el);
+    drag={type:'move',el,startX:p.x,startY:p.y,startLeft:xy.x,startTop:xy.y};
+  }
+  function startResize(el,e){
+    const p=point(e), fs=parseFloat(getComputedStyle(el).fontSize)||16;
+    drag={type:'resize',el,startX:p.x,startY:p.y,startSize:fs};
   }
 
-  /* 기존 편집 엔진보다 먼저 이벤트를 가로채서 충돌을 없앤다. */
   canvas.addEventListener('pointerdown',e=>{
     if(!editing)return;
-    const h=e.target.closest?.('.nv-recovery-handle');
-    let el=e.target.closest?.('.nv-edit-overlay');
-    if(!el||el.classList.contains('nv-fixed-text')){
-      el=document.elementsFromPoint(e.clientX,e.clientY).find(x=>x.classList?.contains('nv-edit-overlay')&&!x.classList.contains('nv-fixed-text'));
-    }
-    if(!el||!overlays().includes(el))return;
-    e.preventDefault();e.stopImmediatePropagation();
-    select(el); const p=point(e);
-    if(h){
-      const fs=parseFloat(getComputedStyle(el).fontSize)||16;
-      drag={type:'resize',el,startX:p.x,startY:p.y,startSize:fs};
-    }else{
-      const xy=pos(el);drag={type:'move',el,startX:p.x,startY:p.y,startLeft:xy.x,startTop:xy.y};
-    }
+    const handleEl=e.target.closest?.('.nv-single-handle');
+    const el=handleEl?.parentElement || hit(e);
+    if(!el||!visible(el))return;
+    e.preventDefault(); e.stopPropagation();
+    select(el);
+    if(handleEl) startResize(el,e); else startMove(el,e);
+    try{canvas.setPointerCapture(e.pointerId)}catch(_){ }
   },true);
 
-  window.addEventListener('pointermove',e=>{
+  canvas.addEventListener('pointermove',e=>{
     if(!drag||!editing)return;
     e.preventDefault();
     const p=point(e),d=drag;
     if(d.type==='move'){
       d.el.style.left=Math.round(d.startLeft+p.x-d.startX)+'px';
       d.el.style.top=Math.round(d.startTop+p.y-d.startY)+'px';
-      clamp(d.el);
     }else{
-      const size=Math.max(6,Math.min(120,d.startSize+(p.x-d.startX)*0.35+(p.y-d.startY)*0.35));
+      const delta=(p.y-d.startY);
+      const size=Math.max(6,Math.min(120,d.startSize*(1+delta/120)));
       d.el.style.fontSize=size.toFixed(1)+'px';
     }
-    mark(d.el);panelUpdate(d.el);
+    d.el.classList.add('nv-edited'); panelSync(d.el);
   },true);
-  window.addEventListener('pointerup',()=>{drag=null},true);
-  window.addEventListener('pointercancel',()=>{drag=null},true);
+  canvas.addEventListener('pointerup',()=>{drag=null;},true);
+  canvas.addEventListener('pointercancel',()=>{drag=null;},true);
 
-  $('nvRecoveryToggle').addEventListener('click',()=>{
-    editing=!editing;canvas.classList.toggle('nv-recovery-editing',editing);$('nvRecoveryToggle').classList.toggle('active',editing);$('nvRecoveryToggle').textContent=editing?'편집모드 켜짐':'편집모드 꺼짐';
+  $('nvSingleToggle').addEventListener('click',()=>{
+    editing=!editing; canvas.classList.toggle('nv-direct-single',editing);
+    $('nvSingleToggle').classList.toggle('active',editing);
+    $('nvSingleToggle').textContent=editing?'편집모드 켜짐':'편집모드 꺼짐';
   });
   function apply(){
     if(!selected)return;
-    const x=parseFloat($('nvRecoveryX').value),y=parseFloat($('nvRecoveryY').value),s=parseFloat($('nvRecoverySize').value);
-    if(Number.isFinite(x))selected.style.left=Math.round(x)+'px';if(Number.isFinite(y))selected.style.top=Math.round(y)+'px';if(Number.isFinite(s))selected.style.fontSize=Math.max(1,s)+'px';clamp(selected);mark(selected);panelUpdate(selected);
+    const x=parseFloat($('nvSingleX').value),y=parseFloat($('nvSingleY').value),z=parseFloat($('nvSingleSize').value);
+    if(Number.isFinite(x))selected.style.left=Math.round(x)+'px';
+    if(Number.isFinite(y))selected.style.top=Math.round(y)+'px';
+    if(Number.isFinite(z))selected.style.fontSize=Math.max(1,z)+'px';
+    selected.classList.add('nv-edited');panelSync(selected);
   }
-  ['nvRecoveryX','nvRecoveryY','nvRecoverySize'].forEach(id=>$(id).addEventListener('change',apply));
-  $('nvRecoveryApply').addEventListener('click',apply);
-  function move(dx,dy){if(!selected)return;selected.style.left=((parseFloat(selected.style.left)||0)+dx)+'px';selected.style.top=((parseFloat(selected.style.top)||0)+dy)+'px';clamp(selected);mark(selected);panelUpdate(selected);}
-  $('nvRecoveryUp').addEventListener('click',()=>move(0,-1));$('nvRecoveryDown').addEventListener('click',()=>move(0,1));$('nvRecoveryLeft').addEventListener('click',()=>move(-1,0));$('nvRecoveryRight').addEventListener('click',()=>move(1,0));
-  $('nvRecoveryWeight').addEventListener('input',e=>{if(!selected)return;selected.style.fontWeight=e.target.value;mark(selected);$('nvRecoveryWeightVal').textContent=e.target.value;});
-  $('nvRecoverySpacing').addEventListener('input',e=>{if(!selected)return;selected.style.letterSpacing=e.target.value+'px';mark(selected);$('nvRecoverySpacingVal').textContent=Number(e.target.value).toFixed(1).replace(/\.0$/,'')+'px';});
-  $('nvRecoveryLineHeight').addEventListener('input',e=>{if(!selected)return;selected.style.lineHeight=e.target.value;mark(selected);$('nvRecoveryLineHeightVal').textContent=String(Math.round(Number(e.target.value)*100)/100);});
+  $('nvSingleApply').addEventListener('click',apply);
+  ['nvSingleX','nvSingleY','nvSingleSize'].forEach(id=>$(id).addEventListener('change',apply));
+  const move=(dx,dy)=>{if(!selected)return;selected.style.left=((parseFloat(selected.style.left)||0)+dx)+'px';selected.style.top=((parseFloat(selected.style.top)||0)+dy)+'px';selected.classList.add('nv-edited');panelSync(selected);};
+  $('nvSingleUp').addEventListener('click',()=>move(0,-1)); $('nvSingleDown').addEventListener('click',()=>move(0,1)); $('nvSingleLeft').addEventListener('click',()=>move(-1,0)); $('nvSingleRight').addEventListener('click',()=>move(1,0));
+  $('nvSingleWeight').addEventListener('input',e=>{if(!selected)return;selected.style.fontWeight=e.target.value;selected.classList.add('nv-edited');$('nvSingleWeightVal').textContent=e.target.value;});
+  $('nvSingleSpacing').addEventListener('input',e=>{if(!selected)return;selected.style.letterSpacing=e.target.value+'px';selected.classList.add('nv-edited');$('nvSingleSpacingVal').textContent=(Math.round(Number(e.target.value)*10)/10)+'px';});
+  $('nvSingleLineHeight').addEventListener('input',e=>{if(!selected)return;selected.style.lineHeight=e.target.value;selected.classList.add('nv-edited');$('nvSingleLineHeightVal').textContent=(Math.round(Number(e.target.value)*100)/100);});
 })();
 </script>
-<style id="nv-direct-editor-topmost">
-.naver-settings{position:relative!important;}
-.naver-settings > .nv-edit-toggle,
-.naver-settings > .nv-coord-panel{order:-9999!important;}
-.naver-settings > h2{order:-9990!important;}
+
+<style id="nv-direct-panel-final">
+/* ===== 네이버 메인 최종 직접편집 패널: 오른쪽 조작만으로 확실하게 편집 ===== */
+.nv-single-editor.nv-final-direct{display:block!important;position:relative!important;z-index:20!important;margin:0 0 16px!important;padding:12px!important;border:1px solid #ddd!important;border-radius:10px!important;background:#fff!important;box-sizing:border-box!important;}
+.nv-final-direct h3{margin:0 0 8px!important;font-size:15px!important;}
+.nv-final-direct .nv-f-row{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:7px 0;}
+.nv-final-direct label{display:inline-flex;align-items:center;gap:5px;font-size:12px;}
+.nv-final-direct input[type=number]{width:76px;box-sizing:border-box;}
+.nv-final-direct input[type=range]{width:105px;}
+.nv-final-direct select{width:100%;height:34px;box-sizing:border-box;}
+.nv-final-direct output{min-width:42px;text-align:right;font-size:11px;color:#555;}
+.nv-final-direct button{border:1px solid #ddd;background:#fff;border-radius:6px;padding:6px 9px;cursor:pointer;}
+.nv-final-direct button.primary{background:#03c75a;color:#fff;border-color:#03c75a;}
+.nv-final-direct .nv-f-help{font-size:11px;color:#777;line-height:1.45;}
+/* 직접편집은 오른쪽 패널에서만 조작한다. */
+#naverCanvas.nv-right-panel-edit-only .nv-edit-overlay:not(.nv-fixed-text){pointer-events:none!important;cursor:default!important;}
 </style>
-<script id="nv-direct-editor-topmost-js">
+<script id="nv-direct-panel-final-js">
 (function(){
-  const panel=document.querySelector('.naver-settings');
-  if(!panel)return;
-  const moveTop=()=>{
-    const tools=panel.querySelector(':scope > .nv-edit-toggle');
-    const coord=panel.querySelector(':scope > .nv-coord-panel');
-    const h2=panel.querySelector(':scope > h2');
-    if(tools) panel.insertBefore(tools,panel.firstElementChild);
-    if(coord) panel.insertBefore(coord,panel.firstElementChild?.nextElementSibling||panel.firstElementChild);
-  };
-  moveTop();
-  setTimeout(moveTop,50);
-  setTimeout(moveTop,200);
+  const canvas=document.getElementById('naverCanvas');
+  const panel=document.querySelector('#naverApp .naver-settings');
+  if(!canvas||!panel)return;
+
+  /* 이전 버전의 직접편집 패널은 하나도 남기지 않는다. */
+  panel.querySelectorAll('.nv-single-editor,.nv-edit-toggle,.nv-coord-panel,.nv-direct-editor-recovery').forEach(el=>el.remove());
+  canvas.querySelectorAll('.nv-single-handle,.nv-single-selected').forEach(el=>el.classList.remove('nv-single-selected'));
+  canvas.classList.remove('nv-direct-single','nv-direct-editing');
+  canvas.classList.add('nv-right-panel-edit-only');
+
+  /* 줄자 도구가 항상 패널 최상단, 직접편집은 그 바로 아래가 되도록 순서를 강제한다. */
+  const rulerTools=panel.querySelector('.nv-guide-tools');
+  if(rulerTools)panel.insertBefore(rulerTools,panel.firstElementChild);
+
+  const box=document.createElement('div');
+  box.id='nvDirectEditorFinal';
+  box.className='nv-single-editor nv-final-direct';
+  box.innerHTML=`
+    <h3>프리뷰에서 글자 직접 편집</h3>
+    <div class="nv-f-row">
+      <select id="nvFinalTarget">
+        <option value="">편집할 글자를 선택하세요</option>
+      </select>
+    </div>
+    <div class="nv-f-help">프리뷰에서 움직이지 않아도 됩니다. 위에서 글자를 선택한 뒤 오른쪽 패널의 X/Y/크기/두께/자간/줄간격을 조절하면 즉시 반영됩니다.</div>
+    <div class="nv-f-row">
+      <label>X <input id="nvFinalX" type="number" step="1"></label>
+      <label>Y <input id="nvFinalY" type="number" step="1"></label>
+      <label>크기 <input id="nvFinalSize" type="number" min="1" step="1"> px</label>
+      <button type="button" id="nvFinalApply" class="primary">적용</button>
+    </div>
+    <div class="nv-f-row">
+      <button type="button" id="nvFinalUp">↑</button><button type="button" id="nvFinalDown">↓</button><button type="button" id="nvFinalLeft">←</button><button type="button" id="nvFinalRight">→</button>
+    </div>
+    <div class="nv-f-row">
+      <label>두께 <input id="nvFinalWeight" type="range" min="100" max="900" step="10" value="400"><output id="nvFinalWeightVal">400</output></label>
+      <label>자간 <input id="nvFinalSpacing" type="range" min="-20" max="30" step="0.1" value="0"><output id="nvFinalSpacingVal">0px</output></label>
+      <label>줄간격 <input id="nvFinalLineHeight" type="range" min="0.8" max="3" step="0.05" value="1.5"><output id="nvFinalLineHeightVal">1.5</output></label>
+    </div>`;
+  panel.insertBefore(box, rulerTools ? rulerTools.nextSibling : panel.firstElementChild);
+
+  const $=id=>document.getElementById(id);
+  const targets=[
+    ['nvSearchOut','검색어'],
+    ['nvAccountNameOut','프로필 이름'],
+    ['nvEmailOut','이메일'],
+    ['nvFeatureMeta','대표기사 날짜/출처'],
+    ['nvFeatureTitle','대표뉴스 제목'],
+    ['nvHeadlinesOut','뉴스 제목 목록'],
+    ['nvRightTextOut','오른쪽 카드']
+  ];
+  const get=id=>document.getElementById(id);
+  const editableTargets=targets.map(([id,name])=>[id,name,get(id)]).filter(x=>x[2] && !x[2].classList.contains('nv-fixed-text'));
+  const select=$('nvFinalTarget');
+  editableTargets.forEach(([id,name,el])=>{
+    const o=document.createElement('option');o.value=id;o.textContent=name;select.appendChild(o);
+  });
+
+  let selected=null;
+  const num=v=>Number.isFinite(parseFloat(v))?parseFloat(v):0;
+  function setImportant(el,prop,value){el.style.setProperty(prop,String(value), 'important');}
+  function currentLineHeight(el){
+    const cs=getComputedStyle(el),fs=num(cs.fontSize)||16;
+    let lh=num(cs.lineHeight);
+    if(!Number.isFinite(lh))lh=1.5;
+    else if(lh>6)lh/=fs;
+    return Math.max(.8,Math.min(3,lh));
+  }
+  function sync(){
+    if(!selected){
+      $('nvFinalX').value='';$('nvFinalY').value='';$('nvFinalSize').value='';
+      $('nvFinalWeight').value=400;$('nvFinalWeightVal').textContent='400';
+      $('nvFinalSpacing').value=0;$('nvFinalSpacingVal').textContent='0px';
+      $('nvFinalLineHeight').value=1.5;$('nvFinalLineHeightVal').textContent='1.5';
+      return;
+    }
+    const cs=getComputedStyle(selected);
+    $('nvFinalX').value=Math.round(num(selected.style.left));
+    $('nvFinalY').value=Math.round(num(selected.style.top));
+    $('nvFinalSize').value=Math.round(num(cs.fontSize)||16);
+    const wt=num(cs.fontWeight)||400;
+    $('nvFinalWeight').value=Math.max(100,Math.min(900,wt));$('nvFinalWeightVal').textContent=Math.round(wt);
+    let sp=num(cs.letterSpacing);if(!Number.isFinite(sp))sp=0;
+    $('nvFinalSpacing').value=Math.max(-20,Math.min(30,sp));$('nvFinalSpacingVal').textContent=(Math.round(sp*10)/10)+'px';
+    const lh=currentLineHeight(selected);$('nvFinalLineHeight').value=lh;$('nvFinalLineHeightVal').textContent=(Math.round(lh*100)/100).toString();
+  }
+  function choose(id){
+    const el=get(id);if(!el)return;
+    selected=el;select.value=id;
+    el.classList.add('nv-edited');
+    sync();
+  }
+  select.addEventListener('change',()=>choose(select.value));
+
+  function apply(){
+    if(!selected)return;
+    const x=parseFloat($('nvFinalX').value),y=parseFloat($('nvFinalY').value),s=parseFloat($('nvFinalSize').value);
+    if(Number.isFinite(x))setImportant(selected,'left',Math.round(x)+'px');
+    if(Number.isFinite(y))setImportant(selected,'top',Math.round(y)+'px');
+    if(Number.isFinite(s))setImportant(selected,'font-size',Math.max(1,s)+'px');
+    selected.classList.add('nv-edited');sync();
+  }
+  $('nvFinalApply').addEventListener('click',apply);
+  ['nvFinalX','nvFinalY','nvFinalSize'].forEach(id=>$(id).addEventListener('change',apply));
+
+  function move(dx,dy){
+    if(!selected)return;
+    const x=num(selected.style.left),y=num(selected.style.top);
+    setImportant(selected,'left',(x+dx)+'px');setImportant(selected,'top',(y+dy)+'px');selected.classList.add('nv-edited');sync();
+  }
+  $('nvFinalUp').addEventListener('click',()=>move(0,-1));
+  $('nvFinalDown').addEventListener('click',()=>move(0,1));
+  $('nvFinalLeft').addEventListener('click',()=>move(-1,0));
+  $('nvFinalRight').addEventListener('click',()=>move(1,0));
+  $('nvFinalWeight').addEventListener('input',e=>{if(!selected)return;setImportant(selected,'font-weight',e.target.value);$('nvFinalWeightVal').textContent=e.target.value;selected.classList.add('nv-edited');});
+  $('nvFinalSpacing').addEventListener('input',e=>{if(!selected)return;setImportant(selected,'letter-spacing',e.target.value+'px');$('nvFinalSpacingVal').textContent=(Math.round(Number(e.target.value)*10)/10)+'px';selected.classList.add('nv-edited');});
+  $('nvFinalLineHeight').addEventListener('input',e=>{if(!selected)return;setImportant(selected,'line-height',e.target.value);$('nvFinalLineHeightVal').textContent=(Math.round(Number(e.target.value)*100)/100);selected.classList.add('nv-edited');});
+
+  /* 기본 선택: 검색어. 즉시 조작 가능하도록 한다. */
+  if(get('nvSearchOut'))choose('nvSearchOut');
 })();
 </script>
