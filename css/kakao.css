@@ -1,0 +1,73 @@
+
+/* Kakao screenshot-like refinements */
+.kk-mobile{position:relative;background:#a9c0d2;aspect-ratio:9/16}
+.kk-m-body{padding:16px 18px 78px;gap:9px}
+.kk-pc{position:relative}
+.kk-pc-body{padding-bottom:72px}
+.kk-date-divider{
+  align-self:center;
+  background:rgba(150,173,190,.72);
+  color:#111;
+  border-radius:999px;
+  padding:7px 18px 8px;
+  font-size:15px;
+  line-height:1.15;
+  margin:8px 0 10px;
+  white-space:nowrap;
+}
+.kk-row{align-items:flex-start}
+.kk-row .kk-avatar{width:34px;height:34px;border-radius:50%;margin-top:2px}
+.kk-nick{font-size:13px;color:#273b48;margin:0 0 3px 2px}
+.kk-bubble,.kk-pc-bubble{
+  border-radius:18px;
+  padding:10px 13px;
+  font-size:16px;
+  line-height:1.32;
+}
+.kk-row:not(.me) .kk-bubble::before,.kk-pc-row:not(.me) .kk-pc-bubble::before{
+  width:11px;height:11px;left:-2px;top:2px;
+}
+.kk-composer{
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:64px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px 12px;
+  box-sizing:border-box;
+  z-index:5;
+}
+.kk-composer-plus{
+  width:34px;height:34px;border-radius:50%;
+  background:#f1f1f1;color:#111;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:300;line-height:1;
+  flex:0 0 auto;
+}
+.kk-composer-input{
+  height:42px;flex:1;border-radius:22px;
+  background:#f0f0f0;color:#a8a8a8;
+  display:flex;align-items:center;
+  padding:0 17px;font-size:16px;box-sizing:border-box;
+}
+.kk-composer-smile{
+  width:38px;height:38px;border-radius:50%;
+  background:#e9e9e9;color:#111;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex:0 0 auto;
+}
+.kk-composer-hash{
+  width:38px;height:38px;border-radius:50%;
+  background:#f1f1f1;color:#111;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:700;flex:0 0 auto;
+}
+.kk-composer-pc{height:58px}
+.kk-composer-pc .kk-composer-input{font-size:14px}
+.kk-date-card{
+  border:1px solid #dcd7ca;border-radius:6px;padding:12px;margin-bottom:10px;background:#f8f8f8;
+}
+.kk-date-card .field{margin-bottom:8px}
+.kk-date-card .field:last-child{margin-bottom:0}

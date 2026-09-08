@@ -1,0 +1,30 @@
+
+/* ---- Tinder ---- */
+.tinder-editor{align-items:flex-start}
+.tinder-panel{max-width:380px}
+.tinder-preview-wrap{width:100%;display:flex;justify-content:center;align-items:flex-start;overflow:auto}
+.tinder-phone{width:min(100%,430px);background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.14);flex-shrink:0}
+.tinder-profile{position:relative;width:100%;aspect-ratio:995/1536;background:#111;overflow:hidden}
+.tinder-profile-photo{width:100%;height:100%;display:block;object-fit:cover}
+.tinder-gradient{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 48%,rgba(0,0,0,.05) 58%,rgba(0,0,0,.88) 82%,#111 100%);pointer-events:none}
+.tinder-copy{position:absolute;left:26px;right:20px;bottom:52px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.tinder-status{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#222;border-radius:999px;padding:7px 14px;font-size:15px;font-weight:600;text-shadow:none;margin-bottom:12px}
+.tinder-status-dot{width:10px;height:10px;border-radius:50%;background:#25a55b;display:block}
+.tinder-name{font-size:37px;line-height:1.1;font-weight:500;letter-spacing:-.04em}
+.tinder-relation{font-size:21px;line-height:1.3;margin-top:8px}
+.tinder-bio{display:flex;align-items:center;gap:12px;font-size:19px;line-height:1.35;margin-top:15px}
+.tinder-bio-emoji{font-size:31px;filter:drop-shadow(0 0 10px rgba(170,80,255,.8))}
+.tinder-actions{width:100%;aspect-ratio:1118/190;position:relative;background:#fff}
+.tinder-actions img{width:100%;height:100%;display:block;object-fit:contain;object-position:center bottom}
+.tinder-file{font-size:12px!important;padding:6px!important}
+.tinder-hint{font-size:11.5px;color:#999;line-height:1.5;margin-top:5px}
+.tinder-section-title{font-size:14px;font-weight:700;margin:20px 0 10px;padding-top:14px;border-top:1px solid #eee}
+.tinder-message-preview-wrap{width:100%;display:flex;justify-content:center;align-items:flex-start;overflow:auto;margin-top:18px}
+.tinder-message-canvas{width:min(100%,520px);aspect-ratio:2236/3452;background:#000;position:relative;overflow:hidden;flex-shrink:0}
+.tinder-message-card{position:absolute;left:16.2%;top:7.15%;width:70.2%;height:8.9%;background:#fff;border-radius:5.1%;display:flex;align-items:center;padding:0 3.0%;box-sizing:border-box}
+.tinder-message-avatar{width:11.0%;aspect-ratio:1;border-radius:50%;overflow:hidden;flex:none;background:#ddd}
+.tinder-message-avatar img{width:100%;height:100%;display:block;object-fit:cover}
+.tinder-message-copy{margin-left:2.8%;min-width:0;line-height:1.08;color:#111;overflow:hidden}
+.tinder-message-name{font-size:clamp(16px,4.2vw,29px);font-weight:700;letter-spacing:-.045em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tinder-message-text{font-size:clamp(16px,4.0vw,28px);font-weight:400;letter-spacing:-.045em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:5px}
+@media(max-width:700px){.tinder-message-preview-wrap{justify-content:flex-start}.tinder-message-canvas{width:520px}}

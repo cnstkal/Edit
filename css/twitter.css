@@ -1,0 +1,37 @@
+.tw-profile-lock{width:14px!important;height:14px!important;display:inline-block!important;vertical-align:-2px;object-fit:contain}
+
+
+.tw-action.private-repost{color:#cfd5da !important;}
+.tw-action.private-repost img{opacity:.45;}
+.tw-lock{width:12px !important;height:12px !important;margin:0 2px !important;vertical-align:-1px;}
+
+
+
+.twitter-preview-wrap .tw-actions{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) auto auto !important;
+  align-items:center !important;
+  column-gap:22px !important;
+  width:100% !important;
+  max-width:610px !important;
+}
+.twitter-preview-wrap .tw-action{
+  justify-self:start;
+  min-width:0 !important;
+}
+.twitter-preview-wrap .tw-action-bookmark{
+  justify-self:end;
+}
+.twitter-preview-wrap .tw-action-share{
+  justify-self:end;
+  margin-left:-16px !important;
+}
+
+
+
+.twitter-preview-wrap .tw-mention,
+.twitter-preview-wrap .tw-mention-btn,
+.twitter-preview-wrap .mention-btn,
+.twitter-preview-wrap .tw-mention-pill{
+  border-radius:999px !important;
+}

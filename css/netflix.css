@@ -1,0 +1,18 @@
+
+.netflix-preview-wrap{background:#f3f3f3;padding:20px;overflow:auto}
+.netflix-canvas{width:1536px;height:864px;background:#000;color:#fff;position:relative;overflow:hidden;font-family:Arial,"Noto Sans",sans-serif}
+.nf-title{position:absolute;top:195px;left:0;width:100%;text-align:center;font-size:54px;font-weight:500;letter-spacing:-2px}
+.nf-profiles{position:absolute;top:330px;left:50%;transform:translateX(-50%);display:flex;justify-content:center;gap:45px;width:1100px}
+.nf-profile{width:205px;text-align:center;cursor:default}
+.nf-photo{width:205px;height:205px;background:#181818 center/cover no-repeat;margin:auto;border-radius:0;box-sizing:border-box}
+.nf-profile-name{font-size:19px;color:#bdbdbd;margin-top:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nf-profile:hover .nf-photo{outline:3px solid #fff;outline-offset:-3px}
+.nf-settings-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.nf-settings-head h2{margin:0}
+.nf-editor{border:1px solid #ddd;border-radius:8px;padding:14px;margin-bottom:12px;background:#fff}
+.nf-editor-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.nf-editor-head strong{font-size:14px}
+.nf-remove{border:0;background:#f1f1f1;border-radius:6px;padding:7px 10px;color:#777}
+.nf-editor .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.nf-editor .field{margin-bottom:9px}
+.nf-editor-preview{width:70px;height:70px;background:#181818 center/cover no-repeat;margin-bottom:8px}
