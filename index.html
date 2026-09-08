@@ -1101,7 +1101,7 @@
 .nv-shopping{margin-top:14px;height:170px}.nv-shop-title{height:57px;display:flex;align-items:center;gap:11px;padding:0 18px;font-size:16px;color:#777;white-space:nowrap}.nv-shop-title strong{color:#111}.nv-shop-title b{margin-left:auto}.nv-products{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:0 18px}.nv-products div{height:90px;background:#eee;border-radius:5px;background-size:cover;background-position:center}
 .nv-account{height:184px}.nv-profile{display:flex;align-items:center;padding:20px 20px 9px;gap:12px}.nv-avatar{width:62px;height:62px;border-radius:50%;background:#eee;color:#fff;display:flex;align-items:center;justify-content:center;font-size:35px;flex:0 0 auto}.nv-profile div:nth-child(2){flex:1;min-width:0}.nv-profile b{font-size:17px}.nv-profile span{color:#777}.nv-profile small{display:block;margin-top:4px}.nv-profile button{border:1px solid #eee;border-radius:25px;background:#fff;padding:9px 15px;color:#777;white-space:nowrap}.nv-points{display:flex;align-items:center;gap:9px;padding:0 36px;font-size:12px}.nv-points>b{background:#09b958;color:#fff;border-radius:15px;padding:5px 9px}.nv-points span{flex:1;white-space:nowrap}.nv-account-menu{height:55px;margin-top:9px;border-top:1px solid #eee;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;text-align:center;font-size:13px;position:relative}.nv-account-menu b{position:absolute;right:-1px;top:8px;border:1px solid #ddd;border-radius:50%;width:35px;height:35px;display:flex;align-items:center;justify-content:center;background:#fff;font-size:25px}
 .nv-right-card{margin-top:14px;height:380px;text-align:center;padding:25px 24px;box-sizing:border-box}.nv-music-disc{margin:auto;width:70px;height:70px;border-radius:50%;background:#c59b69;display:flex;align-items:center;justify-content:center;font-size:35px}.nv-right-card p{font-size:14px;line-height:1.5;margin:13px 0 6px}.nv-longtext{font-size:12px;line-height:1.65;color:#333;white-space:pre-line}
-.naver-settings{margin-top:18px}.naver-settings .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.naver-settings .field{margin-bottom:10px}.naver-settings .style-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.naver-settings .style-row input,.naver-settings .style-row select{width:100%}
+.naver-settings{margin-top:18px}.naver-settings .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.naver-settings .field{margin-bottom:10px}.naver-settings .style-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.naver-settings .style-row input,.naver-settings .style-row select{width:100%}.naver-settings .style-row input[type="range"]{width:100%;min-width:0}.nv-weight-val{display:block;font-size:11px;color:#777;margin-top:3px;text-align:center}
 .nv-text-settings{border-top:1px solid #eee;margin-top:16px;padding-top:16px}.nv-text-settings h3{margin:0 0 10px;font-size:15px}.nv-text-settings .style-row{margin-bottom:10px}
 </style>
 <style>
@@ -1553,9 +1553,9 @@ function toggleHomeCategory(btn){
 <div class="field"><label>쇼핑 썸네일 (최대 5장)</label><div id="nvProductInputs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;"><input accept="image/*" data-nvp="0" type="file"/><input accept="image/*" data-nvp="1" type="file"/><input accept="image/*" data-nvp="2" type="file"/><input accept="image/*" data-nvp="3" type="file"/><input accept="image/*" data-nvp="4" type="file"/></div></div>
 <div class="nv-text-settings">
 <h3>텍스트 꾸미기</h3>
-<div class="style-row"><div class="field"><label>대표 제목 크기</label><input id="nvFeatureSize" max="30" min="8" type="number" value="14"/></div><div class="field"><label>대표 제목 굵기</label><select id="nvFeatureWeight"><option value="400">보통</option><option value="600">중간</option><option selected="" value="700">굵게</option></select></div><div class="field"><label>대표 제목 색상</label><input id="nvFeatureColor" type="color" value="#222222"/></div></div>
-<div class="style-row"><div class="field"><label>뉴스 목록 크기</label><input id="nvHeadlineSize" max="30" min="8" type="number" value="16"/></div><div class="field"><label>뉴스 목록 굵기</label><select id="nvHeadlineWeight"><option selected="" value="400">보통</option><option value="600">중간</option><option value="700">굵게</option></select></div><div class="field"><label>뉴스 목록 색상</label><input id="nvHeadlineColor" type="color" value="#555555"/></div></div>
-<div class="style-row"><div class="field"><label>오른쪽 카드 크기</label><input id="nvRightSize" max="24" min="8" type="number" value="14"/></div><div class="field"><label>오른쪽 카드 굵기</label><select id="nvRightWeight"><option selected="" value="400">보통</option><option value="600">중간</option><option value="700">굵게</option></select></div><div class="field"><label>오른쪽 카드 색상</label><input id="nvRightColor" type="color" value="#222222"/></div></div>
+<div class="style-row"><div class="field"><label>대표 제목 크기</label><input id="nvFeatureSize" max="30" min="8" type="number" value="14"/></div><div class="field"><label>대표 제목 굵기</label><input id="nvFeatureWeight" type="range" min="100" max="900" step="100" value="700"/><span id="nvFeatureWeightVal" class="nv-weight-val">700</span></div><div class="field"><label>대표 제목 색상</label><input id="nvFeatureColor" type="color" value="#222222"/></div></div>
+<div class="style-row"><div class="field"><label>뉴스 목록 크기</label><input id="nvHeadlineSize" max="30" min="8" type="number" value="16"/></div><div class="field"><label>뉴스 목록 굵기</label><input id="nvHeadlineWeight" type="range" min="100" max="900" step="100" value="400"/><span id="nvHeadlineWeightVal" class="nv-weight-val">400</span></div><div class="field"><label>뉴스 목록 색상</label><input id="nvHeadlineColor" type="color" value="#555555"/></div></div>
+<div class="style-row"><div class="field"><label>오른쪽 카드 크기</label><input id="nvRightSize" max="24" min="8" type="number" value="14"/></div><div class="field"><label>오른쪽 카드 굵기</label><input id="nvRightWeight" type="range" min="100" max="900" step="100" value="400"/><span id="nvRightWeightVal" class="nv-weight-val">400</span></div><div class="field"><label>오른쪽 카드 색상</label><input id="nvRightColor" type="color" value="#222222"/></div></div>
 </div>
 <div class="nv-text-settings">
 <h3>뉴스스탠드 텍스트</h3>
@@ -5152,7 +5152,8 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
  document.getElementById('nvAvatarImage')?.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const el=document.getElementById('nvAvatarOut');el.style.backgroundImage=`url("${ev.target.result}")`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.textContent='';};r.readAsDataURL(f);});
  document.querySelectorAll('#nvProductInputs input[data-nvp]').forEach(inp=>inp.addEventListener('change',e=>{const idx=+inp.dataset.nvp,f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const boxes=document.querySelectorAll('#nvProductsOut > div');if(boxes[idx])boxes[idx].style.backgroundImage=`url("${ev.target.result}")`;};r.readAsDataURL(f);}));
  function bindStyle(id, target, prop, suffix=''){const el=document.getElementById(id),out=document.getElementById(target);if(!el||!out)return;const fn=()=>out.style[prop]=el.value+suffix;fn();el.addEventListener('input',fn);}
- bindStyle('nvFeatureSize','nvFeatureTitle','fontSize','px');bindStyle('nvFeatureWeight','nvFeatureTitle','fontWeight');bindStyle('nvFeatureColor','nvFeatureTitle','color');
+ ['nvFeatureWeight','nvFeatureWeightVal'],['nvHeadlineWeight','nvHeadlineWeightVal'],['nvRightWeight','nvRightWeightVal'].forEach(([id,out])=>{const a=document.getElementById(id),b=document.getElementById(out);if(a&&b){const sync=()=>b.textContent=a.value;a.addEventListener('input',sync);sync();}});
+  bindStyle('nvFeatureSize','nvFeatureTitle','fontSize','px');bindStyle('nvFeatureWeight','nvFeatureTitle','fontWeight');bindStyle('nvFeatureColor','nvFeatureTitle','color');
  bindStyle('nvHeadlineSize','nvHeadlinesOut','fontSize','px');bindStyle('nvHeadlineWeight','nvHeadlinesOut','fontWeight');bindStyle('nvHeadlineColor','nvHeadlinesOut','color');
  bindStyle('nvRightSize','nvRightTextOut','fontSize','px');bindStyle('nvRightWeight','nvRightTextOut','fontWeight');bindStyle('nvRightColor','nvRightTextOut','color');
  renderSimpleLists();renderHeadlines();renderPreview();
@@ -5561,6 +5562,8 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
 .nv-resize-handle{position:absolute;width:14px;height:14px;right:-7px;bottom:-7px;background:#03c75a;border:2px solid #fff;border-radius:50%;box-sizing:border-box;cursor:nwse-resize;box-shadow:0 1px 4px rgba(0,0,0,.25);z-index:1001;}
 .nv-coord-panel{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;background:#fff;font-size:12px;box-sizing:border-box;}
 .nv-coord-panel strong{font-size:13px;color:#222}.nv-coord-panel input{width:72px;box-sizing:border-box}.nv-coord-panel .nv-help{color:#777;flex-basis:100%;line-height:1.5}
+
+.nv-arrow-group{display:inline-flex;gap:3px}.nv-arrow-group button{width:30px;height:30px;padding:0!important;font-size:16px!important}.nv-inline-style{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.nv-inline-style input[type=range]{width:100px;min-width:70px}.nv-inline-style output{min-width:38px;text-align:right;font-size:11px;color:#555}.nv-coord-panel{max-width:100%;overflow:hidden}.nv-coord-panel>*{max-width:100%;box-sizing:border-box}
 .nv-edit-toggle{margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .nv-edit-toggle button{border:1px solid #ddd;background:#fff;border-radius:6px;padding:7px 10px;cursor:pointer}
 .nv-edit-toggle button.active{background:#03c75a;color:#fff;border-color:#03c75a}
@@ -5578,7 +5581,7 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
   tools.innerHTML='<button type="button" id="nvDirectEditToggle">프리뷰에서 글자 직접 이동/크기조절</button><span style="font-size:12px;color:#777">텍스트를 클릭한 뒤 드래그하세요. 초록 점을 드래그하면 글자 크기가 바뀝니다.</span>';
   const coord=document.createElement('div');
   coord.className='nv-coord-panel';
-  coord.innerHTML='<strong>선택한 글자</strong><span id="nvSelectedName">없음</span><span>X</span><input id="nvCoordX" type="number" step="1"><span>Y</span><input id="nvCoordY" type="number" step="1"><span>크기</span><input id="nvCoordSize" type="number" min="1" step="1"><span>px</span><button type="button" id="nvApplyCoord">좌표/크기 적용</button><div class="nv-help">좌표는 네이버 원본 2048×1151 기준입니다. 네가 원하는 위치로 움직인 뒤 여기 표시되는 X/Y/크기를 보내주면 그 좌표로 고정할 수 있습니다.</div>';
+  coord.innerHTML='<strong>선택한 글자</strong><span id="nvSelectedName">없음</span><span>X</span><input id="nvCoordX" type="number" step="1"><span>Y</span><input id="nvCoordY" type="number" step="1"><span>크기</span><input id="nvCoordSize" type="number" min="1" step="1"><span>px</span><div class="nv-arrow-group"><button type="button" id="nvMoveUp">↑</button><button type="button" id="nvMoveDown">↓</button><button type="button" id="nvMoveLeft">←</button><button type="button" id="nvMoveRight">→</button></div><label class="nv-inline-style">두께 <input id="nvSelectedWeight" type="range" min="100" max="900" step="10" value="400"><output id="nvSelectedWeightVal">400</output></label><label class="nv-inline-style">자간 <input id="nvSelectedSpacing" type="range" min="-5" max="20" step="0.1" value="0"><output id="nvSelectedSpacingVal">0px</output></label><button type="button" id="nvApplyCoord">좌표/크기 적용</button><div class="nv-help">좌표는 네이버 원본 2048×1151 기준입니다. 선택한 글자를 프리뷰에서 움직이거나 아래 ↑↓←→ 버튼으로 움직이면 좌표에 즉시 반영됩니다. 두께와 자간도 선택한 글자에 바로 적용됩니다. 여기 표시되는 X/Y/크기를 보내주면 그 좌표로 고정할 수 있습니다.</div>';
   panel.insertBefore(tools,panel.firstChild);
   panel.insertBefore(coord,tools.nextSibling);
 
@@ -5615,6 +5618,13 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
     document.getElementById('nvCoordX').value=Math.round(x);
     document.getElementById('nvCoordY').value=Math.round(y);
     document.getElementById('nvCoordSize').value=Math.round(fs);
+    const wt=parseInt(getComputedStyle(selected).fontWeight,10)||400;
+    const sp=parseFloat(getComputedStyle(selected).letterSpacing);
+    document.getElementById('nvSelectedWeight').value=Math.min(900,Math.max(100,wt));
+    document.getElementById('nvSelectedWeightVal').textContent=String(Math.min(900,Math.max(100,wt)));
+    const spacing=Number.isFinite(sp)?sp:0;
+    document.getElementById('nvSelectedSpacing').value=Math.min(20,Math.max(-5,spacing));
+    document.getElementById('nvSelectedSpacingVal').textContent=(Math.round(spacing*10)/10)+'px';
   }
   function localPoint(e){
     const r=canvas.getBoundingClientRect();
@@ -5686,6 +5696,16 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
     if(Number.isFinite(s))selected.style.fontSize=Math.max(1,s)+'px';
     clamp(selected);updateCoord();
   });
+  const moveSelected=(dx,dy)=>{if(!selected)return;selected.style.left=Math.round((parseFloat(selected.style.left)||0)+dx)+'px';selected.style.top=Math.round((parseFloat(selected.style.top)||0)+dy)+'px';clamp(selected);updateCoord();};
+  document.getElementById('nvMoveUp').addEventListener('click',()=>moveSelected(0,-1));
+  document.getElementById('nvMoveDown').addEventListener('click',()=>moveSelected(0,1));
+  document.getElementById('nvMoveLeft').addEventListener('click',()=>moveSelected(-1,0));
+  document.getElementById('nvMoveRight').addEventListener('click',()=>moveSelected(1,0));
+  const sw=document.getElementById('nvSelectedWeight'),sv=document.getElementById('nvSelectedWeightVal');
+  sw.addEventListener('input',()=>{if(!selected)return;selected.style.fontWeight=sw.value;sv.textContent=sw.value;});
+  const ss=document.getElementById('nvSelectedSpacing'),ssv=document.getElementById('nvSelectedSpacingVal');
+  ss.addEventListener('input',()=>{if(!selected)return;selected.style.letterSpacing=ss.value+'px';ssv.textContent=Number(ss.value).toFixed(1).replace(/\.0$/,'')+'px';});
+  [document.getElementById('nvCoordX'),document.getElementById('nvCoordY'),document.getElementById('nvCoordSize')].forEach(inp=>inp.addEventListener('input',()=>{if(!selected)return;const x=parseFloat(document.getElementById('nvCoordX').value),y=parseFloat(document.getElementById('nvCoordY').value),z=parseFloat(document.getElementById('nvCoordSize').value);if(Number.isFinite(x))selected.style.left=Math.round(x)+'px';if(Number.isFinite(y))selected.style.top=Math.round(y)+'px';if(Number.isFinite(z))selected.style.fontSize=Math.max(1,z)+'px';clamp(selected);}));
   // 기존 렌더링으로 요소가 다시 만들어지거나 display가 바뀌어도 핸들을 복구
   const observer=new MutationObserver(()=>{if(editing)wire();});
   observer.observe(canvas,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']});
