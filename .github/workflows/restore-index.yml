@@ -20,3 +20,4 @@ jobs:
           git add index.html
           git commit -m 'fix: restore index.html' || exit 0
           git push
+# restore trigger
