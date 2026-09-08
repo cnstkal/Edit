@@ -27,7 +27,7 @@ body{padding:0 14px 50px}
 <script>
 const items=[
  {icon:'📰',name:'일반 뉴스기사',desc:'포털 뉴스 · 모바일/PC · 댓글',url:'editor.html?type=news'},
- {icon:'📸',name:'디스패치 기사',desc:'Dispatch 스타일 · PC 전용',url:'editor.html?type=dispatch'}
+ {icon:'📸',name:'디스패치 기사',desc:'Dispatch 스타일 · 기사 편집',url:'dispatch.html'}
 ];
 const grid=document.getElementById('grid');
 items.forEach(x=>{const b=document.createElement('button');b.className='card';b.type='button';b.innerHTML='<div class="icon">'+x.icon+'</div><div class="name">'+x.name+'</div><div class="desc">'+x.desc+'</div>';b.onclick=()=>location.href=x.url;grid.appendChild(b)});
