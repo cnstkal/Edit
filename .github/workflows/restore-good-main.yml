@@ -1,0 +1,22 @@
+name: Restore known-good main.js
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  restore:
+    if: github.event.head_commit.message == 'fix: restore known-good main.js'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore main.js
+        run: |
+          git checkout 2c190fc2b924bf619e83c2c95c9f67ec3d470847 -- js/main.js
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add js/main.js
+          git commit -m 'fix: restore known-good main.js'
+          git push
