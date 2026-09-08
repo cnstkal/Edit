@@ -1076,27 +1076,33 @@
 
 
 <style>
+/* ===== NAVER MAIN — completed-reference layout ===== */
 .naver-preview-wrap{width:100%;overflow:auto;background:#f4f4f4;padding:20px;box-sizing:border-box}
 .naver-canvas{width:1500px;height:844px;background:#fff;color:#222;font-family:Arial,"Noto Sans KR",sans-serif;overflow:hidden;position:relative}
-.nv-top{height:154px;position:relative}
-.nv-hamburger{position:absolute;left:40px;top:40px;width:28px}.nv-hamburger i{display:block;height:2px;background:#222;margin:7px 0}
-.nv-pay{position:absolute;left:97px;top:35px;width:34px;height:34px;border:2px solid #111;border-radius:50%;font-size:13px;display:flex;align-items:center;justify-content:center}
-.nv-search{position:absolute;left:354px;top:78px;width:790px;height:72px;border:2px solid #19c463;border-radius:40px;display:flex;align-items:center;padding:0 28px;box-sizing:border-box}
-.nv-search>b{font-size:40px;color:#03c75a;margin-right:20px}.nv-search>span:nth-child(2){font-size:21px;flex:1}.nv-key,.nv-drop{color:#777;font-size:17px;margin-right:12px}.nv-search-ico{font-size:39px;color:#03b957}
-.nv-right-icons{position:absolute;right:35px;top:37px;display:flex;gap:30px;font-size:30px}.nv-bell{position:relative}.nv-bell em{position:absolute;right:-8px;top:-9px;background:#e33;color:#fff;border-radius:12px;font:700 11px Arial;padding:4px 6px}
-.nv-services{height:94px;display:flex;justify-content:center;gap:28px}.nv-services div{width:48px;text-align:center}.nv-services b{width:45px;height:45px;border-radius:14px;border:1px solid #eee;box-shadow:0 1px 6px #eee;display:flex;align-items:center;justify-content:center;color:#03c75a;font-size:17px;margin:auto}.nv-services span{display:block;font-size:15px;margin-top:7px;font-weight:600}
-.nv-columns{display:grid;grid-template-columns:66.5% 33.5%;gap:30px;padding:15px 40px 0;box-sizing:border-box}
+.nv-top{height:125px;position:relative}
+.nv-hamburger{position:absolute;left:32px;top:31px;width:28px}.nv-hamburger i{display:block;height:2px;background:#222;margin:7px 0}
+.nv-pay{position:absolute;left:74px;top:27px;width:34px;height:34px;border:2px solid #111;border-radius:50%;font-size:13px;display:flex;align-items:center;justify-content:center}
+.nv-search{position:absolute;left:289px;top:63px;width:635px;height:53px;border:2px solid #19c463;border-radius:32px;display:flex;align-items:center;padding:0 22px;box-sizing:border-box}
+.nv-search>b{font-size:32px;color:#03c75a;margin-right:17px}.nv-search>span:nth-child(2){font-size:16px;flex:1}.nv-key,.nv-drop{color:#777;font-size:15px;margin-right:10px}.nv-search-ico{font-size:32px;color:#03b957}
+.nv-right-icons{position:absolute;right:24px;top:31px;display:flex;gap:27px;font-size:28px}.nv-bell{position:relative}.nv-bell em{position:absolute;right:-8px;top:-8px;background:#e33;color:#fff;border-radius:12px;font:700 10px Arial;padding:4px 6px}
+.nv-services{height:84px;display:flex;justify-content:center;gap:6px}.nv-services div{width:48px;text-align:center}.nv-services b{width:45px;height:45px;border-radius:14px;border:1px solid #eee;box-shadow:0 1px 6px #eee;display:flex;align-items:center;justify-content:center;color:#03c75a;font-size:17px;margin:auto}.nv-services span{display:block;font-size:15px;margin-top:6px;font-weight:600}
+.nv-columns{width:1150px;margin-left:32px;display:grid;grid-template-columns:747px 379px;gap:24px;padding:0;box-sizing:border-box}
 .nv-columns main{min-width:0}.nv-newsstand,.nv-shopping,.nv-account,.nv-right-card{border:1px solid #ddd;border-radius:10px;background:#fff;overflow:hidden}
-.nv-section-title{height:62px;display:flex;align-items:center;gap:14px;padding:0 24px;font-size:18px;color:#777}.nv-section-title strong{font-size:20px;color:#111}.nv-section-title .live{background:#f44336;color:#fff;border-radius:5px;font-size:9px;padding:3px 5px}
-.nv-newsbar{margin:0 24px;height:55px;background:#f7f8fa;display:flex;align-items:center;padding:0 25px;gap:13px;font-size:15px}.nv-newsbar strong{margin-left:auto;font-size:14px}
-.nv-newsbody{height:255px;display:grid;grid-template-columns:185px 265px 1fr;gap:25px;padding:22px 24px 0;box-sizing:border-box}
-.nv-presses{border:1px solid #eee;border-radius:5px;overflow:hidden}.nv-presses div{padding:12px 22px;font-size:17px}.nv-presses .sel{background:#4859ec;color:#fff;border-radius:4px}.nv-presses .sub{color:#777;font-size:14px}
-.nv-feature-img{height:145px;border-radius:5px;background:linear-gradient(135deg,#aaa,#ddd);background-size:cover;background-position:center;margin-bottom:10px}.nv-feature b{font-size:14px;line-height:1.45}
-.nv-headlines{font-size:16px;line-height:2.05;color:#555}.nv-newsfoot{height:52px;border-top:1px solid #eee;display:flex;align-items:center;justify-content:center;gap:15px;color:#666}.nv-newsfoot span{font-size:27px;border:1px solid #ddd;border-radius:50%;width:35px;height:35px;display:flex;align-items:center;justify-content:center}.nv-newsfoot b{color:#2774e9}.nv-newsfoot i{margin-left:25px;font-style:normal;color:#2774e9}
-.nv-shopping{margin-top:14px;height:170px}.nv-shop-title{height:57px;display:flex;align-items:center;gap:12px;padding:0 24px;font-size:17px;color:#777}.nv-shop-title strong{color:#111}.nv-shop-title b{margin-left:auto}.nv-products{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:0 24px}.nv-products div{height:90px;background:#eee;border-radius:5px}
-.nv-account{height:184px}.nv-profile{display:flex;align-items:center;padding:24px 22px 12px;gap:13px}.nv-avatar{width:62px;height:62px;border-radius:50%;background:#eee;color:#fff;display:flex;align-items:center;justify-content:center;font-size:35px}.nv-profile div:nth-child(2){flex:1}.nv-profile b{font-size:17px}.nv-profile span{color:#777}.nv-profile small{display:block;margin-top:5px}.nv-profile button{border:1px solid #eee;border-radius:25px;background:#fff;padding:10px 17px;color:#777}.nv-points{display:flex;align-items:center;gap:10px;padding:0 40px;font-size:12px}.nv-points>b{background:#09b958;color:#fff;border-radius:15px;padding:5px 9px}.nv-points span{flex:1}.nv-account-menu{height:55px;margin-top:10px;border-top:1px solid #eee;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;text-align:center;font-size:13px}.nv-account-menu b{position:absolute;margin-left:23%;border:1px solid #ddd;border-radius:50%;width:35px;height:35px;display:flex;align-items:center;justify-content:center;background:#fff;font-size:25px}
-.nv-right-card{margin-top:14px;height:380px;text-align:center;padding:25px;box-sizing:border-box}.nv-music-disc{margin:auto;width:70px;height:70px;border-radius:50%;background:#c59b69;display:flex;align-items:center;justify-content:center;font-size:35px}.nv-right-card p{font-size:14px;line-height:1.5}.nv-longtext{font-size:12px;line-height:1.65;color:#333}
-.naver-settings{margin-top:18px}.naver-settings .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.naver-settings .field{margin-bottom:10px}
+.nv-newsstand{height:378px}
+.nv-section-title{height:62px;display:flex;align-items:center;gap:13px;padding:0 18px;font-size:17px;color:#777;white-space:nowrap}.nv-section-title strong{font-size:19px;color:#111}.nv-section-title .live{background:#f44336;color:#fff;border-radius:5px;font-size:8px;padding:3px 5px}
+.nv-newsbar{margin:0 18px;height:44px;background:#f7f8fa;display:flex;align-items:center;padding:0 20px;gap:12px;font-size:15px;box-sizing:border-box}.nv-newsbar strong{margin-left:auto;font-size:14px;color:#111}
+.nv-newsbody{height:220px;display:grid;grid-template-columns:135px 180px 1fr;gap:18px;padding:8px 18px 0;box-sizing:border-box}
+.nv-presses{border:1px solid #eee;border-radius:5px;overflow:hidden;height:201px}.nv-presses div{padding:11px 21px;font-size:16px}.nv-presses .sel{background:#4859ec;color:#fff;border-radius:4px}.nv-presses .sub{color:#777;font-size:13px;padding-top:10px}
+.nv-feature-img{width:180px;height:120px;border-radius:5px;background:linear-gradient(135deg,#aaa,#ddd) center/contain no-repeat;background-color:#eee;margin-bottom:9px;overflow:hidden}
+.nv-feature b{display:block;font-size:14px;line-height:1.42;letter-spacing:-.2px}
+.nv-feature-meta{height:35px;display:flex;align-items:center;gap:8px;color:#aaa;font-size:12px;margin-top:-4px}.nv-feature-meta .press-mini{width:27px;height:27px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;color:#777;font-size:8px;font-weight:700}
+.nv-headlines{font-size:16px;line-height:2.05;color:#555;padding-top:1px;overflow:hidden}.nv-headlines div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nv-newsfoot{height:52px;border-top:1px solid #eee;display:flex;align-items:center;justify-content:center;gap:14px;color:#666}.nv-newsfoot span{font-size:27px;border:1px solid #ddd;border-radius:50%;width:35px;height:35px;display:flex;align-items:center;justify-content:center}.nv-newsfoot b{color:#2774e9}.nv-newsfoot i{margin-left:20px;font-style:normal;color:#2774e9}
+.nv-shopping{margin-top:14px;height:170px}.nv-shop-title{height:57px;display:flex;align-items:center;gap:11px;padding:0 18px;font-size:16px;color:#777;white-space:nowrap}.nv-shop-title strong{color:#111}.nv-shop-title b{margin-left:auto}.nv-products{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:0 18px}.nv-products div{height:90px;background:#eee;border-radius:5px;background-size:cover;background-position:center}
+.nv-account{height:184px}.nv-profile{display:flex;align-items:center;padding:20px 20px 9px;gap:12px}.nv-avatar{width:62px;height:62px;border-radius:50%;background:#eee;color:#fff;display:flex;align-items:center;justify-content:center;font-size:35px;flex:0 0 auto}.nv-profile div:nth-child(2){flex:1;min-width:0}.nv-profile b{font-size:17px}.nv-profile span{color:#777}.nv-profile small{display:block;margin-top:4px}.nv-profile button{border:1px solid #eee;border-radius:25px;background:#fff;padding:9px 15px;color:#777;white-space:nowrap}.nv-points{display:flex;align-items:center;gap:9px;padding:0 36px;font-size:12px}.nv-points>b{background:#09b958;color:#fff;border-radius:15px;padding:5px 9px}.nv-points span{flex:1;white-space:nowrap}.nv-account-menu{height:55px;margin-top:9px;border-top:1px solid #eee;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;text-align:center;font-size:13px;position:relative}.nv-account-menu b{position:absolute;right:-1px;top:8px;border:1px solid #ddd;border-radius:50%;width:35px;height:35px;display:flex;align-items:center;justify-content:center;background:#fff;font-size:25px}
+.nv-right-card{margin-top:14px;height:380px;text-align:center;padding:25px 24px;box-sizing:border-box}.nv-music-disc{margin:auto;width:70px;height:70px;border-radius:50%;background:#c59b69;display:flex;align-items:center;justify-content:center;font-size:35px}.nv-right-card p{font-size:14px;line-height:1.5;margin:13px 0 6px}.nv-longtext{font-size:12px;line-height:1.65;color:#333;white-space:pre-line}
+.naver-settings{margin-top:18px}.naver-settings .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.naver-settings .field{margin-bottom:10px}.naver-settings .style-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.naver-settings .style-row input,.naver-settings .style-row select{width:100%}
+.nv-text-settings{border-top:1px solid #eee;margin-top:16px;padding-top:16px}.nv-text-settings h3{margin:0 0 10px;font-size:15px}.nv-text-settings .style-row{margin-bottom:10px}
 </style>
 
 
@@ -1336,45 +1342,58 @@ window.showScreen = window.showScreen || function(name) {
           <div class="nv-right-icons"><span class="nv-bell">♧<em id="nvBadgeOut">17</em></span><span class="nv-bag">♧</span></div>
         </div>
         <div class="nv-services">
-          <div><b>✉</b><span>메일</span></div><div><b>☕</b><span>카페</span></div><div><b>bl</b><span>블로그</span></div>
-          <div><b>N+</b><span>스토어</span></div><div><b>▤</b><span>뉴스</span></div><div><b>↗</b><span>증권</span></div>
-          <div><b>▦</b><span>부동산</span></div><div><b>N</b><span>지도</span></div><div><b>WEB</b><span>웹툰</span></div><div><b>♨</b><span>라운지</span></div><div><b>•••</b><span></span></div>
+          <div><b>✉</b><span id="nvService1">메일</span></div><div><b>☕</b><span id="nvService2">카페</span></div><div><b>bl</b><span id="nvService3">블로그</span></div>
+          <div><b>N+</b><span id="nvService4">스토어</span></div><div><b>▤</b><span id="nvService5">뉴스</span></div><div><b>↗</b><span id="nvService6">증권</span></div>
+          <div><b>▦</b><span id="nvService7">부동산</span></div><div><b>N</b><span id="nvService8">지도</span></div><div><b>WEB</b><span id="nvService9">웹툰</span></div><div><b>♨</b><span id="nvService10">라운지</span></div><div><b>•••</b><span id="nvService11"></span></div>
         </div>
 
         <div class="nv-columns">
           <main>
             <section class="nv-newsstand">
-              <div class="nv-section-title"><strong>뉴스스탠드</strong><span>언론사편집</span><span>/</span><span>에터</span><span>/</span><span>쇼핑투데이</span><span>/</span><span>스포츠 <b class="live">LIVE</b></span><span>/</span><span>경제</span></div>
-              <div class="nv-newsbar"><span>구독언론사⌄</span><b>|</b><span>ANEWZ · 넌 대체 뭐하는 남자길래</span><strong>뉴스스탠드　|　뉴스홈</strong></div>
+              <div class="nv-section-title"><strong id="nvNewsSection">뉴스스탠드</strong><span id="nvCat1">언론사편집</span><span>/</span><span id="nvCat2">에터</span><span>/</span><span id="nvCat3">쇼핑투데이</span><span>/</span><span id="nvCat4">스포츠 <b class="live">LIVE</b></span><span>/</span><span id="nvCat5">경제</span></div>
+              <div class="nv-newsbar"><span id="nvNewsbarLeft">구독언론사⌄</span><b>|</b><span id="nvNewsbarMiddle">ANEWZ · 넌 대체 뭐하는 남자길래</span><strong id="nvNewsbarRight">뉴스스탠드　|　뉴스홈</strong></div>
               <div class="nv-newsbody">
-                <div class="nv-presses"><div>ABC</div><div>JBS</div><div>KTBC</div><div class="sel">ANEWZ　›</div><div class="sub">구독중 <b>8</b>　⚙</div></div>
+                <div class="nv-presses">
+                  <div id="nvPress1">ABC</div><div id="nvPress2">JBS</div><div id="nvPress3">KTBC</div><div class="sel" id="nvPress4">ANEWZ　›</div><div class="sub" id="nvPressSub">구독중 <b>8</b>　⚙</div>
+                </div>
                 <div class="nv-feature">
+                  <div class="nv-feature-meta"><span class="press-mini">ANEWZ</span><span id="nvFeatureMeta">2월 24일 9:30 직접 편집</span></div>
                   <div class="nv-feature-img" id="nvFeatureImg"></div>
                   <b id="nvFeatureTitle">에이티즈 홍중·윤호, 늦은 밤 작업실 은밀한 만남? 다정한 분위기 눈길</b>
                 </div>
                 <div class="nv-headlines" id="nvHeadlinesOut"></div>
               </div>
-              <div class="nv-newsfoot"><span>‹</span><b>다른 언론사 뉴스</b> 더보기 7/8 <span>›</span><i>☷　▦</i></div>
+              <div class="nv-newsfoot"><span>‹</span><b id="nvFooterBlue">다른 언론사 뉴스</b><span id="nvFooterMore">더보기 7/8</span><span>›</span><i>☷　▦</i></div>
             </section>
 
             <section class="nv-shopping">
-              <div class="nv-shop-title"><strong>쇼핑</strong><span>/</span><span>맨즈</span><span>/</span><span>브랜드샵</span><span>/</span><span>추천핫딜</span><span>/</span><span>MY추천</span><span>/</span><span>쇼핑라이브</span><b>1/14　‹　›</b></div>
-              <div class="nv-products" id="nvProductsOut">
-                <div></div><div></div><div></div><div></div><div></div>
-              </div>
+              <div class="nv-shop-title"><strong id="nvShop1">쇼핑</strong><span>/</span><span id="nvShop2">맨즈</span><span>/</span><span id="nvShop3">브랜드샵</span><span>/</span><span id="nvShop4">추천핫딜</span><span>/</span><span id="nvShop5">MY추천</span><span>/</span><span id="nvShop6">쇼핑라이브</span><b id="nvShopPage">1/14　‹　›</b></div>
+              <div class="nv-products" id="nvProductsOut"><div></div><div></div><div></div><div></div><div></div></div>
             </section>
           </main>
 
           <aside>
             <section class="nv-account">
-              <div class="nv-profile"><div class="nv-avatar" id="nvAvatarOut">♙</div><div><b id="nvAccountNameOut">HJ님</b> <span>네이버ID 🔒</span><small id="nvEmailOut">no1ikeme@naver.com</small></div><button>로그아웃　↪</button></div>
-              <div class="nv-points"><b id="nvPoint1Out">442</b><span>N＋ 멤버십　쪽지 0　🟢 해피빈</span><b id="nvPoint2Out">20</b></div>
-              <div class="nv-account-menu"><span>메일</span><span>카페</span><span>블로그</span><span>페이</span><b>›</b></div>
+              <div class="nv-profile"><div class="nv-avatar" id="nvAvatarOut">♙</div><div><b id="nvAccountNameOut">HJ님</b> <span id="nvNaverId">네이버ID 🔒</span><small id="nvEmailOut">no1ikeme@naver.com</small></div><button id="nvLogoutText">로그아웃　↪</button></div>
+              <div class="nv-points"><b id="nvPoint1Out">442</b><span id="nvPointMiddle">N＋ 멤버십　쪽지 0　🟢 해피빈</span><b id="nvPoint2Out">20</b></div>
+              <div class="nv-account-menu"><span id="nvMenu1">메일</span><span id="nvMenu2">카페</span><span id="nvMenu3">블로그</span><span id="nvMenu4">페이</span><b>›</b></div>
             </section>
             <section class="nv-right-card">
               <div class="nv-music-disc">◉</div>
               <p id="nvRightTextOut">전화할까 말까 문자로 할까<br>아 시간 너무 늦었나 그런데 쓰자</p>
-              <div class="nv-longtext">오늘따라 밤이 너무 길어<br>문자를 썼다 고쳤다 하다가 지원<br>아쉬워 밤 늦은 문자가<br>답장을 기다리는 이 시간이 너무 길어</div>
+              <div class="nv-longtext" id="nvLongTextOut">오늘따라 밤이 너무 길어
+문자를 썼다 고쳤다 하다가 지원
+아쉬워 밤 늦은 문자가
+답장을 기다리는 이 시간이 너무 길어
+안절부절 못하는 내 모습이 안타까워서 약속도 없는 밤거리로 나왔어
+뺑 터져 호르몬 두근거려 사춘기 중학생처럼 오예
+내 맘에 빨간 불이 켜졌어 널 생각하면 이성은 꿈쩍 못하고 얼어
+제대로 떨려 난 딱 걸렸어 난 전지만 감당하기 힘든 일을 벌였어
+난 브레이크가 고장 난 8톤 트럭
+못 멈춰 이미 시동 걸었어
+넌 웃을 때 (웃을 때) 콧구멍이 커져
+그건 위험해 (위험해) 니 앞에 서면
+괜히 수줍게 어물쩍해</div>
             </section>
           </aside>
         </div>
@@ -1396,37 +1415,59 @@ window.showScreen = window.showScreen || function(name) {
       <div class="field"><label>포인트 1</label><input id="nvPoint1" value="442"></div>
       <div class="field"><label>포인트 2</label><input id="nvPoint2" value="20"></div>
     </div>
-    <div class="field"><label>뉴스 대표 제목</label><input id="nvFeatureTitle" value="에이티즈 홍중·윤호, 늦은 밤 작업실 은밀한 만남? 다정한 분위기 눈길"></div>
-    <div class="field"><label>오른쪽 카드 문구</label><textarea id="nvRightText" rows="3">전화할까 말까 문자로 할까
+    <div class="row">
+      <div class="field"><label>뉴스 대표 제목</label><input id="nvFeatureTitle" value="에이티즈 홍중·윤호, 늦은 밤 작업실 은밀한 만남? 다정한 분위기 눈길"></div>
+      <div class="field"><label>대표 기사 날짜/출처</label><input id="nvFeatureMetaInput" value="2월 24일 9:30 직접 편집"></div>
+    </div>
+    <div class="field"><label>오른쪽 카드 상단 문구</label><textarea id="nvRightText" rows="3">전화할까 말까 문자로 할까
 아 시간 너무 늦었나 그런데 쓰자</textarea></div>
-    <div class="field">
-      <label>뉴스 제목 목록</label>
-      <div id="nvHeadlineList"></div>
-      <button type="button" class="btn btn-secondary" id="nvAddHeadline" style="width:100%;">+ 뉴스 제목 추가</button>
+    <div class="field"><label>오른쪽 카드 본문</label><textarea id="nvLongText" rows="8">오늘따라 밤이 너무 길어
+문자를 썼다 고쳤다 하다가 지원
+아쉬워 밤 늦은 문자가
+답장을 기다리는 이 시간이 너무 길어
+안절부절 못하는 내 모습이 안타까워서 약속도 없는 밤거리로 나왔어
+뺑 터져 호르몬 두근거려 사춘기 중학생처럼 오예
+내 맘에 빨간 불이 켜졌어 널 생각하면 이성은 꿈쩍 못하고 얼어
+제대로 떨려 난 딱 걸렸어 난 전지만 감당하기 힘든 일을 벌였어
+난 브레이크가 고장 난 8톤 트럭
+못 멈춰 이미 시동 걸었어
+넌 웃을 때 (웃을 때) 콧구멍이 커져
+그건 위험해 (위험해) 니 앞에 서면
+괜히 수줍게 어물쩍해</textarea></div>
+    <div class="field"><label>뉴스 제목 목록</label><div id="nvHeadlineList"></div><button type="button" class="btn btn-secondary" id="nvAddHeadline" style="width:100%;">+ 뉴스 제목 추가</button></div>
+    <div class="field"><label>뉴스 대표 이미지</label><input type="file" id="nvFeatureImage" accept="image/*"><small style="display:block;color:#888;margin-top:5px">완성본 레이아웃에 맞는 고정 프레임에 원본 비율을 유지해 넣습니다.</small></div>
+    <div class="field"><label>프로필 사진</label><input type="file" id="nvAvatarImage" accept="image/*"></div>
+    <div class="field"><label>쇼핑 썸네일 (최대 5장)</label><div id="nvProductInputs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;"><input type="file" accept="image/*" data-nvp="0"><input type="file" accept="image/*" data-nvp="1"><input type="file" accept="image/*" data-nvp="2"><input type="file" accept="image/*" data-nvp="3"><input type="file" accept="image/*" data-nvp="4"></div></div>
+
+    <div class="nv-text-settings">
+      <h3>텍스트 꾸미기</h3>
+      <div class="style-row"><div class="field"><label>대표 제목 크기</label><input type="number" id="nvFeatureSize" value="14" min="8" max="30"></div><div class="field"><label>대표 제목 굵기</label><select id="nvFeatureWeight"><option value="400">보통</option><option value="600">중간</option><option value="700" selected>굵게</option></select></div><div class="field"><label>대표 제목 색상</label><input type="color" id="nvFeatureColor" value="#222222"></div></div>
+      <div class="style-row"><div class="field"><label>뉴스 목록 크기</label><input type="number" id="nvHeadlineSize" value="16" min="8" max="30"></div><div class="field"><label>뉴스 목록 굵기</label><select id="nvHeadlineWeight"><option value="400" selected>보통</option><option value="600">중간</option><option value="700">굵게</option></select></div><div class="field"><label>뉴스 목록 색상</label><input type="color" id="nvHeadlineColor" value="#555555"></div></div>
+      <div class="style-row"><div class="field"><label>오른쪽 카드 크기</label><input type="number" id="nvRightSize" value="14" min="8" max="24"></div><div class="field"><label>오른쪽 카드 굵기</label><select id="nvRightWeight"><option value="400" selected>보통</option><option value="600">중간</option><option value="700">굵게</option></select></div><div class="field"><label>오른쪽 카드 색상</label><input type="color" id="nvRightColor" value="#222222"></div></div>
     </div>
-    <div class="field">
-      <label>뉴스 대표 이미지</label>
-      <input type="file" id="nvFeatureImage" accept="image/*">
+
+    <div class="nv-text-settings">
+      <h3>뉴스스탠드 텍스트</h3>
+      <div class="row"><div class="field"><label>뉴스스탠드</label><input id="nvNewsSectionInput" value="뉴스스탠드"></div><div class="field"><label>언론사편집</label><input id="nvCat1Input" value="언론사편집"></div></div>
+      <div class="row"><div class="field"><label>카테고리 2</label><input id="nvCat2Input" value="에터"></div><div class="field"><label>카테고리 3</label><input id="nvCat3Input" value="쇼핑투데이"></div></div>
+      <div class="row"><div class="field"><label>카테고리 4</label><input id="nvCat4Input" value="스포츠"></div><div class="field"><label>카테고리 5</label><input id="nvCat5Input" value="경제"></div></div>
+      <div class="row"><div class="field"><label>뉴스바 왼쪽</label><input id="nvNewsbarLeftInput" value="구독언론사⌄"></div><div class="field"><label>뉴스바 가운데</label><input id="nvNewsbarMiddleInput" value="ANEWZ · 넌 대체 뭐하는 남자길래"></div></div>
+      <div class="row"><div class="field"><label>뉴스바 오른쪽</label><input id="nvNewsbarRightInput" value="뉴스스탠드　|　뉴스홈"></div><div class="field"><label>선택 언론사</label><input id="nvPress4Input" value="ANEWZ　›"></div></div>
     </div>
-    <div class="field">
-      <label>프로필 사진</label>
-      <input type="file" id="nvAvatarImage" accept="image/*">
-    </div>
-    <div class="field">
-      <label>쇼핑 썸네일 (최대 5장)</label>
-      <div id="nvProductInputs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
-        <input type="file" accept="image/*" data-nvp="0">
-        <input type="file" accept="image/*" data-nvp="1">
-        <input type="file" accept="image/*" data-nvp="2">
-        <input type="file" accept="image/*" data-nvp="3">
-        <input type="file" accept="image/*" data-nvp="4">
-      </div>
+
+    <div class="nv-text-settings">
+      <h3>계정 / 쇼핑 / 하단 텍스트</h3>
+      <div class="row"><div class="field"><label>로그아웃</label><input id="nvLogoutInput" value="로그아웃　↪"></div><div class="field"><label>네이버ID</label><input id="nvNaverIdInput" value="네이버ID 🔒"></div></div>
+      <div class="row"><div class="field"><label>포인트 중간 문구</label><input id="nvPointMiddleInput" value="N＋ 멤버십　쪽지 0　🟢 해피빈"></div><div class="field"><label>구독 문구</label><input id="nvPressSubInput" value="구독중 8　⚙"></div></div>
+      <div class="row"><div class="field"><label>뉴스 하단 파란 글씨</label><input id="nvFooterBlueInput" value="다른 언론사 뉴스"></div><div class="field"><label>뉴스 하단 더보기</label><input id="nvFooterMoreInput" value="더보기 7/8"></div></div>
+      <div class="row"><div class="field"><label>쇼핑 제목</label><input id="nvShop1Input" value="쇼핑"></div><div class="field"><label>쇼핑 2</label><input id="nvShop2Input" value="맨즈"></div></div>
+      <div class="row"><div class="field"><label>쇼핑 3</label><input id="nvShop3Input" value="브랜드샵"></div><div class="field"><label>쇼핑 4</label><input id="nvShop4Input" value="추천핫딜"></div></div>
+      <div class="row"><div class="field"><label>쇼핑 5</label><input id="nvShop5Input" value="MY추천"></div><div class="field"><label>쇼핑 6</label><input id="nvShop6Input" value="쇼핑라이브"></div></div>
+      <div class="row"><div class="field"><label>쇼핑 페이지</label><input id="nvShopPageInput" value="1/14　‹　›"></div><div class="field"><label>서비스 1~11 이름</label><input id="nvServicesInput" value="메일|카페|블로그|스토어|뉴스|증권|부동산|지도|웹툰|라운지|"></div></div>
+      <div class="row"><div class="field"><label>계정 메뉴 1~4</label><input id="nvMenuInput" value="메일|카페|블로그|페이"></div><div class="field"><label>뉴스 언론사 1~3</label><input id="nvPressesInput" value="ABC|JBS|KTBC"></div></div>
     </div>
   </div>
 </div>
-
-
-
 
 
 <div class="app hidden" id="netflixApp">
@@ -5066,21 +5107,40 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
   "에드워드 김, 화려한 이면 뒤 숨겨진 마약 스캔들…경찰 추적 중",
   "OTC, 컴백과 동시에 음원 차트 상위권…'커리어 하이' 예고",
   "계약 조건 갈등 끝 폭행 사태…OTC 기획, 소속사 사장 폭행 혐의",
+  "신예에서 중심으로…김소설 작가, 주요 문학상 휩쓸다",
   "유명 야구 선수 정모씨 살인 혐의로 입건…구단 '사실 확인 중'",
   "에이티즈 우호, 비주얼·피지컬·실력 삼박자…완성형 아이돌 입증"
  ];
- const bind=(id,out)=>{const a=document.getElementById(id),b=document.getElementById(out);if(!a||!b)return; b.textContent=a.value;a.addEventListener('input',()=>b.textContent=a.value);}
- bind("nvSearch","nvSearchOut");bind("nvBadge","nvBadgeOut");bind("nvAccountName","nvAccountNameOut");bind("nvEmail","nvEmailOut");bind("nvPoint1","nvPoint1Out");bind("nvPoint2","nvPoint2Out");bind("nvFeatureTitle","nvFeatureTitleOut");bind("nvRightText","nvRightTextOut");
- const titleInput=document.getElementById("nvFeatureTitle"),titleOut=document.getElementById("nvFeatureTitle");
- if(titleInput&&titleOut) titleInput.addEventListener("input",()=>document.getElementById("nvFeatureTitle").value=titleInput.value);
- function renderHeadlines(){const box=document.getElementById("nvHeadlineList");if(!box)return;box.innerHTML=headlines.map((h,i)=>`<div class="field"><input value="${h.replace(/"/g,'&quot;')}" data-nvh="${i}"></div>`).join("");box.querySelectorAll("[data-nvh]").forEach(e=>e.addEventListener("input",()=>{headlines[+e.dataset.nvh]=e.value;renderPreview();}));}
- function renderPreview(){document.getElementById("nvHeadlinesOut").innerHTML=headlines.map(h=>`<div>${h}</div>`).join("");}
- document.getElementById("nvAddHeadline")?.addEventListener("click",()=>{headlines.push("새로운 뉴스 제목을 입력하세요");renderHeadlines();renderPreview();});
- document.getElementById("nvFeatureImage")?.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>document.getElementById("nvFeatureImg").style.backgroundImage=`url("${ev.target.result}")`;r.readAsDataURL(f);});
- document.getElementById("nvAvatarImage")?.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const el=document.getElementById("nvAvatarOut");el.style.backgroundImage=`url("${ev.target.result}")`;el.style.backgroundSize="cover";el.style.backgroundPosition="center";el.textContent="";};r.readAsDataURL(f);});
- document.querySelectorAll("#nvProductInputs input[data-nvp]").forEach(inp=>{inp.addEventListener("change",e=>{const idx=+inp.dataset.nvp,f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const boxes=document.querySelectorAll("#nvProductsOut > div");if(boxes[idx]){boxes[idx].style.backgroundImage=`url("${ev.target.result}")`;boxes[idx].style.backgroundSize="cover";boxes[idx].style.backgroundPosition="center";}};r.readAsDataURL(f);});});
- document.getElementById("naverSavePng")?.addEventListener("click",()=>{const t=document.getElementById("naverCanvas");html2canvas(t,{scale:2,backgroundColor:"#fff",useCORS:true}).then(c=>{const a=document.createElement("a");a.download="naver_main.png";a.href=c.toDataURL("image/png");a.click();});});
- renderHeadlines();renderPreview();
+ const bind=(id,out,prop='textContent')=>{const a=document.getElementById(id),b=document.getElementById(out);if(!a||!b)return;const fn=()=>b[prop]=a.value;fn();a.addEventListener('input',fn);};
+ [
+ ['nvSearch','nvSearchOut'],['nvBadge','nvBadgeOut'],['nvAccountName','nvAccountNameOut'],['nvEmail','nvEmailOut'],['nvPoint1','nvPoint1Out'],['nvPoint2','nvPoint2Out'],
+ ['nvFeatureTitle','nvFeatureTitle'],['nvFeatureMetaInput','nvFeatureMeta'],['nvRightText','nvRightTextOut'],['nvLongText','nvLongTextOut'],['nvNewsSectionInput','nvNewsSection'],['nvCat1Input','nvCat1'],['nvCat2Input','nvCat2'],['nvCat3Input','nvCat3'],['nvCat5Input','nvCat5'],
+ ['nvNewsbarLeftInput','nvNewsbarLeft'],['nvNewsbarMiddleInput','nvNewsbarMiddle'],['nvNewsbarRightInput','nvNewsbarRight'],['nvPress4Input','nvPress4'],['nvLogoutInput','nvLogoutText'],['nvNaverIdInput','nvNaverId'],['nvPointMiddleInput','nvPointMiddle'],['nvPressSubInput','nvPressSub'],['nvFooterBlueInput','nvFooterBlue'],['nvFooterMoreInput','nvFooterMore'],
+ ['nvShop1Input','nvShop1'],['nvShop2Input','nvShop2'],['nvShop3Input','nvShop3'],['nvShop4Input','nvShop4'],['nvShop5Input','nvShop5'],['nvShop6Input','nvShop6'],['nvShopPageInput','nvShopPage']
+ ].forEach(x=>bind(x[0],x[1]));
+ ['nvServicesInput','nvMenuInput','nvPressesInput'].forEach(id=>document.getElementById(id)?.addEventListener('input',()=>renderSimpleLists()));
+ function renderSimpleLists(){
+   const sv=(document.getElementById('nvServicesInput')?.value||'').split('|'); for(let i=1;i<=11;i++){const e=document.getElementById('nvService'+i);if(e)e.textContent=sv[i-1]||'';}
+   const mn=(document.getElementById('nvMenuInput')?.value||'').split('|'); for(let i=1;i<=4;i++){const e=document.getElementById('nvMenu'+i);if(e)e.textContent=mn[i-1]||'';}
+   const pr=(document.getElementById('nvPressesInput')?.value||'').split('|'); for(let i=1;i<=3;i++){const e=document.getElementById('nvPress'+i);if(e)e.textContent=pr[i-1]||'';}
+ }
+ function renderHeadlines(){
+   const box=document.getElementById('nvHeadlineList'); if(!box)return;
+   box.innerHTML=headlines.map((h,i)=>`<div class="field"><input value="${h.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-nvh="${i}"></div>`).join('');
+   box.querySelectorAll('[data-nvh]').forEach(e=>e.addEventListener('input',()=>{headlines[+e.dataset.nvh]=e.value;renderPreview();}));
+ }
+ function renderPreview(){document.getElementById('nvHeadlinesOut').innerHTML=headlines.map(h=>`<div>${escapeHtml(h)}</div>`).join('');}
+ function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+ document.getElementById('nvAddHeadline')?.addEventListener('click',()=>{headlines.push('새로운 뉴스 제목을 입력하세요');renderHeadlines();renderPreview();});
+ document.getElementById('nvFeatureImage')?.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const el=document.getElementById('nvFeatureImg');el.style.backgroundImage=`url("${ev.target.result}")`;el.style.backgroundSize='contain';el.style.backgroundPosition='center';el.style.backgroundRepeat='no-repeat';};r.readAsDataURL(f);});
+ document.getElementById('nvAvatarImage')?.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const el=document.getElementById('nvAvatarOut');el.style.backgroundImage=`url("${ev.target.result}")`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.textContent='';};r.readAsDataURL(f);});
+ document.querySelectorAll('#nvProductInputs input[data-nvp]').forEach(inp=>inp.addEventListener('change',e=>{const idx=+inp.dataset.nvp,f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const boxes=document.querySelectorAll('#nvProductsOut > div');if(boxes[idx])boxes[idx].style.backgroundImage=`url("${ev.target.result}")`;};r.readAsDataURL(f);}));
+ function bindStyle(id, target, prop, suffix=''){const el=document.getElementById(id),out=document.getElementById(target);if(!el||!out)return;const fn=()=>out.style[prop]=el.value+suffix;fn();el.addEventListener('input',fn);}
+ bindStyle('nvFeatureSize','nvFeatureTitle','fontSize','px');bindStyle('nvFeatureWeight','nvFeatureTitle','fontWeight');bindStyle('nvFeatureColor','nvFeatureTitle','color');
+ bindStyle('nvHeadlineSize','nvHeadlinesOut','fontSize','px');bindStyle('nvHeadlineWeight','nvHeadlinesOut','fontWeight');bindStyle('nvHeadlineColor','nvHeadlinesOut','color');
+ bindStyle('nvRightSize','nvRightTextOut','fontSize','px');bindStyle('nvRightWeight','nvRightTextOut','fontWeight');bindStyle('nvRightColor','nvRightTextOut','color');
+ renderSimpleLists();renderHeadlines();renderPreview();
+ document.getElementById('naverSavePng')?.addEventListener('click',()=>{const t=document.getElementById('naverCanvas');const b=document.getElementById('naverSavePng');if(typeof html2canvas==='undefined'){alert('이미지 생성 기능을 불러오지 못했습니다.');return}const old=b.textContent;b.textContent='이미지 생성 중...';b.disabled=true;Promise.resolve(document.fonts?.ready).then(()=>html2canvas(t,{scale:2,backgroundColor:'#fff',useCORS:true,allowTaint:true,logging:false,imageTimeout:15000})).then(c=>c.toBlob(blob=>{if(!blob)throw new Error('blob');const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='naver_main.png';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(u),1500);b.textContent=old;b.disabled=false},'image/png')).catch(err=>{console.error(err);alert('PNG 저장에 실패했습니다.');b.textContent=old;b.disabled=false;});});
 })();
 </script>
 
