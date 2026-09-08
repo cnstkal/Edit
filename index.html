@@ -5548,10 +5548,10 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
   /* 기본 텍스트는 템플릿 이미지 위에 이미 보이므로 투명하게 유지하되,
      편집 모드에서는 반드시 마우스/터치 입력을 받을 수 있어야 한다. */
   pointer-events:auto !important;
-  opacity:.001 !important;
+  opacity:1 !important;
 }
 #naverCanvas.nv-direct-editing .nv-edit-overlay.nv-selected{
-  opacity:.001 !important;
+  opacity:1 !important;
   pointer-events:auto !important;
 }
 #naverCanvas.nv-direct-editing .nv-edit-overlay.nv-selected{
@@ -5709,5 +5709,107 @@ document.getElementById('igpAvatar')?.addEventListener('change',e=>{const f=e.ta
   // 기존 렌더링으로 요소가 다시 만들어지거나 display가 바뀌어도 핸들을 복구
   const observer=new MutationObserver(()=>{if(editing)wire();});
   observer.observe(canvas,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']});
+})();
+</script>
+<style>
+/* 네이버 직접 편집: 모든 텍스트를 개별 선택 가능하게 */
+#naverCanvas.nv-direct-editing .nv-edit-overlay{pointer-events:auto!important;opacity:1!important;}
+#naverCanvas.nv-direct-editing .nv-edit-overlay.nv-fixed-text{pointer-events:none!important;}
+#naverCanvas.nv-direct-editing .nv-edit-overlay.nv-selected{outline:2px solid #03c75a!important;outline-offset:2px;z-index:9999!important;}
+</style>
+<script>
+(function(){
+  const canvas=document.getElementById('naverCanvas');
+  if(!canvas)return;
+
+  // 검색어 고정값: X 594 / Y 132 / 크기 28 / 두께 490 / 자간 -0.5px
+  const search=document.getElementById('nvSearchOut');
+  if(search){
+    search.style.left='594px';
+    search.style.top='132px';
+    search.style.fontSize='28px';
+    search.style.fontWeight='490';
+    search.style.letterSpacing='-0.5px';
+    search.style.width='430px';
+    search.style.height='42px';
+  }
+
+  // 기존 직접편집 로직이 첫 선택 요소에 고착되지 않도록 별도 선택기를 사용한다.
+  let active=null, dragging=null;
+  const visible=el=>{
+    const s=getComputedStyle(el);
+    return s.display!=='none' && s.visibility!=='hidden' && el.offsetParent!==null && !el.classList.contains('nv-fixed-text');
+  };
+  const els=()=>[...canvas.querySelectorAll('.nv-edit-overlay')].filter(visible);
+  const coord=(el)=>{
+    if(!el)return;
+    const x=parseFloat(el.style.left)||0, y=parseFloat(el.style.top)||0;
+    const size=parseFloat(getComputedStyle(el).fontSize)||16;
+    const wt=parseFloat(getComputedStyle(el).fontWeight)||400;
+    const sp=parseFloat(getComputedStyle(el).letterSpacing);
+    const $=id=>document.getElementById(id);
+    if($('nvSelectedName'))$('nvSelectedName').textContent=el.id||'텍스트';
+    if($('nvCoordX'))$('nvCoordX').value=Math.round(x);
+    if($('nvCoordY'))$('nvCoordY').value=Math.round(y);
+    if($('nvCoordSize'))$('nvCoordSize').value=Math.round(size);
+    if($('nvSelectedWeight'))$('nvSelectedWeight').value=wt;
+    if($('nvSelectedWeightVal'))$('nvSelectedWeightVal').textContent=String(wt);
+    if($('nvSelectedSpacing'))$('nvSelectedSpacing').value=sp||0;
+    if($('nvSelectedSpacingVal'))$('nvSelectedSpacingVal').textContent=(Math.round((sp||0)*10)/10)+'px';
+  };
+  const select=el=>{
+    if(!el||!visible(el))return;
+    els().forEach(x=>x.classList.remove('nv-selected'));
+    active=el; active.classList.add('nv-selected'); coord(active);
+  };
+  const point=e=>{const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*(canvas.offsetWidth/r.width),y:(e.clientY-r.top)*(canvas.offsetHeight/r.height)};};
+
+  // pointerdown에서 실제 클릭한 텍스트를 새로 선택하고, 움직일 때만 드래그한다.
+  canvas.addEventListener('pointerdown',e=>{
+    if(!canvas.classList.contains('nv-direct-editing'))return;
+    const el=e.target.closest('.nv-edit-overlay');
+    if(!el||!visible(el)||e.target.classList.contains('nv-resize-handle'))return;
+    select(el);
+    const p=point(e);
+    dragging={el,x:p.x,y:p.y,left:parseFloat(el.style.left)||0,top:parseFloat(el.style.top)||0};
+    e.preventDefault();
+  },true);
+  window.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    const p=point(e), el=dragging.el;
+    el.style.left=Math.round(dragging.left+p.x-dragging.x)+'px';
+    el.style.top=Math.round(dragging.top+p.y-dragging.y)+'px';
+    coord(el);
+  },true);
+  window.addEventListener('pointerup',()=>{dragging=null;},true);
+
+  // 설정창의 좌표/크기/두께/자간을 현재 선택 요소에 즉시 적용.
+  const apply=()=>{
+    if(!active)return;
+    const x=parseFloat(document.getElementById('nvCoordX')?.value), y=parseFloat(document.getElementById('nvCoordY')?.value), z=parseFloat(document.getElementById('nvCoordSize')?.value);
+    if(Number.isFinite(x))active.style.left=Math.round(x)+'px';
+    if(Number.isFinite(y))active.style.top=Math.round(y)+'px';
+    if(Number.isFinite(z))active.style.fontSize=Math.max(1,z)+'px';
+    coord(active);
+  };
+  ['nvCoordX','nvCoordY','nvCoordSize'].forEach(id=>document.getElementById(id)?.addEventListener('input',apply));
+  const weight=document.getElementById('nvSelectedWeight');
+  weight?.addEventListener('input',()=>{if(!active)return;active.style.fontWeight=weight.value;document.getElementById('nvSelectedWeightVal').textContent=weight.value;});
+  const spacing=document.getElementById('nvSelectedSpacing');
+  spacing?.addEventListener('input',()=>{if(!active)return;active.style.letterSpacing=spacing.value+'px';document.getElementById('nvSelectedSpacingVal').textContent=Number(spacing.value).toFixed(1).replace(/\.0$/,'')+'px';});
+
+  // 좌표 버튼은 기존 버튼을 그대로 사용하되 현재 선택 요소에 적용.
+  const move=(dx,dy)=>{if(!active)return;active.style.left=Math.round((parseFloat(active.style.left)||0)+dx)+'px';active.style.top=Math.round((parseFloat(active.style.top)||0)+dy)+'px';coord(active);};
+  const replaceClick=(id,fn)=>{const b=document.getElementById(id);if(!b)return;const c=b.cloneNode(true);b.replaceWith(c);c.addEventListener('click',fn);};
+  replaceClick('nvMoveUp',()=>move(0,-1));
+  replaceClick('nvMoveDown',()=>move(0,1));
+  replaceClick('nvMoveLeft',()=>move(-1,0));
+  replaceClick('nvMoveRight',()=>move(1,0));
+
+  // 편집모드 토글 후에도 모든 요소가 다시 선택 가능하도록 선택 상태를 초기화.
+  const toggle=document.getElementById('nvDirectEditToggle');
+  toggle?.addEventListener('click',()=>{setTimeout(()=>{active=null;els().forEach(x=>x.classList.remove('nv-selected'));},0);},true);
+
+  // 시작 시 검색어가 선택된 상태가 아니라도 직접 클릭해서 선택 가능.
 })();
 </script>
