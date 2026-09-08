@@ -1,4 +1,3 @@
-===== 디스패치 기사 생성기 =====
 const DP_STORAGE_KEY = "virtual_dispatch_draft_v1";
 const DP_DEFAULT = {
   logo: null,
@@ -14,203 +13,18 @@ const DP_DEFAULT = {
     { img: null, title: "관련 기사 제목 예시 3", date: "2026.09.06" }
   ]
 };
-function dpCloneDefault() { return JSON.parse(JSON.stringify(DP_DEFAULT)); }
-function dpLoad() {
-  try {
-    const raw = sessionStorage.getItem(DP_STORAGE_KEY);
-    if (raw) return Object.assign(dpCloneDefault(), JSON.parse(raw));
-  } catch (e) {}
-  return dpCloneDefault();
-}
-let dpState = dpLoad();
-function dpSave() { try { sessionStorage.setItem(DP_STORAGE_KEY, JSON.stringify(dpState)); } catch (e) {} }
-
-function dpRenderBody(text) {
-  return (text || "").split(/\n\s*\n/).map(para => {
-    const esc = para.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    const bold = esc.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br/>");
-    return `<p>${bold}</p>`;
-  }).join("");
-}
-
-function dpRenderAll() {
-  document.getElementById("dpOutTitle").textContent = dpState.title;
-  document.getElementById("dpOutMeta").textContent = `${dpState.date} | ${dpState.date2}`;
-  document.getElementById("dpOutBody").innerHTML = dpRenderBody(dpState.body);
-  document.getElementById("dpOutCaption").textContent = dpState.caption || "";
-
-  const relOut = document.getElementById("dpRelatedOut");
-  relOut.innerHTML = dpState.related.map(r => `
-    <div class="dp-side-item">
-      <img src="${r.img || PLACEHOLDER_IMG}" />
-      <div class="stit">${(r.title || "").replace(/</g,"&lt;")}</div>
-    </div>
-  `).join("");
-
-  const imgEl = document.getElementById("dpOutImg");
-  if (dpState.img) { imgEl.src = dpState.img; imgEl.classList.remove("hidden"); }
-  else { imgEl.src = ""; imgEl.classList.add("hidden"); }
-
-  const logoImg = document.getElementById("dpLogoImg");
-  const logoPh = document.getElementById("dpLogoPlaceholder");
-  if (dpState.logo) { logoImg.src = dpState.logo; logoImg.classList.remove("hidden"); logoPh.classList.add("hidden"); }
-  else { logoImg.src = ""; logoImg.classList.add("hidden"); logoPh.classList.remove("hidden"); }
-
-  dpSave();
-}
-
-function dpFillForm() {
-  document.getElementById("dpTitle").value = dpState.title;
-  document.getElementById("dpDate").value = dpState.date;
-  document.getElementById("dpDate2").value = dpState.date2;
-  document.getElementById("dpBody").value = dpState.body;
-  document.getElementById("dpCaption").value = dpState.caption;
-  document.getElementById("dpLogoPreview").src = dpState.logo || "";
-  dpRenderRelatedEditor();
-}
-
-function dpBindInput(id, key) {
-  document.getElementById(id).addEventListener("input", (e) => {
-    dpState[key] = e.target.value;
-    dpRenderAll();
-  });
-}
-dpBindInput("dpTitle", "title");
-dpBindInput("dpDate", "date");
-dpBindInput("dpDate2", "date2");
-dpBindInput("dpBody", "body");
-dpBindInput("dpCaption", "caption");
-
-function dpBindFile(inputId, key, previewId) {
-  document.getElementById(inputId).addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      dpState[key] = ev.target.result;
-      if (previewId) document.getElementById(previewId).src = ev.target.result;
-      dpRenderAll();
-    };
-    reader.readAsDataURL(file);
-  });
-}
-dpBindFile("dpLogoInput", "logo", "dpLogoPreview");
-dpBindFile("dpImgInput", "img");
-
-document.getElementById("dpRemoveLogoBtn").addEventListener("click", () => {
-  dpState.logo = null;
-  document.getElementById("dpLogoInput").value = "";
-  document.getElementById("dpLogoPreview").src = "";
-  dpRenderAll();
-});
-document.getElementById("dpRemoveImgBtn").addEventListener("click", () => {
-  dpState.img = null;
-  document.getElementById("dpImgInput").value = "";
-  dpRenderAll();
-});
-
-function dpRenderRelatedEditor() {
-  const wrap = document.getElementById("dpRelatedEditor");
-  wrap.innerHTML = dpState.related.map((r, i) => `
-    <div class="comment-edit-card">
-      <div class="field">
-        <label>사진 ${i+1}</label>
-        <div class="comment-edit-avatar-row">
-          <img class="comment-edit-avatar-preview" style="border-radius:2px;" src="${r.img || PLACEHOLDER_IMG}" />
-          <input type="file" accept="image/*" data-dp-related-field="img" data-dp-related-index="${i}" />
-        </div>
-      </div>
-      <div class="field">
-        <label>제목</label>
-        <input type="text" value="${(r.title||"").replace(/"/g,'&quot;')}" data-dp-related-field="title" data-dp-related-index="${i}" />
-      </div>
-      <div class="field">
-        <label>날짜</label>
-        <input type="text" value="${(r.date||"").replace(/"/g,'&quot;')}" data-dp-related-field="date" data-dp-related-index="${i}" />
-      </div>
-    </div>
-  `).join("");
-}
-document.getElementById("dpRelatedEditor").addEventListener("input", (e) => {
-  const field = e.target.getAttribute("data-dp-related-field");
-  const idx = e.target.getAttribute("data-dp-related-index");
-  if (field && idx !== null && field !== "img") {
-    dpState.related[idx][field] = e.target.value;
-    dpRenderAll();
-  }
-});
-document.getElementById("dpRelatedEditor").addEventListener("change", (e) => {
-  const field = e.target.getAttribute("data-dp-related-field");
-  const idx = e.target.getAttribute("data-dp-related-index");
-  if (field === "img" && idx !== null) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      dpState.related[idx].img = ev.target.result;
-      dpRenderRelatedEditor();
-      dpRenderAll();
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
-document.getElementById("dpBoldBtn").addEventListener("click", () => {
-  const ta = document.getElementById("dpBody");
-  const start = ta.selectionStart, end = ta.selectionEnd;
-  if (start === end) return;
-  ta.value = ta.value.slice(0, start) + "**" + ta.value.slice(start, end) + "**" + ta.value.slice(end);
-  dpState.body = ta.value;
-  dpRenderAll();
-  ta.focus();
-});
-
-document.getElementById("dpResetBtn").addEventListener("click", () => {
-  if (!confirm("디스패치 기사 입력 내용을 기본값으로 되돌릴까요?")) return;
-  dpState = dpCloneDefault();
-  try { sessionStorage.removeItem(DP_STORAGE_KEY); } catch (e) {}
-  document.getElementById("dpLogoInput").value = "";
-  document.getElementById("dpImgInput").value = "";
-  dpFillForm();
-  dpRenderAll();
-});
-
-document.getElementById("dpSavePngBtn").addEventListener("click", () => {
-  const target = document.getElementById("previewDispatch");
-  const btn = document.getElementById("dpSavePngBtn");
-  const originalText = btn.textContent;
-  if (typeof html2canvas === "undefined") {
-    alert("이미지 생성 기능을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로고침해서 다시 시도해주세요.");
-    return;
-  }
-  btn.textContent = "이미지 생성 중...";
-  btn.disabled = true;
-  const ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
-  ready.then(() => html2canvas(target, {
-    backgroundColor: "#ffffff", scale: 3, useCORS: true, allowTaint: true, logging: false, imageTimeout: 15000
-  })).then(canvas => {
-    canvas.toBlob((blob) => {
-      if (!blob) throw new Error("blob 생성 실패");
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.download = "dispatch_article.png";
-      link.href = url;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 2000);
-      btn.textContent = originalText;
-      btn.disabled = false;
-    }, "image/png");
-  }).catch((err) => {
-    console.error("PNG 저장 실패:", err);
-    alert("이미지 생성에 실패했습니다. 사진 파일 용량을 줄이거나 다른 사진으로 바꿔서 다시 시도해보세요.");
-    btn.textContent = originalText;
-    btn.disabled = false;
-  });
-});
-
-dpFillForm();
-dpRenderAll();
-
-// 
+function dpCloneDefault(){return JSON.parse(JSON.stringify(DP_DEFAULT));}
+function dpLoad(){try{const raw=sessionStorage.getItem(DP_STORAGE_KEY);if(raw)return Object.assign(dpCloneDefault(),JSON.parse(raw));}catch(e){}return dpCloneDefault();}
+let dpState=dpLoad();function dpSave(){try{sessionStorage.setItem(DP_STORAGE_KEY,JSON.stringify(dpState));}catch(e){}}
+function dpRenderBody(text){return(text||"").split(/\n\s*\n/).map(para=>{const esc=para.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");const bold=esc.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\n/g,"<br/>");return `<p>${bold}</p>`;}).join("");}
+function dpRenderAll(){document.getElementById("dpOutTitle").textContent=dpState.title;document.getElementById("dpOutMeta").textContent=`${dpState.date} | ${dpState.date2}`;document.getElementById("dpOutBody").innerHTML=dpRenderBody(dpState.body);document.getElementById("dpOutCaption").textContent=dpState.caption||"";const relOut=document.getElementById("dpRelatedOut");relOut.innerHTML=dpState.related.map(r=>`<div class="dp-side-item"><img src="${r.img||PLACEHOLDER_IMG}" /><div class="stit">${(r.title||"").replace(/</g,"&lt;")}</div></div>`).join("");const imgEl=document.getElementById("dpOutImg");if(dpState.img){imgEl.src=dpState.img;imgEl.classList.remove("hidden");}else{imgEl.src="";imgEl.classList.add("hidden");}const logoImg=document.getElementById("dpLogoImg"),logoPh=document.getElementById("dpLogoPlaceholder");if(dpState.logo){logoImg.src=dpState.logo;logoImg.classList.remove("hidden");logoPh.classList.add("hidden");}else{logoImg.src="";logoImg.classList.add("hidden");logoPh.classList.remove("hidden");}dpSave();}
+function dpFillForm(){document.getElementById("dpTitle").value=dpState.title;document.getElementById("dpDate").value=dpState.date;document.getElementById("dpDate2").value=dpState.date2;document.getElementById("dpBody").value=dpState.body;document.getElementById("dpCaption").value=dpState.caption;document.getElementById("dpLogoPreview").src=dpState.logo||"";dpRenderRelatedEditor();}
+function dpBindInput(id,key){document.getElementById(id).addEventListener("input",e=>{dpState[key]=e.target.value;dpRenderAll();});}dpBindInput("dpTitle","title");dpBindInput("dpDate","date");dpBindInput("dpDate2","date2");dpBindInput("dpBody","body");dpBindInput("dpCaption","caption");
+function dpBindFile(inputId,key,previewId){document.getElementById(inputId).addEventListener("change",e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{dpState[key]=ev.target.result;if(previewId)document.getElementById(previewId).src=ev.target.result;dpRenderAll();};reader.readAsDataURL(file);});}dpBindFile("dpLogoInput","logo","dpLogoPreview");dpBindFile("dpImgInput","img");
+document.getElementById("dpRemoveLogoBtn").addEventListener("click",()=>{dpState.logo=null;document.getElementById("dpLogoInput").value="";document.getElementById("dpLogoPreview").src="";dpRenderAll();});document.getElementById("dpRemoveImgBtn").addEventListener("click",()=>{dpState.img=null;document.getElementById("dpImgInput").value="";dpRenderAll();});
+function dpRenderRelatedEditor(){const wrap=document.getElementById("dpRelatedEditor");wrap.innerHTML=dpState.related.map((r,i)=>`<div class="comment-edit-card"><div class="field"><label>사진 ${i+1}</label><div class="comment-edit-avatar-row"><img class="comment-edit-avatar-preview" style="border-radius:2px;" src="${r.img||PLACEHOLDER_IMG}" /><input type="file" accept="image/*" data-dp-related-field="img" data-dp-related-index="${i}" /></div></div><div class="field"><label>제목</label><input type="text" value="${(r.title||"").replace(/"/g,'&quot;')}" data-dp-related-field="title" data-dp-related-index="${i}" /></div><div class="field"><label>날짜</label><input type="text" value="${(r.date||"").replace(/"/g,'&quot;')}" data-dp-related-field="date" data-dp-related-index="${i}" /></div></div>`).join("");}
+document.getElementById("dpRelatedEditor").addEventListener("input",e=>{const field=e.target.getAttribute("data-dp-related-field"),idx=e.target.getAttribute("data-dp-related-index");if(field&&idx!==null&&field!=="img"){dpState.related[idx][field]=e.target.value;dpRenderAll();}});document.getElementById("dpRelatedEditor").addEventListener("change",e=>{const field=e.target.getAttribute("data-dp-related-field"),idx=e.target.getAttribute("data-dp-related-index");if(field==="img"&&idx!==null){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{dpState.related[idx].img=ev.target.result;dpRenderRelatedEditor();dpRenderAll();};reader.readAsDataURL(file);}});
+document.getElementById("dpBoldBtn").addEventListener("click",()=>{const ta=document.getElementById("dpBody"),start=ta.selectionStart,end=ta.selectionEnd;if(start===end)return;ta.value=ta.value.slice(0,start)+"**"+ta.value.slice(start,end)+"**"+ta.value.slice(end);dpState.body=ta.value;dpRenderAll();ta.focus();});
+document.getElementById("dpResetBtn").addEventListener("click",()=>{if(!confirm("디스패치 기사 입력 내용을 기본값으로 되돌릴까요?"))return;dpState=dpCloneDefault();try{sessionStorage.removeItem(DP_STORAGE_KEY);}catch(e){}document.getElementById("dpLogoInput").value="";document.getElementById("dpImgInput").value="";dpFillForm();dpRenderAll();});
+document.getElementById("dpSavePngBtn").addEventListener("click",()=>{const target=document.getElementById("previewDispatch"),btn=document.getElementById("dpSavePngBtn"),originalText=btn.textContent;if(typeof html2canvas==="undefined"){alert("이미지 생성 기능을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로고침해서 다시 시도해주세요.");return}btn.textContent="이미지 생성 중...";btn.disabled=true;const ready=document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve();ready.then(()=>html2canvas(target,{backgroundColor:"#ffffff",scale:3,useCORS:true,allowTaint:true,logging:false,imageTimeout:15000})).then(canvas=>{canvas.toBlob(blob=>{if(!blob)throw new Error("blob 생성 실패");const url=URL.createObjectURL(blob),link=document.createElement("a");link.download="dispatch_article.png";link.href=url;document.body.appendChild(link);link.click();document.body.removeChild(link);setTimeout(()=>URL.revokeObjectURL(url),2000);btn.textContent=originalText;btn.disabled=false;},"image/png");}).catch(err=>{console.error("PNG 저장 실패:",err);alert("이미지 생성에 실패했습니다. 사진 파일 용량을 줄이거나 다른 사진으로 바꿔서 다시 시도해보세요.");btn.textContent=originalText;btn.disabled=false;});});
+dpFillForm();dpRenderAll();
