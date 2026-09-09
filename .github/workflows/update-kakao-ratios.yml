@@ -1,0 +1,43 @@
+name: update Kakao ratios
+on:
+  push:
+    paths:
+      - '.github/workflows/update-kakao-ratios.yml'
+jobs:
+  update:
+    if: github.event.head_commit.message != 'chore: remove temporary kakao ratio workflow'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch kakao2
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('kakao2.html')
+          s=p.read_text()
+          s=s.replace('<option value="mobile">모바일 · 9:16</option><option value="pc">PC · 16:9</option>', '<option value="mobile">모바일 · 9:16</option><option value="2to3">모바일 · 2:3</option><option value="4to3">모바일 · 4:3</option><option value="pc">PC · 16:9</option>', 1)
+          anchor='.chat{width:720px;height:1280px;position:relative;overflow:hidden;background:#b8cbdc}'
+          css=".chat{width:720px;height:auto;min-height:1280px;position:relative;overflow:visible;background:#b8cbdc;display:flex;flex-direction:column}.nav{flex:none;border-bottom:1px solid #d4d4d4}.messages{position:relative;left:auto;right:auto;top:auto;bottom:auto;flex:none;overflow:visible;padding:12px 25px 25px}.composer{position:relative;left:auto;right:auto;bottom:auto;flex:none;margin-top:auto}.chat.pc{width:1600px;height:auto;min-height:900px}.chat.ratio-2to3{width:720px}.chat.ratio-4to3{width:720px}.stage.ratio-2to3{aspect-ratio:2/3}.stage.ratio-4to3{aspect-ratio:4/3}"
+          if anchor not in s: raise SystemExit('chat anchor not found')
+          s=s.replace(anchor, css, 1)
+          marker='</style></head>'
+          extra=".stage.ratio-2to3,.stage.ratio-4to3{max-width:720px}.chat.ratio-2to3,.chat.ratio-4to3{min-height:1080px}.stage.pc-frame{aspect-ratio:16/9}.chat.pc{min-height:900px}"
+          s=s.replace(marker, extra+marker, 1)
+          script='''<script>\n(()=>{const m=document.getElementById('mode'),st=document.getElementById('stage'),ch=document.getElementById('chat');if(!m||!st||!ch)return;function applyRatio(){const v=m.value;st.classList.remove('pc-frame','ratio-2to3','ratio-4to3');ch.classList.remove('pc','ratio-2to3','ratio-4to3');if(v==='pc'){st.classList.add('pc-frame');ch.classList.add('pc')}else if(v==='2to3'){st.classList.add('ratio-2to3');ch.classList.add('ratio-2to3')}else if(v==='4to3'){st.classList.add('ratio-4to3');ch.classList.add('ratio-4to3')}}m.addEventListener('change',applyRatio);applyRatio()})();</script>\n</body>'''
+          s=s.replace('</body>',script,1)
+          p.write_text(s)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add kakao2.html
+          git commit -m 'feat: add Kakao preview ratios and flexible height'
+          git push
+      - name: Remove workflow
+        run: |
+          git rm .github/workflows/update-kakao-ratios.yml
+          git commit -m 'chore: remove temporary kakao ratio workflow'
+          git push
