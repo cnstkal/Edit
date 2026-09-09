@@ -1,0 +1,117 @@
+name: Patch Kakao profile edit mode
+on:
+  workflow_dispatch:
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('kakao-profile.html')
+          s=p.read_text()
+
+          # Slightly rounder profile card and fix duplicated music toggle.
+          s=s.replace('border-radius:0 0 34px 34px;', 'border-radius:0 0 42px 42px;')
+          s=s.replace('border-radius:24px;object-fit:cover;background:#ddd;display:block;', 'border-radius:28px;object-fit:cover;background:#ddd;display:block;')
+          s=s.replace('@media(max-width:760px){.stage{max-width:min(100%,405px)}.music{transform:scale(.82);transform-origin:left top}.likes{top:360px}.profile-content{padding-left:30px;padding-right:30px}.profile-name{font-size:42px}.avatar{width:100px;height:100px;border-radius:22px}', '@media(max-width:760px){.stage{max-width:min(100%,405px)}.music{transform:scale(.82);transform-origin:left top}.likes{top:360px}.profile-content{padding-left:30px;padding-right:30px}.profile-name{font-size:42px}.avatar{width:100px;height:100px;border-radius:25px}')
+          # Remove accidental duplicated music toggle, preserving the first one.
+          dup='<label class="music-toggle"><input id="musicEnabled" type="checkbox" checked> 음악 표시</label>'
+          if s.count(dup)>1:
+              first=s.find(dup); second=s.find(dup, first+len(dup))
+              s=s[:second]+s[second+len(dup):]
+
+          # Toolbar edit-mode button.
+          old='<span style="font-size:12px;font-weight:700">모바일 · 9:16</span><div class="zoom">'
+          new='<span style="font-size:12px;font-weight:700">모바일 · 9:16</span><button id="editMode" class="edit-mode">편집모드 OFF</button><div class="zoom">'
+          s=s.replace(old,new,1)
+
+          # Edit-mode styles.
+          marker='.extra-item{border:1px solid #e5e1db;'
+          css='''.edit-mode{border:1px solid #ddd9d2;background:#fff;border-radius:9px;padding:7px 10px;font-size:11px;font-weight:700;white-space:nowrap}.edit-mode.on{background:#171717;color:#fff;border-color:#171717}.profile.editing .music,.profile.editing .avatar,.profile.editing .profile-name,.profile.editing .actions,.profile.editing .profile-sticker,.profile.editing .profile-text{outline:2px dashed rgba(255,255,255,.9);outline-offset:4px;cursor:grab}.profile.editing .music:active,.profile.editing .avatar:active,.profile.editing .profile-name:active,.profile.editing .actions:active,.profile.editing .profile-sticker:active,.profile.editing .profile-text:active{cursor:grabbing}.profile.editing .media{pointer-events:none}.profile.editing .action{pointer-events:none}.profile.editing .music,.profile.editing .avatar,.profile.editing .profile-name,.profile.editing .actions,.profile.editing .profile-sticker,.profile.editing .profile-text{user-select:none;-webkit-user-select:none}.'''
+          s=s.replace(marker,css+marker,1)
+
+          # Insert edit-mode interaction script before the existing final script.
+          script=r'''<script>
+          (function(){
+            const profile=document.getElementById('profile'), btn=document.getElementById('editMode');
+            if(!profile||!btn)return;
+            let editing=false, drag=null;
+            const key='kakao-profile-editmode-v1';
+            let saved={};
+            try{saved=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){}
+            const ids=['pvMusic','pvAvatar','pvName'];
+            function apply(id){
+              const el=document.getElementById(id), d=saved[id];
+              if(!el||!d)return;
+              el.style.transform=(d.x||d.y)?`translate(${d.x||0}px,${d.y||0}px)`:'';
+            }
+            function applyActions(){
+              const el=profile.querySelector('.actions'),d=saved.actions;
+              if(el&&d)el.style.transform=`translate(${d.x||0}px,${d.y||0}px)`;
+            }
+            function restore(){ids.forEach(apply);applyActions();}
+            function persist(id,x,y){saved[id]={x,y};localStorage.setItem(key,JSON.stringify(saved));}
+            function posFor(id){return saved[id]||{x:0,y:0}}
+            function isDraggable(el){return el && (el.id==='pvMusic'||el.id==='pvAvatar'||el.id==='pvName'||el.classList.contains('actions')||el.classList.contains('profile-sticker')||el.classList.contains('profile-text'))}
+            function pointerDown(e){
+              if(!editing)return;
+              const el=e.target.closest('.music,.avatar,.profile-name,.actions,.profile-sticker,.profile-text');
+              if(!el||!profile.contains(el)||!isDraggable(el))return;
+              if(e.pointerType==='mouse'&&e.button!==0)return;
+              e.preventDefault();e.stopPropagation();
+              const id=el.classList.contains('actions')?'actions':el.id||el.dataset.extraId;
+              const base=posFor(id);
+              drag={el,id,startX:e.clientX,startY:e.clientY,x:Number(base.x)||0,y:Number(base.y)||0,moved:false};
+              el.setPointerCapture?.(e.pointerId);
+            }
+            function pointerMove(e){
+              if(!drag)return;
+              const dx=e.clientX-drag.startX,dy=e.clientY-drag.startY;
+              if(Math.abs(dx)+Math.abs(dy)>2)drag.moved=true;
+              // Stage scales the 720px profile, so convert screen movement back to profile pixels.
+              const stage=document.getElementById('stage');
+              const ratio=stage&&stage.clientWidth?720/(stage.clientWidth):1;
+              const x=drag.x+dx*ratio,y=drag.y+dy*ratio;
+              drag.el.style.transform=`translate(${x}px,${y}px)`;
+              drag.current={x,y};
+            }
+            function pointerUp(){
+              if(!drag)return;
+              if(drag.current)persist(drag.id,drag.current.x,drag.current.y);
+              drag=null;
+            }
+            btn.addEventListener('click',()=>{editing=!editing;profile.classList.toggle('editing',editing);btn.classList.toggle('on',editing);btn.textContent=editing?'편집모드 ON':'편집모드 OFF';});
+            profile.addEventListener('pointerdown',pointerDown,true);
+            profile.addEventListener('pointermove',pointerMove,true);
+            profile.addEventListener('pointerup',pointerUp,true);
+            profile.addEventListener('pointercancel',pointerUp,true);
+            restore();
+            window.__kakaoProfileEditMode={restore};
+          })();
+          </script>'''
+          # Ensure overlays get stable IDs for drag persistence and are included after each render.
+          hook='''
+          const _oldRenderExtras=window.renderExtras;
+          if(_oldRenderExtras){
+            window.renderExtras=function(){_oldRenderExtras();document.querySelectorAll('.profile-sticker,.profile-text').forEach((el,i)=>{el.dataset.extraId=el.dataset.extraId||((el.classList.contains('profile-sticker')?'sticker':'text')+'-'+i);});};
+          }
+          '''
+          # The existing page already wraps render; append edit script after all page scripts so it can bind safely.
+          if '</body></html>' in s:
+              s=s.replace('</body></html>',script+'</body></html>',1)
+          p.write_text(s)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add kakao-profile.html
+          git commit -m 'Add draggable preview edit mode' || exit 0
+          git push
+      - name: Remove temporary workflow
+        if: always()
+        run: rm -f .github/workflows/patch-kakao-profile-editmode.yml && git add .github/workflows/patch-kakao-profile-editmode.yml && git commit -m 'Remove temporary patch workflow' || true
