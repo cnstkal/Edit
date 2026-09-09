@@ -7,7 +7,7 @@
 html,body{width:100%;max-width:100%;overflow-x:hidden}
 .layout{min-width:0}
 .preview,.panel{min-width:0}
-.scale{width:100%;height:100%;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0}
+.scale{display:flex;align-items:center;justify-content:center;flex:none;min-width:0;min-height:0}
 .stage{width:min(100%,405px);min-width:0}
 @media(max-width:900px){
   .layout{width:100%;max-width:100%;min-width:0;gap:18px}
@@ -44,6 +44,6 @@ function render(){ $('pvName').textContent=S.name;$('pvMusicTitle').textContent=
 function renderMedia(){const m=$('media');m.innerHTML='';S.media.forEach((x,i)=>{const d=document.createElement('div');d.className='media-item'+(x?'':' placeholder');if(x)d.style.backgroundImage=`url(${x})`;else if(i===0){d.innerHTML='<div class="media-label">방금 본 미디어</div>'}m.appendChild(d)})}
 function makeMediaEditor(){const box=$('mediaEditor');box.innerHTML='';S.media.forEach((x,i)=>{const d=document.createElement('div');d.className='media-box';d.innerHTML=`<b>사진 ${i+1}</b><input type="file" accept="image/*">`;d.querySelector('input').addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{S.media[i]=r.result;render();saveState()};r.readAsDataURL(f)});box.appendChild(d)})}
 $('save').onclick=async()=>{try{const c=await html2canvas($('profile'),{scale:1,useCORS:true,backgroundColor:null});const a=document.createElement('a');a.download='kakao-profile.png';a.href=c.toDataURL('image/png');a.click()}catch(e){alert('PNG 저장에 실패했습니다.')}};
-let z=45;function applyZoom(){z=Math.max(30,Math.min(100,z));$('zoom').value=z;$('zt').textContent=z+'%';$('scale').style.transform=`scale(${z/100})`};$('zoom').oninput=e=>{z=+e.target.value;applyZoom()};$('minus').onclick=()=>{z-=5;applyZoom()};$('plus').onclick=()=>{z+=5;applyZoom()};$('fit').onclick=()=>{z=45;applyZoom()};
+let z=45;function applyZoom(){z=Math.max(30,Math.min(100,z));$('zoom').value=z;$('zt').textContent=z+'%';$('scale').style.width=(720*z/100)+'px';$('scale').style.height=(1280*z/100)+'px';$('scale').style.transform=`scale(${z/100})`};$('zoom').oninput=e=>{z=+e.target.value;applyZoom()};$('minus').onclick=()=>{z-=5;applyZoom()};$('plus').onclick=()=>{z+=5;applyZoom()};$('fit').onclick=()=>{z=45;applyZoom()};
 makeMediaEditor();render();applyZoom();
 </script></body></html>
