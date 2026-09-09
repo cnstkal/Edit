@@ -1,0 +1,35 @@
+name: Update Kakao send button
+on:
+  workflow_dispatch:
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update send button
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('kakao2.html')
+          s=p.read_text()
+          old=".send{width:48px;height:48px;border:0;background:#fee500;border-radius:14px;font-size:0;position:relative}.send:after{content:'➤';font-size:22px;color:#333;position:absolute;left:13px;top:11px}"
+          new=".send{width:56px;height:56px;flex:none;border:0;background:#fee500;border-radius:50%;font-size:0;position:relative;display:flex;align-items:center;justify-content:center}.send:before{content:'';position:absolute;width:5px;height:27px;background:#222;border-radius:3px;left:25.5px;top:15px}.send:after{content:'';position:absolute;width:17px;height:17px;border-left:5px solid #222;border-top:5px solid #222;transform:rotate(45deg);left:17px;top:12px;border-radius:2px}"
+          if old not in s:
+              raise SystemExit('target CSS not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add kakao2.html
+          git commit -m 'fix: update Kakao send button design'
+          git push
+      - name: Remove temporary workflow
+        if: success()
+        run: |
+          git rm .github/workflows/update-send-button.yml
+          git commit -m 'chore: remove temporary workflow'
+          git push
