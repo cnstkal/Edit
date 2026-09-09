@@ -1,0 +1,51 @@
+name: fix Kakao profile mobile layout
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-profile-layout.yml'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch profile layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('kakao-profile.html')
+          s=p.read_text()
+          css='''
+          html,body{width:100%;max-width:100%;overflow-x:hidden}
+          .layout{min-width:0}
+          .preview,.panel{min-width:0}
+          .scale{width:100%;height:100%;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0}
+          .stage{width:min(100%,405px);min-width:0}
+          @media(max-width:900px){
+            .layout{width:100%;max-width:100%;min-width:0;gap:18px}
+            .preview{width:100%;min-width:0}
+            .panel{width:100%;max-width:100%;min-width:0}
+            .tools{width:100%;min-width:0;overflow:hidden}
+            .zoom{min-width:0}
+            .zoom input{min-width:0}
+            .stage{width:min(100%,405px);max-width:405px}
+          }
+          '''
+          marker='</style>'
+          if marker not in s: raise SystemExit('style target not found')
+          s=s.replace(marker,css+marker,1)
+          s=s.replace('id="zoom" type="range" min="10" max="100" value="45"','id="zoom" type="range" min="30" max="100" value="45"',1)
+          s=s.replace("z=Math.max(10,Math.min(100,z))","z=Math.max(30,Math.min(100,z))",1)
+          p.write_text(s)
+          PY
+      - name: Commit and remove workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add kakao-profile.html
+          git commit -m 'fix: prevent Kakao profile editor mobile shrink' || true
+          git push || true
+          git rm .github/workflows/fix-profile-layout.yml || true
+          git commit -m 'chore: remove temporary profile layout workflow' || true
+          git push || true
