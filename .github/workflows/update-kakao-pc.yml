@@ -1,0 +1,40 @@
+name: Update Kakao PC sizing
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/update-kakao-pc.yml
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update PC preview sizing
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('kakao2.html')
+          s=p.read_text()
+          marker='</style></head>'
+          css='''<style>\n/* PC 16:9 preview: enlarge chat content except room name */\n.chat.pc .nav{height:132px;padding:0 30px}\n.chat.pc .messages{padding:18px 40px 32px}\n.chat.pc .day{margin-bottom:32px}\n.chat.pc .day span{padding:12px 25px;font-size:21px}\n.chat.pc .msg{gap:28px;margin-bottom:28px}\n.chat.pc .avatar{width:68px;height:68px;border-radius:30px}\n.chat.pc .msgbody{max-width:680px}\n.chat.pc .name{font-size:23px;margin:1px 0 7px}\n.chat.pc .bubble{max-width:600px;padding:15px 22px;font-size:28px;line-height:1.35}\n.chat.pc .bubbletime{font-size:17px}\n.chat.pc .read{font-size:16px}\n.chat.pc .timebox{min-width:34px}\n.chat.pc .composer{height:110px;padding:14px 24px;gap:12px}\n.chat.pc .composer .circle{width:54px;height:54px;font-size:31px}\n.chat.pc .inputbar{height:64px;padding:0 22px;border-radius:32px;font-size:23px}\n.chat.pc .send{width:60px;height:60px}\n</style>'''
+          if '/* PC 16:9 preview: enlarge chat content except room name */' in s:
+              raise SystemExit('already applied')
+          if marker not in s:
+              raise SystemExit('style marker not found')
+          p.write_text(s.replace(marker,css+marker,1))
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add kakao2.html
+          git commit -m 'fix: enlarge Kakao PC preview content'
+          git push
+      - name: Remove temporary workflow
+        if: success()
+        run: |
+          git rm .github/workflows/update-kakao-pc.yml
+          git commit -m 'chore: remove temporary Kakao PC workflow'
+          git push
