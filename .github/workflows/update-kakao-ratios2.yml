@@ -17,17 +17,38 @@ jobs:
           p=Path('kakao2.html')
           s=p.read_text()
           s=s.replace('<option value="mobile">모바일 · 9:16</option><option value="pc">PC · 16:9</option>', '<option value="mobile">모바일 · 9:16</option><option value="2to3">모바일 · 2:3</option><option value="4to3">모바일 · 4:3</option><option value="pc">PC · 16:9</option>', 1)
-          old='.chat{width:720px;height:1280px;position:relative;overflow:hidden;background:#b8cbdc}'
-          new='.chat{width:720px;height:auto;min-height:1280px;position:relative;overflow:visible;background:#b8cbdc;display:flex;flex-direction:column}.nav{flex:none;border-bottom:1px solid #d4d4d4}.messages{position:relative;left:auto;right:auto;top:auto;bottom:auto;flex:none;overflow:visible;padding:12px 25px 25px}.composer{position:relative;left:auto;right:auto;bottom:auto;flex:none;margin-top:auto}.chat.pc{width:1600px;height:auto;min-height:900px}.chat.ratio-2to3,.chat.ratio-4to3{width:720px}'
-          if old not in s: raise SystemExit('CSS target not found')
-          s=s.replace(old,new,1)
-          old2='.stage.pc-frame{max-width:720px;aspect-ratio:16/9}'
-          new2='.stage.pc-frame{max-width:720px;aspect-ratio:16/9}.stage.ratio-2to3{max-width:720px;aspect-ratio:2/3}.stage.ratio-4to3{max-width:720px;aspect-ratio:4/3}.chat.ratio-2to3,.chat.ratio-4to3{min-height:1080px}'
-          s=s.replace(old2,new2,1)
-          marker='</body>'
-          js='<script>(()=>{const m=document.getElementById("mode"),st=document.getElementById("stage"),ch=document.getElementById("chat");if(!m||!st||!ch)return;const a=()=>{const v=m.value;st.classList.remove("pc-frame","ratio-2to3","ratio-4to3");ch.classList.remove("pc","ratio-2to3","ratio-4to3");if(v==="pc"){st.classList.add("pc-frame");ch.classList.add("pc")}else if(v==="2to3"){st.classList.add("ratio-2to3");ch.classList.add("ratio-2to3")}else if(v==="4to3"){st.classList.add("ratio-4to3");ch.classList.add("ratio-4to3")}};m.addEventListener("change",a);a()})();</script></body>'
-          if marker not in s: raise SystemExit('body target not found')
-          s=s.replace(marker,js,1)
+          extra_css='''
+          .nav{border-bottom:1px solid #d4d4d4}
+          .chat{height:auto!important;min-height:1280px!important;overflow:visible!important;display:flex;flex-direction:column}
+          .messages{position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;flex:none;overflow:visible!important}
+          .composer{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;flex:none;margin-top:auto}
+          .chat.pc{width:1600px!important;height:auto!important;min-height:900px!important}
+          .stage.ratio-2to3{aspect-ratio:2/3!important}
+          .stage.ratio-4to3{aspect-ratio:4/3!important}
+          .chat.ratio-2to3{width:720px!important;min-height:1080px!important}
+          .chat.ratio-4to3{width:720px!important;min-height:540px!important}
+          '''
+          marker='</style>'
+          if marker not in s: raise SystemExit('style target not found')
+          s=s.replace(marker,extra_css+marker,1)
+          js='''<script>
+          (()=>{
+            const m=document.getElementById('mode'),st=document.getElementById('stage'),ch=document.getElementById('chat');
+            if(!m||!st||!ch)return;
+            function applyKakaoRatio(){
+              const v=m.value;
+              st.classList.remove('pc-frame','ratio-2to3','ratio-4to3');
+              ch.classList.remove('pc','ratio-2to3','ratio-4to3');
+              if(v==='pc'){st.classList.add('pc-frame');ch.classList.add('pc')}
+              else if(v==='2to3'){st.classList.add('ratio-2to3');ch.classList.add('ratio-2to3')}
+              else if(v==='4to3'){st.classList.add('ratio-4to3');ch.classList.add('ratio-4to3')}
+            }
+            m.addEventListener('change',applyKakaoRatio);
+            applyKakaoRatio();
+          })();
+          </script>\n</body>'''
+          if '</body>' not in s: raise SystemExit('body target not found')
+          s=s.replace('</body>',js,1)
           p.write_text(s)
           PY
       - name: Commit patch
