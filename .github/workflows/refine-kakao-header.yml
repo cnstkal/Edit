@@ -1,5 +1,8 @@
 name: Refine Kakao header
 on:
+  push:
+    paths:
+      - .github/workflows/refine-kakao-header.yml
   workflow_dispatch:
 jobs:
   update:
