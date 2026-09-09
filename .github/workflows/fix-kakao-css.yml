@@ -1,5 +1,8 @@
 name: Fix Kakao CSS
 on:
+  push:
+    paths:
+      - .github/workflows/fix-kakao-css.yml
   workflow_dispatch:
 jobs:
   fix:
