@@ -17,37 +17,48 @@ jobs:
           from pathlib import Path
           p=Path('kakao-profile.html')
           s=p.read_text()
+          # Keep profile card slightly rounder.
           s=s.replace('border-radius:0 0 34px 34px;', 'border-radius:0 0 42px 42px;')
           s=s.replace('border-radius:24px;object-fit:cover;background:#ddd;display:block;', 'border-radius:28px;object-fit:cover;background:#ddd;display:block;')
           s=s.replace('@media(max-width:760px){.stage{max-width:min(100%,405px)}.music{transform:scale(.82);transform-origin:left top}.likes{top:360px}.profile-content{padding-left:30px;padding-right:30px}.profile-name{font-size:42px}.avatar{width:100px;height:100px;border-radius:22px}', '@media(max-width:760px){.stage{max-width:min(100%,405px)}.music{transform:scale(.82);transform-origin:left top}.likes{top:360px}.profile-content{padding-left:30px;padding-right:30px}.profile-name{font-size:42px}.avatar{width:100px;height:100px;border-radius:25px}')
           dup='<label class="music-toggle"><input id="musicEnabled" type="checkbox" checked> 음악 표시</label>'
-          if s.count(dup)>1:
+          while s.count(dup)>1:
               first=s.find(dup); second=s.find(dup, first+len(dup)); s=s[:second]+s[second+len(dup):]
+          # Toolbar edit mode button.
           old='<span style="font-size:12px;font-weight:700">모바일 · 9:16</span><div class="zoom">'
           new='<span style="font-size:12px;font-weight:700">모바일 · 9:16</span><button id="editMode" class="edit-mode">편집모드 OFF</button><div class="zoom">'
           s=s.replace(old,new,1)
+          # Remove previous edit-mode CSS if this workflow is ever rerun, then add corrected CSS.
+          start=s.find('.edit-mode{')
+          end=s.find('.extra-item{',start) if start>=0 else -1
+          if start>=0 and end>=0: s=s[:start]+s[end:]
           marker='.extra-item{border:1px solid #e5e1db;'
-          css='''.edit-mode{border:1px solid #ddd9d2;background:#fff;border-radius:9px;padding:7px 10px;font-size:11px;font-weight:700;white-space:nowrap}.edit-mode.on{background:#171717;color:#fff;border-color:#171717}.profile.editing .music,.profile.editing .avatar,.profile.editing .profile-name,.profile.editing .actions,.profile.editing .profile-sticker,.profile.editing .profile-text{outline:2px dashed rgba(255,255,255,.9);outline-offset:4px;cursor:grab}.profile.editing .music:active,.profile.editing .avatar:active,.profile.editing .profile-name:active,.profile.editing .actions:active,.profile.editing .profile-sticker:active,.profile.editing .profile-text:active{cursor:grabbing}.profile.editing .media{pointer-events:none}.profile.editing .action{pointer-events:none}.profile.editing .music,.profile.editing .avatar,.profile.editing .profile-name,.profile.editing .actions,.profile.editing .profile-sticker,.profile.editing .profile-text{user-select:none;-webkit-user-select:none}.'''
+          css='''.edit-mode{border:1px solid #ddd9d2;background:#fff;border-radius:9px;padding:7px 10px;font-size:11px;font-weight:700;white-space:nowrap}.edit-mode.on{background:#171717;color:#fff;border-color:#171717}.profile.editing .music,.profile.editing .profile-sticker,.profile.editing .profile-text{outline:2px dashed rgba(255,255,255,.9);outline-offset:4px;cursor:grab}.profile.editing .music:active,.profile.editing .profile-sticker:active,.profile.editing .profile-text:active{cursor:grabbing}.profile.editing .media{pointer-events:none}.profile.editing .music,.profile.editing .profile-sticker,.profile.editing .profile-text{user-select:none;-webkit-user-select:none}.'''
           s=s.replace(marker,css+marker,1)
+          # Remove the previous appended edit-mode script(s), then append corrected one.
+          import re
+          s=re.sub(r'<script>\s*\(function\(\)\{\s*const profile=document\.getElementById\([\'\"]profile[\'\"]\),btn=document\.getElementById\([\'\"]editMode[\'\"]\).*?</script>', '', s, flags=re.S)
           script=r'''<script>
           (function(){
             const profile=document.getElementById('profile'),btn=document.getElementById('editMode');if(!profile||!btn)return;
-            let editing=false,drag=null;const key='kakao-profile-editmode-v1';let saved={};
+            let editing=false,drag=null;const key='kakao-profile-editmode-v2';let saved={};
             try{saved=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){}
-            function apply(el,id){const d=saved[id];if(el&&d)el.style.transform=`translate(${d.x||0}px,${d.y||0}px)`}
-            function restore(){apply(document.getElementById('pvMusic'),'pvMusic');apply(document.getElementById('pvAvatar'),'pvAvatar');apply(document.getElementById('pvName'),'pvName');apply(profile.querySelector('.actions'),'actions')}
+            function pos(id){return saved[id]||{x:0,y:0}}
+            function apply(el,id){const d=pos(id);if(el&&(d.x||d.y))el.style.transform=`translate(${d.x||0}px,${d.y||0}px)`}
+            function restore(){apply(document.getElementById('pvMusic'),'pvMusic');document.querySelectorAll('.profile-sticker,.profile-text').forEach((el,i)=>{const id=el.dataset.extraId||((el.classList.contains('profile-sticker')?'sticker':'text')+'-'+i);el.dataset.extraId=id;apply(el,id)})}
             function persist(id,x,y){saved[id]={x,y};localStorage.setItem(key,JSON.stringify(saved))}
             function pointerDown(e){
-              if(!editing)return;const el=e.target.closest('.music,.avatar,.profile-name,.actions,.profile-sticker,.profile-text');
-              if(!el||!profile.contains(el)||(e.pointerType==='mouse'&&e.button!==0))return;e.preventDefault();e.stopPropagation();
-              const id=el.classList.contains('actions')?'actions':el.id||el.dataset.extraId;if(!id)return;const d=saved[id]||{x:0,y:0};
-              drag={el,id,startX:e.clientX,startY:e.clientY,x:Number(d.x)||0,y:Number(d.y)||0};el.setPointerCapture?.(e.pointerId)
+              if(!editing)return;
+              const el=e.target.closest('.music,.profile-sticker,.profile-text');
+              if(!el||!profile.contains(el)||(e.pointerType==='mouse'&&e.button!==0))return;
+              e.preventDefault();e.stopPropagation();
+              const id=el.id==='pvMusic'?'pvMusic':(el.dataset.extraId||(el.classList.contains('profile-sticker')?'sticker-'+Date.now():'text-'+Date.now()));
+              el.dataset.extraId=id;const d=pos(id);drag={el,id,startX:e.clientX,startY:e.clientY,x:Number(d.x)||0,y:Number(d.y)||0};el.setPointerCapture?.(e.pointerId)
             }
             function pointerMove(e){if(!drag)return;const stage=document.getElementById('stage');const ratio=stage&&stage.clientWidth?720/stage.clientWidth:1;const x=drag.x+(e.clientX-drag.startX)*ratio,y=drag.y+(e.clientY-drag.startY)*ratio;drag.el.style.transform=`translate(${x}px,${y}px)`;drag.current={x,y}}
             function pointerUp(){if(drag&&drag.current)persist(drag.id,drag.current.x,drag.current.y);drag=null}
             btn.addEventListener('click',()=>{editing=!editing;profile.classList.toggle('editing',editing);btn.classList.toggle('on',editing);btn.textContent=editing?'편집모드 ON':'편집모드 OFF'});
             profile.addEventListener('pointerdown',pointerDown,true);profile.addEventListener('pointermove',pointerMove,true);profile.addEventListener('pointerup',pointerUp,true);profile.addEventListener('pointercancel',pointerUp,true);restore();
-            window.__kakaoProfileEditMode={restore};
           })();</script>'''
           s=s.replace('</body></html>',script+'</body></html>',1)
           p.write_text(s)
@@ -55,7 +66,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add kakao-profile.html
-          git commit -m 'Add draggable preview edit mode' || exit 0
+          git commit -m 'Restrict edit mode to music stickers and text' || exit 0
           git push
       - name: Remove temporary workflow
         if: always()
