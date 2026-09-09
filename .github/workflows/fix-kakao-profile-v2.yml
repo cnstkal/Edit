@@ -1,0 +1,64 @@
+name: patch Kakao profile v2
+on: push
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch editor
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('kakao-profile.html')
+          s=p.read_text()
+          s=s.replace("$('pvLikes').textContent=S.likes;", "")
+          s=s.replace(".cover{position:absolute;inset:0;background:#777 center/cover no-repeat}.cover:after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.02) 28%,rgba(0,0,0,.08) 48%,rgba(235,235,235,.78) 73%,#aaa 82%,#aaa 100%)}", ".cover{position:absolute;inset:0;background:#777 center/cover no-repeat;border-radius:0 0 42px 42px;overflow:hidden}.cover:after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.02) 25%,rgba(0,0,0,.04) 45%,rgba(205,205,205,.12) 60%,rgba(185,185,185,.38) 72%,rgba(170,170,170,.72) 84%,#aaa 100%)}")
+          s=s.replace('.avatar{width:118px;height:118px;border-radius:50%;', '.avatar{width:118px;height:118px;border-radius:24px;')
+          s=s.replace('.avatar{width:100px;height:100px}', '.avatar{width:100px;height:100px;border-radius:22px}')
+          s=s.replace('<div class="group"><div class="gtitle">♡ 반응</div><div class="field"><div class="sub">좋아요 수</div><input class="input" id="likes" type="number" min="0" value="196"></div></div>', '')
+          s=s.replace("<div class=\"gtitle\">♫ 음악</div>", "<div class=\"gtitle\">♫ 음악</div><label class=\"music-toggle\"><input id=\"musicEnabled\" type=\"checkbox\" checked> 음악 표시</label><div class=\"music-position\"><div><div class=\"sub\">가로 위치</div><input id=\"musicX\" type=\"range\" min=\"0\" max=\"650\" value=\"38\"></div><div><div class=\"sub\">세로 위치</div><input id=\"musicY\" type=\"range\" min=\"0\" max=\"500\" value=\"55\"></div></div>")
+          s=s.replace('<div class="profile-content">', '<div class="overlay-layer" id="overlayLayer"></div><div class="profile-content">')
+          extra="<div class=\"group\"><div class=\"gtitle\">✦ 스티커 / 텍스트</div><div class=\"actions-editor\"><button class=\"btn\" id=\"addSticker\">＋ 스티커 추가</button><button class=\"btn\" id=\"addText\">＋ 텍스트 추가</button></div><div class=\"hint\">사진을 스티커처럼 올리고 위치·크기를 자유롭게 조절할 수 있습니다. 개수 제한 없음.</div><div id=\"extraEditor\"></div></div>"
+          s=s.replace('<div class="group"><div class="gtitle">저장</div>', extra+'<div class="group"><div class="gtitle">저장</div>')
+          css="""
+          .music-toggle{display:flex;align-items:center;gap:7px;font-size:12px;color:#555;margin:-4px 0 12px}.music-toggle input{width:16px;height:16px}.music-position{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}.overlay-layer{position:absolute;inset:0;z-index:7;pointer-events:none}.profile-sticker{position:absolute;object-fit:contain}.profile-text{position:absolute;white-space:pre-wrap;line-height:1.15;font-weight:700;text-shadow:0 1px 3px #0005;transform-origin:top left}.extra-item{border:1px solid #e5e1db;border-radius:10px;padding:10px;margin-top:8px}.extra-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.extra-head b{font-size:12px}.extra-delete{width:auto;padding:5px 9px}.extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.extra-grid .range-wrap{min-width:0}.extra-grid label{display:flex;justify-content:space-between;font-size:10px;color:#777;margin-bottom:4px}.extra-grid input{width:100%;padding:0;border:0;background:transparent}.extra-item input[type=file]{font-size:10px}
+          """
+          s=s.replace('</style>', css+'</style>', 1)
+          js="""
+          <script>
+          (function(){
+            S.stickers=S.stickers||[];S.texts=S.texts||[];S.musicEnabled=S.musicEnabled!==false;S.musicX=S.musicX??38;S.musicY=S.musicY??55;
+            function renderExtras(){
+              const layer=document.getElementById('overlayLayer');if(!layer)return;layer.innerHTML='';
+              S.stickers.forEach(o=>{if(!o.src)return;const e=document.createElement('img');e.className='profile-sticker';e.src=o.src;e.style.left=(o.x||0)+'px';e.style.top=(o.y||0)+'px';e.style.width=(o.size||160)+'px';layer.appendChild(e)});
+              S.texts.forEach(o=>{const e=document.createElement('div');e.className='profile-text';e.textContent=o.text||'';e.style.left=(o.x||0)+'px';e.style.top=(o.y||0)+'px';e.style.fontSize=(o.size||42)+'px';layer.appendChild(e)});
+            }
+            const oldRender=window.render;window.render=function(){oldRender();const m=document.getElementById('pvMusic');if(m){m.style.left=S.musicX+'px';m.style.top=S.musicY+'px';m.style.display=S.musicEnabled?'flex':'none'}renderExtras()};
+            const mx=document.getElementById('musicX'),my=document.getElementById('musicY'),me=document.getElementById('musicEnabled');
+            if(mx){mx.value=S.musicX;mx.oninput=()=>{S.musicX=+mx.value;saveState();render()}}if(my){my.value=S.musicY;my.oninput=()=>{S.musicY=+my.value;saveState();render()}}if(me){me.checked=S.musicEnabled;me.onchange=()=>{S.musicEnabled=me.checked;saveState();render()}}
+            function editor(){const box=document.getElementById('extraEditor');if(!box)return;box.innerHTML='';
+              S.stickers.forEach((o,i)=>{const d=document.createElement('div');d.className='extra-item';d.innerHTML='<div class="extra-head"><b>스티커 '+(i+1)+'</b><button class="btn extra-delete">삭제</button></div><input class="input" type="file" accept="image/*"><div class="extra-grid"><div class="range-wrap"><label><span>가로</span><span class="xv"></span></label><input class="x" type="range" min="0" max="680"></div><div class="range-wrap"><label><span>세로</span><span class="yv"></span></label><input class="y" type="range" min="0" max="1240"></div><div class="range-wrap"><label><span>크기</span><span class="sv"></span></label><input class="size" type="range" min="20" max="600"></div></div>';
+                const f=d.querySelector('input[type=file]');f.onchange=e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const r=new FileReader();r.onload=()=>{o.src=r.result;saveState();render();editor()};r.readAsDataURL(file)};
+                const x=d.querySelector('.x'),y=d.querySelector('.y'),z=d.querySelector('.size');x.value=o.x||0;y.value=o.y||0;z.value=o.size||160;d.querySelector('.xv').textContent=x.value+'px';d.querySelector('.yv').textContent=y.value+'px';d.querySelector('.sv').textContent=z.value+'px';x.oninput=()=>{o.x=+x.value;saveState();render()};y.oninput=()=>{o.y=+y.value;saveState();render()};z.oninput=()=>{o.size=+z.value;saveState();render()};d.querySelector('.extra-delete').onclick=()=>{S.stickers.splice(i,1);saveState();editor();render()};box.appendChild(d)});
+              S.texts.forEach((o,i)=>{const d=document.createElement('div');d.className='extra-item';d.innerHTML='<div class="extra-head"><b>텍스트 '+(i+1)+'</b><button class="btn extra-delete">삭제</button></div><input class="input text-value" type="text"><div class="extra-grid"><div class="range-wrap"><label><span>가로</span><span class="xv"></span></label><input class="x" type="range" min="0" max="680"></div><div class="range-wrap"><label><span>세로</span><span class="yv"></span></label><input class="y" type="range" min="0" max="1240"></div><div class="range-wrap"><label><span>크기</span><span class="sv"></span></label><input class="size" type="range" min="10" max="240"></div></div>';
+                const t=d.querySelector('.text-value'),x=d.querySelector('.x'),y=d.querySelector('.y'),z=d.querySelector('.size');t.value=o.text||'';x.value=o.x||0;y.value=o.y||0;z.value=o.size||42;d.querySelector('.xv').textContent=x.value+'px';d.querySelector('.yv').textContent=y.value+'px';d.querySelector('.sv').textContent=z.value+'px';t.oninput=()=>{o.text=t.value;saveState();render()};x.oninput=()=>{o.x=+x.value;saveState();render()};y.oninput=()=>{o.y=+y.value;saveState();render()};z.oninput=()=>{o.size=+z.value;saveState();render()};d.querySelector('.extra-delete').onclick=()=>{S.texts.splice(i,1);saveState();editor();render()};box.appendChild(d)});
+            }
+            document.getElementById('addSticker').onclick=()=>{S.stickers.push({src:'',x:80,y:300,size:160});saveState();editor();render()};document.getElementById('addText').onclick=()=>{S.texts.push({text:'여기에 텍스트를 입력하세요.',x:80,y:500,size:42});saveState();editor();render()};editor();render();
+          })();
+          </script>
+          """
+          s=s.replace('</body>', js+'</body>', 1)
+          p.write_text(s)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add kakao-profile.html
+          git commit -m "feat: add movable profile stickers text and music" || true
+          git push
+          git rm .github/workflows/fix-kakao-profile-v2.yml .github/workflows/fix-kakao-profile-overlays.yml || true
+          git commit -m "chore: remove temporary profile workflows" || true
+          git push || true
