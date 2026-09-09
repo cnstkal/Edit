@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>트위터 설정</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#f5f6f7;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif}button,input,textarea{font:inherit}button{cursor:pointer;border:0}.top{height:64px;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;padding:0 22px;position:sticky;top:0;z-index:20}.top a{color:#111;text-decoration:none;font-size:16px;font-weight:700}.top h1{font-size:18px;margin:0 auto;font-weight:800}.top .spacer{width:55px}.layout{max-width:1420px;margin:0 auto;padding:24px;display:grid;grid-template-columns:minmax(360px,520px) minmax(420px,768px);gap:28px;align-items:start}.settings{background:#fff;border:1px solid #e3e5e8;border-radius:16px;padding:20px}.section{padding:0 0 20px;margin-bottom:20px;border-bottom:1px solid #eceef0}.section:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}.section h2{font-size:16px;margin:0 0 14px}.field{margin:11px 0}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:#343a40}.field input,.field textarea,.field select{width:100%;border:1px solid #d8dce0;border-radius:10px;padding:10px 11px;outline:none;background:#fff}.field textarea{min-height:80px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:#999}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.check{display:flex;align-items:center;gap:8px;font-size:13px;margin-top:10px}.check input{width:17px;height:17px}.tweet-card{border:1px solid #e1e4e7;border-radius:14px;padding:14px;margin:10px 0;background:#fff}.tweet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.tweet-num{font-weight:800;font-size:14px}.danger{color:#c62828;background:#fff0f0;border:1px solid #ffd4d4;border-radius:8px;padding:6px 9px;font-size:12px;font-weight:700}.small{font-size:12px;color:#687078}.add{width:100%;padding:11px;border-radius:10px;background:#111;color:#fff;font-weight:800}.preview-wrap{position:sticky;top:88px}.toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px}.tool{background:#fff;border:1px solid #dfe2e5;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700}.stage{width:min(100%,432px);aspect-ratio:9/16;margin:0 auto;background:#fff;overflow:hidden;border:1px solid #dfe2e5;box-shadow:0 10px 35px rgba(0,0,0,.08)}.screen{width:100%;height:100%;background:#fff;overflow:hidden;position:relative}.twitter-head{height:13%;min-height:78px;border-bottom:1px solid #e5e7e9;background:#fff;position:relative}.tabs{height:100%;display:flex;align-items:flex-end;justify-content:space-around;padding:0 10%;gap:30px}.tab{font-size:clamp(18px,4vw,25px);font-weight:500;color:#5e707b;height:57%;display:flex;align-items:center;justify-content:center;position:relative;white-space:nowrap}.tab.active{font-weight:800;color:#111}.tab.active:after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;border-radius:4px;background:#1d9bf0}.feed{height:87%;overflow:hidden}.tweet{position:relative;padding:18px 18px 16px 78px;border-bottom:1px solid #e3e5e7;background:#fff;min-height:18.2%;font-size:14px}.avatar{position:absolute;left:18px;top:20px;width:48px;height:48px;border-radius:50%;background:#e9ecef;object-fit:cover}.identity{display:flex;align-items:center;gap:5px;min-width:0;padding-right:22px;white-space:nowrap}.name{font-size:16px;font-weight:800;overflow:hidden;text-overflow:ellipsis}.lock{display:inline-flex;width:18px;height:18px;align-items:center;justify-content:center}.handle,.time{color:#5f727e;font-size:14px}.more{position:absolute;right:17px;top:20px;color:#647783;font-weight:900;letter-spacing:3px;font-size:16px}.tweet-text{font-size:17px;line-height:1.38;margin-top:9px;white-space:pre-wrap;overflow-wrap:anywhere}.actions{display:grid;grid-template-columns:1.05fr 1fr 1fr 1.15fr 1fr 1fr;align-items:center;margin-top:13px;color:#5f727e}.act{display:flex;align-items:center;justify-content:center;gap:4px;font-size:13px;min-width:0}.ico{width:21px;height:21px;display:inline-flex;align-items:center;justify-content:center}.ico svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7}.num{font-size:13px}.empty{color:#c7cdd1}.screen[data-scale="large"] .tweet-text{font-size:19px}.screen[data-scale="large"] .name{font-size:17px}.screen[data-scale="large"] .tweet{padding-left:84px}.screen[data-scale="large"] .avatar{width:52px;height:52px}.footer-save{margin-top:12px;text-align:center}.save{background:#111;color:#fff;border-radius:10px;padding:11px 16px;font-weight:800;width:100%}@media(max-width:900px){.layout{grid-template-columns:1fr;padding:14px}.preview-wrap{position:static}.settings{max-width:560px;margin:0 auto}.stage{width:min(100%,430px)}}@media(max-width:560px){.top{height:56px;padding:0 14px}.top h1{font-size:17px}.layout{display:flex;flex-direction:column;padding:10px}.settings{width:100%;padding:15px}.preview-wrap{width:100%}.stage{width:min(100%,390px)}.row{grid-template-columns:1fr}.tweet{padding-left:72px}.actions{gap:0}.act{font-size:11px}.num{font-size:11px}.tweet-text{font-size:16px}.tab{font-size:18px}}
+</style>
+</head>
+<body>
+<header class="top"><a href="index.html">← 홈</a><h1>트위터 설정</h1><div class="spacer"></div></header>
+<main class="layout">
+<section class="settings">
+<div class="section"><h2>기본 정보</h2>
+<div class="row"><div class="field"><label>첫 번째 탭</label><input id="tab1" value="추천"></div><div class="field"><label>두 번째 탭</label><input id="tab2" value="팔로잉"></div></div>
+<div class="check"><input id="activeTab" type="checkbox" checked><span>두 번째 탭을 활성화</span></div>
+</div>
+<div class="section"><h2>게시글</h2><div id="tweets"></div><button class="add" id="addTweet">＋ 게시글 추가</button><div class="small" style="margin-top:9px">게시글을 여러 개 추가해 피드를 구성할 수 있어요.</div></div>
+<div class="section"><h2>화면 표시</h2>
+<div class="row"><div class="field"><label>피드 배경색</label><input id="bg" type="color" value="#ffffff"></div><div class="field"><label>글 크기</label><select id="scale"><option value="normal">기본</option><option value="large">크게</option></select></div></div>
+</div>
+<div class="footer-save"><button class="save" id="savePng">PNG로 저장</button></div>
+</section>
+<section class="preview-wrap"><div class="toolbar"><button class="tool" id="reset">기본값 복원</button></div><div class="stage"><div class="screen" id="screen"><div class="twitter-head"><div class="tabs"><div class="tab" id="pvTab1">추천</div><div class="tab active" id="pvTab2">팔로잉</div></div></div><div class="feed" id="feed"></div></div></div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const KEY='twitter-editor-v1';
+const icon={
+ reply:'<svg viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H7l-4 3v-5.1A7.5 7.5 0 1 1 20 11.5Z"/></svg>',
+ repost:'<svg viewBox="0 0 24 24"><path d="m8 8 4-4 4 4M12 4v11M16 16l-4 4-4-4M12 20V9"/></svg>',
+ like:'<svg viewBox="0 0 24 24"><path d="M20.8 8.7c0 5.5-8.8 10.2-8.8 10.2S3.2 14.2 3.2 8.7A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.8 2.3Z"/></svg>',
+ views:'<svg viewBox="0 0 24 24"><path d="M4 20V10M9 20V5M14 20v-8M19 20V2"/></svg>',
+ bookmark:'<svg viewBox="0 0 24 24"><path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4Z"/></svg>',
+ share:'<svg viewBox="0 0 24 24"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 13v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg>'
+};
+const defaults=[
+{name:'여기에 이름을 입력하세요.',handle:'@username***',time:'여기에 시간을 입력하세요.',text:'여기에 게시글을 입력하세요.',reply:'',repost:'',like:'',views:'',avatar:'',lock:true},
+{name:'여기에 이름을 입력하세요.',handle:'@username***',time:'여기에 시간을 입력하세요.',text:'여기에 게시글을 입력하세요.',reply:'',repost:'',like:'',views:'',avatar:'',lock:true},
+{name:'여기에 이름을 입력하세요.',handle:'@username***',time:'여기에 시간을 입력하세요.',text:'여기에 게시글을 입력하세요.',reply:'',repost:'',like:'',views:'',avatar:'',lock:true}
+];
+let S=load();
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x)return x}catch(e){}return{tab1:'추천',tab2:'팔로잉',activeTab:true,bg:'#ffffff',scale:'normal',tweets:structuredClone(defaults)}}
+function esc(s){return String(s??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\\':'&#39;'}[m]))}
+function renderEditor(){
+ $('tab1').value=S.tab1;$('tab2').value=S.tab2;$('activeTab').checked=S.activeTab;$('bg').value=S.bg;$('scale').value=S.scale;
+ const box=$('tweets');box.innerHTML='';
+ S.tweets.forEach((t,i)=>{const c=document.createElement('div');c.className='tweet-card';c.innerHTML=`<div class="tweet-head"><span class="tweet-num">게시글 ${i+1}</span>${S.tweets.length>1?'<button class="danger" data-del="'+i+'">삭제</button>':''}</div><div class="row"><div class="field"><label>이름</label><input data-i="${i}" data-k="name" value="${esc(t.name)}"></div><div class="field"><label>아이디</label><input data-i="${i}" data-k="handle" value="${esc(t.handle)}"></div></div><div class="row"><div class="field"><label>작성 시간</label><input data-i="${i}" data-k="time" value="${esc(t.time)}"></div><div class="field"><label>프로필 사진</label><input data-i="${i}" data-k="avatar" placeholder="이미지 URL (선택)" value="${esc(t.avatar)}"></div></div><div class="field"><label>게시글 내용</label><textarea data-i="${i}" data-k="text">${esc(t.text)}</textarea></div><div class="row"><div class="field"><label>댓글 수</label><input data-i="${i}" data-k="reply" value="${esc(t.reply)}" placeholder="예: 23"></div><div class="field"><label>리포스트 수</label><input data-i="${i}" data-k="repost" value="${esc(t.repost)}" placeholder="예: 205"></div></div><div class="row"><div class="field"><label>좋아요 수</label><input data-i="${i}" data-k="like" value="${esc(t.like)}" placeholder="예: 3"></div><div class="field"><label>조회 수</label><input data-i="${i}" data-k="views" value="${esc(t.views)}" placeholder="예: 1149"></div></div><label class="check"><input type="checkbox" data-i="${i}" data-k="lock" ${t.lock?'checked':''}><span>비공개 계정 자물쇠 표시</span></label>`;box.appendChild(c)})
+ box.querySelectorAll('[data-i][data-k]').forEach(el=>el.addEventListener('input',e=>{const i=+e.target.dataset.i,k=e.target.dataset.k;S.tweets[i][k]=e.target.type==='checkbox'?e.target.checked:e.target.value;save();render()}));
+ box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{S.tweets.splice(+b.dataset.del,1);save();renderEditor();render()});
+}
+function render(){
+ $('pvTab1').textContent=S.tab1;$('pvTab2').textContent=S.tab2;$('pvTab2').classList.toggle('active',S.activeTab);$('pvTab1').classList.toggle('active',!S.activeTab);$('screen').dataset.scale=S.scale;
+ $('screen').style.background=S.bg;$('feed').style.background=S.bg;
+ $('feed').innerHTML=S.tweets.map(t=>`<article class="tweet"><img class="avatar" src="${esc(t.avatar||'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'96\' height=\'96\'%3E%3Crect width=\'96\' height=\'96\' fill=\'%23e9ecef\'/%3E%3Ccircle cx=\'48\' cy=\'38\' r=\'18\' fill=\'%23aeb7bd\'/%3E%3Cpath d=\'M20 88c3-21 17-30 28-30s25 9 28 30\' fill=\'%23aeb7bd\'/%3E%3C/svg%3E'}" onerror="this.removeAttribute('src')"><div class="identity"><span class="name">${esc(t.name)}</span>${t.lock?'<span class="lock">🔒</span>':''}<span class="handle">${esc(t.handle)}</span><span class="time">· ${esc(t.time)}</span></div><span class="more">•••</span><div class="tweet-text">${esc(t.text)}</div><div class="actions"><span class="act ${t.reply?'':'empty'}"><i class="ico">${icon.reply}</i><span class="num">${esc(t.reply)}</span></span><span class="act ${t.repost?'':'empty'}"><i class="ico">${icon.repost}</i><span class="num">${esc(t.repost)}</span></span><span class="act ${t.like?'':'empty'}"><i class="ico">${icon.like}</i><span class="num">${esc(t.like)}</span></span><span class="act ${t.views?'':'empty'}"><i class="ico">${icon.views}</i><span class="num">${esc(t.views)}</span></span><span class="act"><i class="ico">${icon.bookmark}</i></span><span class="act"><i class="ico">${icon.share}</i></span></div></article>`).join('')
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(S))}
+['tab1','tab2','bg','scale'].forEach(id=>$(id).addEventListener('input',e=>{S[id]=e.target.value;save();render()}));
+$('activeTab').onchange=e=>{S.activeTab=e.target.checked;save();render()};
+$('addTweet').onclick=()=>{S.tweets.push(structuredClone(defaults[0]));save();renderEditor();render()};
+$('reset').onclick=()=>{if(confirm('기본값으로 복원할까요?')){localStorage.removeItem(KEY);S=load();renderEditor();render()}};
+$('savePng').onclick=async()=>{if(!window.html2canvas){const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';document.head.appendChild(s);await new Promise(r=>s.onload=r)}const c=await html2canvas($('screen'),{scale:3,useCORS:true,backgroundColor:'#fff'});const a=document.createElement('a');a.download='twitter.png';a.href=c.toDataURL('image/png');a.click()};
+renderEditor();render();
+</script>
+</body>
+</html>
