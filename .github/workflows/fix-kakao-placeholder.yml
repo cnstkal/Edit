@@ -1,0 +1,36 @@
+name: Remove Kakao placeholder
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-kakao-placeholder.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove placeholder
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('kakao-profile.html')
+          s = p.read_text(encoding='utf-8')
+          old = "else if(i===0){d.innerHTML='<div class=\\\"media-label\\\">방금 본 미디어</div>'}"
+          if old not in s:
+              raise SystemExit('target placeholder not found')
+          s = s.replace(old, '')
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add kakao-profile.html
+          git diff --cached --quiet || git commit -m 'fix: remove kakao profile media placeholder'
+          git push
+      - name: Remove workflow
+        run: |
+          git rm .github/workflows/fix-kakao-placeholder.yml
+          git commit -m 'chore: remove temporary placeholder workflow'
+          git push
