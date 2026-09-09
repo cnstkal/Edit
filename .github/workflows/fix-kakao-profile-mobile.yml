@@ -1,6 +1,8 @@
 name: Fix Kakao Profile Mobile Layout
 on:
-  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fix-kakao-profile-mobile.yml'
 jobs:
   fix:
     runs-on: ubuntu-latest
