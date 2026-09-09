@@ -1,6 +1,8 @@
 name: Update Kakao send button
 on:
-  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/update-send-button.yml'
 jobs:
   update:
     runs-on: ubuntu-latest
