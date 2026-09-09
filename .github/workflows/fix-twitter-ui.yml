@@ -1,0 +1,104 @@
+name: Fix Twitter editor UI
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-twitter-ui.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch twitter.html
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          p = Path('twitter.html')
+          s = p.read_text(encoding='utf-8')
+
+          s = s.replace(
+              '.layout{max-width:1420px;margin:0 auto;padding:24px;display:grid;grid-template-columns:minmax(360px,520px) minmax(420px,768px);gap:28px;align-items:start}',
+              '.layout{width:min(1120px,100%);margin:0 auto;padding:0 0 48px;display:flex;flex-direction:column;gap:24px;align-items:stretch}'
+          )
+          s = s.replace(
+              '.settings{background:#fff;border:1px solid #e3e5e8;border-radius:16px;padding:20px}',
+              '.settings{width:100%;max-width:760px;margin:0 auto;background:transparent;border:0;border-radius:0;padding:0;order:2}'
+          )
+          s = s.replace(
+              '.section{padding:0 0 20px;margin-bottom:20px;border-bottom:1px solid #eceef0}',
+              '.section{background:#fff;border:1px solid #dddcd8;border-radius:17px;box-shadow:0 1px 4px #7771;padding:18px 22px 20px;margin-bottom:12px}'
+          )
+          s = s.replace(
+              '.section:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}',
+              '.section:last-child{margin-bottom:12px}'
+          )
+          s = s.replace(
+              '.section h2{font-size:16px;margin:0 0 14px}',
+              '.section h2{font-size:18px;margin:0 0 14px;font-weight:750}'
+          )
+          s = s.replace(
+              '.tweet-card{border:1px solid #e1e4e7;border-radius:14px;padding:14px;margin:10px 0;background:#fff}',
+              '.tweet-card{border:1px solid #e7e0d5;border-radius:10px;padding:12px;margin:10px 0;background:#fcfaf5}'
+          )
+          s = s.replace(
+              '.add{width:100%;padding:11px;border-radius:10px;background:#111;color:#fff;font-weight:800}',
+              '.add{width:100%;height:44px;padding:0;border-radius:11px;background:#fff;color:#222;border:1px solid #d9d8d4;font-size:13px;font-weight:600}'
+          )
+          s = s.replace(
+              '.preview-wrap{position:sticky;top:88px}',
+              '.preview-wrap{width:100%;order:1;position:static}'
+          )
+          s = s.replace(
+              '.toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px}',
+              '.toolbar{width:min(760px,100%);margin:0 auto 10px;display:flex;justify-content:flex-end;gap:8px}'
+          )
+          s = s.replace(
+              '@media(max-width:900px){.layout{grid-template-columns:1fr;padding:14px}.preview-wrap{position:static}.settings{max-width:560px;margin:0 auto}.stage{width:min(100%,430px)}}',
+              '@media(max-width:900px){.layout{width:100%;padding:0 14px 40px}.preview-wrap{position:static}.settings{width:100%;max-width:760px;margin:0 auto}.stage{width:min(100%,430px)}}'
+          )
+          s = s.replace(
+              '@media(max-width:560px){.top{height:56px;padding:0 14px}.top h1{font-size:17px}.layout{display:flex;flex-direction:column;padding:10px}.settings{width:100%;padding:15px}.preview-wrap{width:100%}.stage{width:min(100%,390px)}.row{grid-template-columns:1fr}.tweet{padding-left:72px}.actions{gap:0}.act{font-size:11px}.num{font-size:11px}.tweet-text{font-size:16px}.tab{font-size:18px}}',
+              '@media(max-width:560px){.top{height:56px;padding:0 14px}.top h1{font-size:17px}.layout{display:flex;flex-direction:column;padding:0 10px 40px}.settings{width:100%;padding:0}.preview-wrap{width:100%}.stage{width:min(100%,390px)}.row{grid-template-columns:1fr}.tweet{padding-left:72px}.actions{gap:0}.act{font-size:11px}.num{font-size:11px}.tweet-text{font-size:16px}.tab{font-size:18px}.section{padding:17px 15px}}'
+          )
+
+          marker = '</body>'
+          patch = r'''<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const old=document.getElementById('addTweet');
+  if(!old) return;
+  const btn=old.cloneNode(true);
+  old.replaceWith(btn);
+  btn.addEventListener('click',()=>{
+    S.tweets.push({name:'여기에 이름을 입력하세요.',handle:'@username***',time:'여기에 시간을 입력하세요.',text:'여기에 게시글을 입력하세요.',reply:'',repost:'',like:'',views:'',avatar:'',lock:true});
+    save();
+    renderEditor();
+    render();
+  });
+});
+</script>'''
+          if 'const old=document.getElementById(\'addTweet\')' not in s:
+              s = s.replace(marker, patch + '\n' + marker)
+
+          p.write_text(s, encoding='utf-8')
+
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add twitter.html
+          git diff --cached --quiet || git commit -m 'Fix Twitter editor UI and add button'
+          git push
+
+      - name: Remove temporary workflow
+        if: always()
+        run: |
+          rm -f .github/workflows/fix-twitter-ui.yml
+          git add .github/workflows/fix-twitter-ui.yml
+          git diff --cached --quiet || git commit -m 'Remove temporary Twitter patch workflow'
+          git push
