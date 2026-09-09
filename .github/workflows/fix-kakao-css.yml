@@ -1,0 +1,36 @@
+name: Fix Kakao CSS
+on:
+  workflow_dispatch:
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repair style tags
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('kakao2.html')
+          s = p.read_text()
+          s = s.replace('<style>.stage.ratio-9-16', '.stage.ratio-9-16', 1)
+          s = s.replace('<style>\n/* Refine chat header */', '\n/* Refine chat header */', 1)
+          s = s.replace('<style>\n/* Final Kakao header refinement */', '\n/* Final Kakao header refinement */', 1)
+          s = s.replace('<style>\n/* PC 16:9 preview: enlarge chat content except room name */', '\n/* PC 16:9 preview: enlarge chat content except room name */', 1)
+          s = s.replace('</style></style></head>', '</style></head>', 1)
+          p.write_text(s)
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add kakao2.html
+          git commit -m 'fix: repair Kakao CSS markup'
+          git push
+      - name: Remove temporary workflow
+        if: success()
+        run: |
+          git rm .github/workflows/fix-kakao-css.yml
+          git commit -m 'chore: remove temporary CSS fix workflow'
+          git push
