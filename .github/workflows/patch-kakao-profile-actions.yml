@@ -1,0 +1,42 @@
+name: Patch Kakao profile actions
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-kakao-profile-actions.yml'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch action buttons
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('kakao-profile.html')
+          s=p.read_text()
+          s=s.replace('.action{display:flex;align-items:center;justify-content:center;gap:14px;font-size:30px}', '.action{display:flex;align-items:center;justify-content:center;gap:8px;font-size:30px}')
+          s=s.replace('.action-icon{width:30px;height:30px;display:block;flex:none}', '.action-icon{width:30px;height:30px;display:block;flex:none}')
+          s=s.replace('.action{font-size:25px}.action-icon{width:28px;height:28px}', '.action{font-size:25px}.action-icon{width:25px;height:25px}')
+          old='''<span class="action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H11l-4.5 3v-3H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"/></svg></span>'''
+          new='''<span class="action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5.5h12a3 3 0 0 1 3 3v5.5a3 3 0 0 1-3 3h-7l-4.5 3v-3H6a3 3 0 0 1-3-3V8.5a3 3 0 0 1 3-3Z"/><path d="M7.5 10h9M7.5 13h6"/></svg></span>'''
+          s=s.replace(old,new)
+          old='''<span class="action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 4.5 9.5 3l2.4 4.2-2 1.6c.9 2 2.3 3.4 4.3 4.3l1.6-2 4.2 2.4-1.5 2.3c-.6.9-1.7 1.4-2.8 1.1-6-1.5-10.7-6.2-12.2-12.2-.3-1.1.2-2.2 1.1-2.8Z"/></svg></span>'''
+          new='''<span class="action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.7 3.8 10.1 3l2.2 5-2.4 1.5a12.7 12.7 0 0 0 4.6 4.6l1.5-2.4 5 2.2-.8 2.4a2.7 2.7 0 0 1-3.1 1.8A17.3 17.3 0 0 1 5.9 7a2.7 2.7 0 0 1 1.8-3.2Z"/></svg></span>'''
+          s=s.replace(old,new)
+          p.write_text(s)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add kakao-profile.html
+          git diff --cached --quiet || git commit -m 'Refine Kakao profile action icons'
+          git push
+      - name: Remove workflow
+        if: always()
+        run: |
+          git rm .github/workflows/patch-kakao-profile-actions.yml
+          git commit -m 'Remove temporary action icon patch workflow'
+          git push
