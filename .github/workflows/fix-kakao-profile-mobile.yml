@@ -1,0 +1,33 @@
+name: Fix Kakao Profile Mobile Layout
+on:
+  workflow_dispatch:
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch profile editor
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('kakao-profile.html')
+          s=p.read_text(encoding='utf-8')
+          css='''\n/* mobile settings overflow fix */\n.field,.row,.media-editor,.media-box{min-width:0}\n.row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}\n.media-editor{grid-template-columns:repeat(3,minmax(0,1fr))}\n.media-box{overflow:hidden}\n.input,textarea,select,input{min-width:0;max-width:100%}\n.media-box input{width:100%;max-width:100%;display:block}\n.panel{overflow:hidden}\n@media(max-width:760px){\n  body{width:100%;max-width:100%;overflow-x:hidden}\n  .layout,.preview,.panel,.group{width:100%;max-width:100%;min-width:0}\n  .media-editor{grid-template-columns:repeat(2,minmax(0,1fr))}\n}\n'''
+          s=s.replace('</style>',css+'</style>',1)
+          s=s.replace("else if(i===0){d.innerHTML='<div class=\\\"media-label\\\">방금 본 미디어</div>'}","")
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add kakao-profile.html
+          git diff --cached --quiet || git commit -m 'fix: prevent kakao profile settings overflow'
+          git push
+      - name: Remove temporary workflow
+        run: |
+          git rm .github/workflows/fix-kakao-profile-mobile.yml
+          git commit -m 'chore: remove temporary profile mobile workflow'
+          git push
