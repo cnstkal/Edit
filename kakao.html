@@ -92,4 +92,60 @@ body{padding:0!important;margin:0!important}
   }
   window.addEventListener('DOMContentLoaded',run);window.addEventListener('load',run);setTimeout(run,300);setTimeout(run,1000);
 })();
-</script></head><body><div class="top"><button class="home" onclick="location.href='index.html'">← 홈으로</button><b>카톡</b></div><main><header class="head"><h1>카톡</h1><p>만들 소스 종류를 선택하세요</p></header><section class="grid"><button class="card" onclick="location.href='kakao2.html?v=20260909h'"><div class="icon">💬</div><div class="name">채팅</div><div class="desc">카카오톡 채팅 · 프로필 · 날짜 · 시간</div></button><button class="card" onclick="location.href='kakao-profile.html?v=20260910b'"><div class="icon">👤</div><div class="name">프로필</div><div class="desc">카카오톡 프로필 · 음악 · 미디어</div></button></section></main></body></html>
+</script><style id="EDITOR_UI_HARD_FIX_V1">
+/* One source of truth for editor chrome */
+html,body{margin:0!important;background:#f5f3ee!important}
+body{padding:0!important}
+.top{position:relative!important;width:100%!important;max-width:none!important;height:68px!important;min-height:68px!important;margin:0!important;padding:0 28px!important;box-sizing:border-box!important;background:#fbfaf7!important;border-bottom:1px solid #e2dfda!important;display:flex!important;align-items:center!important;justify-content:center!important;z-index:50!important}
+.top:before,.top:after{content:none!important;display:none!important}
+.top .brand{display:none!important}
+.top .home,.top a.home,.top>a:first-child{position:absolute!important;left:28px!important;right:auto!important;top:12px!important;width:76px!important;min-width:76px!important;height:44px!important;padding:0!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;border:1px solid #d8d4ce!important;border-radius:11px!important;background:#fff!important;color:#4d4b49!important;text-decoration:none!important;font-size:13px!important;font-weight:700!important;line-height:1!important;z-index:3!important}
+.top .home:before,.top .home:after,.top a.home:before,.top a.home:after,.top>a:first-child:before,.top>a:first-child:after{content:none!important;display:none!important}
+.top .top-right{position:absolute!important;right:28px!important;top:12px!important;height:44px!important;display:flex!important;align-items:center!important;gap:8px!important;z-index:3!important}
+.top .top-right .save,.top .top-right #save,.top .top-right #savePng,.top>.save,.top>#save,.top>#savePng{position:static!important;width:190px!important;min-width:190px!important;height:44px!important;margin:0!important;padding:0!important;border:0!important;border-radius:11px!important;background:#4b4948!important;color:#fff!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:15px!important;font-weight:750!important;line-height:1!important}
+.top .top-right .save:before,.top .top-right .save:after,.top #save:before,.top #save:after,.top #savePng:before,.top #savePng:after{content:none!important}
+.layout{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:0!important;align-items:start!important}
+.preview,.preview-wrap{grid-column:1!important;grid-row:1!important;width:100%!important;min-width:0!important;margin:0!important;padding:24px 28px!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-items:center!important}
+.previewSticky{position:static!important;width:100%!important}
+.preview-tools,.tools{width:min(100%,760px)!important;box-sizing:border-box!important;margin:0 auto 12px!important;padding:8px 12px!important;min-height:52px!important;height:52px!important;border:1px solid #ddd9d3!important;border-radius:12px!important;background:#fffdfa!important;box-shadow:0 1px 5px #7771!important;display:flex!important;align-items:center!important}
+.preview-tools .mode,.tools .mode{height:36px!important;min-height:36px!important;padding:0 11px!important;border:1px solid #dedad5!important;border-radius:9px!important;font-size:12px!important}
+.preview-tools .zoom,.tools .zoom{margin-left:auto!important;gap:6px!important;display:flex!important;align-items:center!important}
+.preview-tools .zoom button,.tools .zoom button{height:36px!important;min-width:36px!important;border:1px solid #ddd!important;border-radius:9px!important;font-size:18px!important}
+.stage-wrap{width:min(100%,920px)!important;box-sizing:border-box!important;margin:0 auto!important;padding:12px!important;border:1px solid #d8d4ce!important;border-radius:12px!important;background:#e2ded6!important;overflow:hidden!important}
+.stage{margin:0 auto!important}
+.settings,.panel{grid-column:2!important;grid-row:1!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:24px 28px 28px!important;box-sizing:border-box!important;border:1px solid #ddd9d3!important;border-top:0!important;border-right:0!important;border-radius:0 0 0 14px!important;background:#fbfaf7!important;box-shadow:none!important;overflow-y:auto!important;overflow-x:hidden!important}
+.settings:before,.panel:before{display:none!important}
+.settings>h2,.panel>h2{margin:0 0 18px!important;font-size:26px!important}
+.settings .card,.panel .group,.panel .card,.settings .group{box-sizing:border-box!important;width:100%!important;max-width:none!important}
+.settings .restore,.settings .reset,.panel .restore,.panel .reset{margin-top:14px!important}
+@media(max-width:900px){
+  .top{height:64px!important;min-height:64px!important;padding:0 10px!important}
+  .top .home,.top a.home,.top>a:first-child{left:10px!important;top:10px!important;width:68px!important;min-width:68px!important;height:40px!important;font-size:12px!important}
+  .top .top-right{right:10px!important;top:10px!important;height:40px!important}
+  .top .top-right .save,.top .top-right #save,.top .top-right #savePng,.top>.save,.top>#save,.top>#savePng{width:125px!important;min-width:125px!important;height:40px!important;font-size:12px!important}
+  .layout{display:flex!important;flex-direction:column!important}
+  .preview,.preview-wrap{order:1!important;width:100%!important;padding:12px 8px 0!important}
+  .settings,.panel{order:2!important;width:100%!important;height:auto!important;min-height:0!important;padding:20px 8px 50px!important;border:0!important;border-radius:0!important;overflow:visible!important;background:#f5f3ee!important}
+  .stage-wrap{width:100%!important;padding:8px!important}
+}
+</style><script id="EDITOR_UI_HARD_FIX_V1_JS">(()=>{
+function run(){
+  document.querySelectorAll('.top').forEach(top=>{
+    const links=[...top.querySelectorAll('a,.home')];
+    const home=links.find(x=>/홈|home/i.test((x.textContent||'')))||links[0];
+    if(home){home.textContent='홈으로';home.classList.add('home');}
+    let saves=[...top.querySelectorAll('button,a,.save,[id*=save i]')].filter(x=>/PNG|저장|save/i.test((x.textContent||'')+' '+(x.id||'')));
+    saves=saves.filter(x=>x!==home);
+    if(saves.length){const keep=saves[saves.length-1];saves.slice(0,-1).forEach(x=>{if(x!==keep)x.style.display='none'});let box=top.querySelector('.top-right');if(!box){box=document.createElement('div');box.className='top-right';top.appendChild(box)}box.appendChild(keep);keep.textContent='PNG로 저장';}
+  });
+  document.querySelectorAll('.settings,.panel').forEach(settings=>{
+    const layout=settings.closest('.layout'); if(!layout)return;
+    const preview=layout.querySelector('.preview,.preview-wrap'); if(!preview)return;
+    if(window.innerWidth>900){
+      const h=Math.max(0,preview.getBoundingClientRect().height);
+      settings.style.height=h+'px';settings.style.maxHeight=h+'px';settings.style.overflowY='auto';
+    } else {settings.style.height='auto';settings.style.maxHeight='none';}
+  });
+}
+window.addEventListener('DOMContentLoaded',run);window.addEventListener('load',run);window.addEventListener('resize',run);setTimeout(run,300);setTimeout(run,1000);
+})();</script></head><body><div class="top"><button class="home" onclick="location.href='index.html'">← 홈으로</button><b>카톡</b></div><main><header class="head"><h1>카톡</h1><p>만들 소스 종류를 선택하세요</p></header><section class="grid"><button class="card" onclick="location.href='kakao2.html?v=20260909h'"><div class="icon">💬</div><div class="name">채팅</div><div class="desc">카카오톡 채팅 · 프로필 · 날짜 · 시간</div></button><button class="card" onclick="location.href='kakao-profile.html?v=20260910b'"><div class="icon">👤</div><div class="name">프로필</div><div class="desc">카카오톡 프로필 · 음악 · 미디어</div></button></section></main></body></html>
