@@ -16,7 +16,50 @@ html,body{margin:0;background:#f3efe7;color:#111;font-family:Pretendard,sans-ser
 @media(max-width:800px){body{padding:10px 8px 28px}.top{margin-bottom:9px}.brand{font-size:14px}.top-right{gap:5px}.layout{display:flex;flex-direction:column}.panel{order:2;width:100%;max-width:760px;margin:auto}.preview-wrap{order:1;width:100%}.preview-tools{width:100%}.stage-wrap{order:2;padding:8px;width:100%}.stage{max-width:920px;width:100%;aspect-ratio:16/9!important}.stage.pc-frame{width:100%;max-width:1180px;aspect-ratio:16/9!important;min-height:0}.pc-main{display:block;padding:28px 6.5% 45px}.side{display:none}.title{font-size:27px;margin-bottom:7px}.nav{font-size:15px;height:44px;justify-content:flex-start;gap:80px}.nav span{padding-bottom:6px}.brand-row{height:68px;justify-content:flex-start}.logo{width:185px;height:58px;left:0;transform:none}.search{display:none}.stage:not(.pc-frame) .dispatch{width:720px;min-height:1280px}.stage:not(.pc-frame) .brand-row .logo{left:0!important;transform:none!important}.stage:not(.pc-frame) .nav{width:720px;margin-left:2.7%;justify-content:flex-start;gap:80px;font-size:17px}.stage:not(.pc-frame) .date{font-size:10px}.stage.pc-frame .brand-row .logo{left:50%!important;transform:translateX(-50%)!important}.stage.pc-frame .pc-main{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:4%;padding:30px 4% 32px}.stage.pc-frame .side{display:block;padding:14px 10px 6px}.stage.pc-frame .nav{justify-content:space-between;gap:10px;font-size:15px}.stage.pc-frame .side h3{font-size:13px;margin-bottom:10px}.stage.pc-frame .mini{margin-bottom:10px;padding-bottom:10px}.stage.pc-frame .mini-title{font-size:12px;line-height:1.4;padding-left:6px}.stage.pc-frame .title{font-size:20px}.stage.pc-frame .date{font-size:9px;margin-bottom:10px}.stage.pc-frame .body{font-size:12px;line-height:1.65}.stage.pc-frame .credit{font-size:10px}.stage.pc-frame .photo{margin-bottom:16px}.preview-tools .zoom{width:100%;margin-left:0}.preview-tools .zoom input{flex:1}}
 .preview-tools,.preview-tools *{touch-action:manipulation}
 </style>
-<style id="no-input-zoom">input:not([type="checkbox"]):not([type="radio"]),textarea,select{font-size:16px!important}</style></head>
+<style id="no-input-zoom">input:not([type="checkbox"]):not([type="radio"]),textarea,select{font-size:16px!important}</style><style>
+
+/* PC_EDITOR_OPTIMIZATION_V1 */
+@media (min-width: 1251px){
+  .layout{width:min(1320px,calc(100% - 32px));grid-template-columns:minmax(460px,520px) minmax(640px,760px);gap:32px;align-items:start}
+  .panel,.settings{width:100%;max-width:760px}
+  .preview,.preview-wrap{width:100%;min-width:0}
+  .previewSticky{width:100%}
+  .stage{max-width:480px}
+  .tools{width:100%;flex-wrap:nowrap}
+  .preview-tools{width:100%;flex-wrap:nowrap}
+  .zoom{min-width:0}
+  .zoom input{min-width:120px}
+}
+@media (min-width: 901px) and (max-width: 1250px){
+  .layout{width:min(1120px,calc(100% - 24px));grid-template-columns:minmax(360px,1fr) minmax(520px,760px);gap:22px}
+  .panel,.settings{max-width:760px}
+  .preview,.preview-wrap{min-width:0}
+  .tools,.preview-tools{max-width:100%;}
+}
+@media (min-width: 901px){
+  .panel{justify-self:stretch}
+  .settings{justify-self:stretch}
+  .card,.section{overflow:visible}
+  input,textarea,select{max-width:100%;min-width:0}
+}
+@media (min-width: 1251px){
+  .card{padding-left:22px;padding-right:22px}
+  .group{min-width:0}
+  .grid2,.grid3,.row{min-width:0}
+  .field{min-width:0}
+  .previewSticky{top:16px}
+  .preview-tools{margin-bottom:12px}
+  .stage-wrap{padding:12px}
+}
+@media (max-width: 1250px) and (min-width: 901px){
+  .preview-tools{gap:8px;padding:12px 14px}
+  .preview-tools .mode{padding:10px 14px;min-height:48px;font-size:15px}
+  .preview-tools .zoom{gap:7px}
+  .preview-tools .zoom button{min-width:44px;height:44px;font-size:22px}
+  .preview-tools .zoom span{font-size:13px;min-width:38px}
+}
+
+</style></head>
 <body>
 <div class="top"><button class="home" type="button" onclick="location.href='index.html'">← 홈으로</button><div class="brand">디스패치</div></div>
 <div class="layout">
