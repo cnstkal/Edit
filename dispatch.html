@@ -65,16 +65,16 @@ html,body{margin:0;background:#f3efe7;color:#111;font-family:Pretendard,sans-ser
 <div class="layout">
 <section class="panel">
 <h2>디스패치 기사 설정</h2>
-<div class="group"><label>디스패치 로고</label><div class="upload-row"><label class="upload">여기에 로고 이미지를 추가하세요.<input id="logoFile" type="file" accept="image/*"></label><button class="remove" id="removeLogo" type="button">삭제</button></div><div class="small">여기에 상단 중앙에 표시할 로고를 추가하세요.</div></div>
-<div class="group"><label>기사 제목</label><textarea id="title" style="min-height:76px">여기에 기사 제목을 입력하세요.</textarea></div>
-<div class="group"><label>작성일시</label><input id="date" type="text" value="여기에 기사 작성일시를 입력하세요."></div>
-<div class="group"><label>기사 사진</label><div class="upload-row"><label class="upload">여기에 기사 사진을 추가하세요.<input id="photoFile" type="file" accept="image/*"></label><button class="remove" id="removePhoto" type="button">삭제</button></div><div class="small">여기에 원본 사진을 추가하세요. 원본 비율 그대로 표시됩니다.</div></div>
-<div class="group"><label>기사 본문</label><textarea id="body">여기에 기사 본문을 입력하세요.</textarea></div>
-<div class="group"><label>사진 출처</label><input id="credit" type="text" placeholder="여기에 사진 출처를 입력하세요."></div>
+<div class="group"><label>디스패치 로고</label><div class="upload-row"><label class="upload">로고<input id="logoFile" type="file" accept="image/*"></label><button class="remove" id="removeLogo" type="button">삭제</button></div><div class="small">로고</div></div>
+<div class="group"><label>기사 제목</label><textarea id="title" style="min-height:76px">제목</textarea></div>
+<div class="group"><label>작성일시</label><input id="date" type="text" value="작성일"></div>
+<div class="group"><label>기사 사진</label><div class="upload-row"><label class="upload">사진<input id="photoFile" type="file" accept="image/*"></label><button class="remove" id="removePhoto" type="button">삭제</button></div><div class="small">사진 원본 비율 그대로 표시됩니다.</div></div>
+<div class="group"><label>기사 본문</label><textarea id="body">본문</textarea></div>
+<div class="group"><label>사진 출처</label><input id="credit" type="text" placeholder="출처"></div>
 <div class="group"><label>PC 오른쪽 미니 기사 3개</label>
-<div class="mini-edit"><label>1번 사진</label><div class="upload-row"><label class="upload">여기에 사진을 추가하세요.<input id="miniFile1" type="file" accept="image/*"></label><button class="remove" id="removeMini1" type="button">삭제</button></div><input id="miniTitle1" type="text" value="여기에 관련 기사 제목을 입력하세요."></div>
-<div class="mini-edit"><label>2번 사진</label><div class="upload-row"><label class="upload">여기에 사진을 추가하세요.<input id="miniFile2" type="file" accept="image/*"></label><button class="remove" id="removeMini2" type="button">삭제</button></div><input id="miniTitle2" type="text" value="여기에 관련 기사 제목을 입력하세요."></div>
-<div class="mini-edit"><label>3번 사진</label><div class="upload-row"><label class="upload">여기에 사진을 추가하세요.<input id="miniFile3" type="file" accept="image/*"></label><button class="remove" id="removeMini3" type="button">삭제</button></div><input id="miniTitle3" type="text" value="여기에 관련 기사 제목을 입력하세요."></div>
+<div class="mini-edit"><label>1번 사진</label><div class="upload-row"><label class="upload">사진<input id="miniFile1" type="file" accept="image/*"></label><button class="remove" id="removeMini1" type="button">삭제</button></div><input id="miniTitle1" type="text" value="관련 기사"></div>
+<div class="mini-edit"><label>2번 사진</label><div class="upload-row"><label class="upload">사진<input id="miniFile2" type="file" accept="image/*"></label><button class="remove" id="removeMini2" type="button">삭제</button></div><input id="miniTitle2" type="text" value="관련 기사"></div>
+<div class="mini-edit"><label>3번 사진</label><div class="upload-row"><label class="upload">사진<input id="miniFile3" type="file" accept="image/*"></label><button class="remove" id="removeMini3" type="button">삭제</button></div><input id="miniTitle3" type="text" value="관련 기사"></div>
 </div>
 <div class="actions"><button class="action light" id="reset" type="button">초기화</button><button class="action" id="save" type="button">PNG 저장</button></div>
 </section>
@@ -96,5 +96,43 @@ fields.forEach(id=>$(id).addEventListener('input',render));
 function file(id,cb){$(id).addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(!f.type.startsWith('image/')){alert('이미지 파일만 업로드할 수 있습니다.');e.target.value='';return}if(f.size>15*1024*1024){alert('이미지는 15MB 이하로 업로드해 주세요.');e.target.value='';return}const r=new FileReader;r.onerror=()=>alert('이미지를 불러오지 못했습니다.');r.onload=()=>{cb(r.result);render();requestAnimationFrame(()=>{if($('mode').value==='pc'||$('zoom').value==='40')fit()})};r.readAsDataURL(f)})}
 function removeImage(kind,index){if(kind==='logo'){logo='';$('logoFile').value=''}else if(kind==='photo'){photo='';$('photoFile').value=''}else{mini[index]='';$('miniFile'+(index+1)).value=''}render();saveLocal(true)}
 file('logoFile',x=>logo=x);file('photoFile',x=>photo=x);file('miniFile1',x=>mini[0]=x);file('miniFile2',x=>mini[1]=x);file('miniFile3',x=>mini[2]=x);$('removeLogo').onclick=()=>removeImage('logo');$('removePhoto').onclick=()=>removeImage('photo');$('removeMini1').onclick=()=>removeImage('mini',0);$('removeMini2').onclick=()=>removeImage('mini',1);$('removeMini3').onclick=()=>removeImage('mini',2);$('mode').onchange=mode;$('zoom').oninput=()=>zoom($('zoom').value,false);$('minus').onclick=()=>zoom(+$('zoom').value-10,false);$('plus').onclick=()=>zoom(+$('zoom').value+10,false);$('fit').onclick=()=>fit();$('stage').addEventListener('pointerdown',e=>{if(e.target.closest('button,input,select,textarea'))return;panX0=e.clientX;panY0=e.clientY;startX=panX;startY=panY;$('stage').classList.add('dragging');$('stage').setPointerCapture(e.pointerId)});let panX0=0,panY0=0,startX=0,startY=0;$('stage').addEventListener('pointermove',e=>{if(!$('stage').classList.contains('dragging'))return;panX=startX+(e.clientX-panX0);panY=startY+(e.clientY-panY0);clamp();transform()});$('stage').addEventListener('pointerup',e=>{$('stage').classList.remove('dragging');try{$('stage').releasePointerCapture(e.pointerId)}catch(_){ }saveLocal()});$('stage').addEventListener('pointercancel',()=>{$('stage').classList.remove('dragging');saveLocal()});$('reset').onclick=()=>{if(confirm('작성한 내용을 초기화할까요?')){localStorage.removeItem(STORE);location.reload()}};$('save').onclick=async()=>{const b=$('save');if(b.disabled)return;b.disabled=true;b.textContent='저장 중…';try{if(!window.html2canvas)throw new Error('html2canvas unavailable');const c=await html2canvas($('dispatch'),{backgroundColor:'#fff',scale:2,useCORS:true,logging:false});const a=document.createElement('a');a.download='dispatch-article.png';a.href=c.toDataURL('image/png');a.click()}catch(e){alert('PNG 저장에 실패했습니다. 다시 시도해 주세요.')}finally{b.disabled=false;b.textContent='PNG 저장';saveLocal(true)}};loadLocal();render();requestAnimationFrame(()=>{if(!$('zoom').value||+$('zoom').value===40)fit();else transform()});window.addEventListener('resize',()=>{clearTimeout(window.__dispatchResize);window.__dispatchResize=setTimeout(()=>{clamp();transform()},120)});window.addEventListener('beforeunload',()=>saveLocal(true));})();
+</script>
+
+<style id="FINAL_DISPATCH_LAYOUT_V2">
+@media(min-width:901px){
+  .layout{grid-template-columns:minmax(420px,520px) minmax(0,1fr)!important;gap:24px!important;align-items:start!important}
+  .layout>.panel{grid-column:2!important;grid-row:1!important;max-width:760px!important;justify-self:stretch!important}
+  .layout>.preview-wrap,.layout>.preview,.layout>.previewSticky{grid-column:1!important;grid-row:1!important;min-width:0!important;width:100%!important}
+}
+.preview-tools{padding:8px 12px!important;border-width:1px!important;border-radius:14px!important;gap:8px!important;margin-bottom:8px!important}
+.preview-tools b{font-size:12px!important}
+.preview-tools .mode{padding:7px 11px!important;min-height:36px!important;border-width:1px!important;border-radius:12px!important;font-size:12px!important}
+.zoom{gap:6px!important}
+.zoom button{min-width:34px!important;height:34px!important;border-width:1px!important;border-radius:9px!important;font-size:19px!important}
+.zoom span{font-size:11px!important;min-width:34px!important}
+.zoom input{min-width:70px!important}
+@media(max-width:800px){
+  .layout{display:flex!important;flex-direction:column!important}
+  .layout>.preview-wrap,.layout>.preview,.layout>.previewSticky{order:1!important;width:100%!important}
+  .layout>.panel,.layout>.settings{order:2!important;width:100%!important}
+}
+</style>
+<script>
+(()=>{
+  function syncDispatchMode(){
+    const sels=[...document.querySelectorAll('select')];
+    const sel=sels.find(x=>[...x.options].some(o=>/PC|모바일|mobile/i.test(o.textContent||'')));
+    if(!sel)return;
+    const label=sel.options[sel.selectedIndex]?.textContent||'';
+    const isPC=/PC/i.test(label)&&!/모바일|mobile/i.test(label);
+    document.querySelectorAll('.stage').forEach(st=>st.classList.toggle('pc-frame',isPC));
+  }
+  function start(){
+    syncDispatchMode();
+    document.querySelectorAll('select').forEach(s=>s.addEventListener('change',syncDispatchMode));
+    const mo=new MutationObserver(syncDispatchMode);mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
 </script>
 </body></html>

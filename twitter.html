@@ -114,7 +114,7 @@ const $=id=>document.getElementById(id),KEY='twitter-editor-v2';
 const LOCK='이미지/img-f028c6992e04.webp';
 const blank=()=>({name:'',handle:'@username***',time:'',text:'',reply:'',repost:'',like:'',views:'',avatar:'',lock:true,reposted:false,liked:false,bookmarked:false});
 function defaults(){return{tab1:'추천',tab2:'팔로잉',activeTab:true,theme:'white',scale:'normal',tweets:[blank(),blank(),blank()]}}
-function normalize(x){const d=defaults();if(!x||typeof x!=='object')return d;x.tweets=Array.isArray(x.tweets)&&x.tweets.length?x.tweets.map(t=>{const n=Object.assign(blank(),t||{});if(n.name==='여기에 이름을 입력하세요.')n.name='';if(n.time==='여기에 시간을 입력하세요.')n.time='';if(n.text==='여기에 게시글을 입력하세요.')n.text='';return n}):d.tweets;x.tab1=String(x.tab1??d.tab1);x.tab2=String(x.tab2??d.tab2);x.activeTab=x.activeTab!==false;x.theme=x.theme==='black'?'black':'white';x.scale=x.scale==='large'?'large':'normal';return x}
+function normalize(x){const d=defaults();if(!x||typeof x!=='object')return d;x.tweets=Array.isArray(x.tweets)&&x.tweets.length?x.tweets.map(t=>{const n=Object.assign(blank(),t||{});if(n.name==='이름')n.name='';if(n.time==='시간')n.time='';if(n.text==='게시글')n.text='';return n}):d.tweets;x.tab1=String(x.tab1??d.tab1);x.tab2=String(x.tab2??d.tab2);x.activeTab=x.activeTab!==false;x.theme=x.theme==='black'?'black':'white';x.scale=x.scale==='large'?'large':'normal';return x}
 function load(){try{return normalize(JSON.parse(localStorage.getItem(KEY)||'null'))}catch(e){return defaults()}}
 let S=load();
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -125,7 +125,7 @@ $('tab1').value=S.tab1;$('tab2').value=S.tab2;$('activeTab').checked=S.activeTab
 const box=$('tweets');box.innerHTML='';
 S.tweets.forEach((t,i)=>{
 const c=document.createElement('div');c.className='tweet-card';
-c.innerHTML='<div class="tweet-head"><b>게시글 '+(i+1)+'</b>'+(S.tweets.length>1?'<button class="danger" data-del="'+i+'">삭제</button>':'')+'</div><div class="row"><div class="field"><label>이름</label><input placeholder="이름" data-i="'+i+'" data-k="name"></div><div class="field"><label>아이디</label><input placeholder="@username" data-i="'+i+'" data-k="handle"></div></div><div class="row"><div class="field"><label>작성 시간</label><input placeholder="시간" data-i="'+i+'" data-k="time"></div><div class="field"><label>프로필 사진</label><input type="file" accept="image/*" data-i="'+i+'" data-k="avatar"></div></div><div class="field"><label>게시글 내용</label><textarea placeholder="여기에 게시글을 입력하세요." data-i="'+i+'" data-k="text"></textarea></div><div class="row"><div class="field"><label>댓글 수</label><input data-i="'+i+'" data-k="reply"></div><div class="field"><label>리포스트 수</label><input data-i="'+i+'" data-k="repost"></div></div><div class="row"><div class="field"><label>좋아요 수</label><input data-i="'+i+'" data-k="like"></div><div class="field"><label>조회 수</label><input data-i="'+i+'" data-k="views"></div></div><label class="check"><input type="checkbox" data-i="'+i+'" data-k="lock"><span>비공개 계정 자물쇠 표시</span></label>';
+c.innerHTML='<div class="tweet-head"><b>게시글 '+(i+1)+'</b>'+(S.tweets.length>1?'<button class="danger" data-del="'+i+'">삭제</button>':'')+'</div><div class="row"><div class="field"><label>이름</label><input placeholder="이름" data-i="'+i+'" data-k="name"></div><div class="field"><label>아이디</label><input placeholder="@username" data-i="'+i+'" data-k="handle"></div></div><div class="row"><div class="field"><label>작성 시간</label><input placeholder="시간" data-i="'+i+'" data-k="time"></div><div class="field"><label>프로필 사진</label><input type="file" accept="image/*" data-i="'+i+'" data-k="avatar"></div></div><div class="field"><label>게시글 내용</label><textarea placeholder="게시글" data-i="'+i+'" data-k="text"></textarea></div><div class="row"><div class="field"><label>댓글 수</label><input data-i="'+i+'" data-k="reply"></div><div class="field"><label>리포스트 수</label><input data-i="'+i+'" data-k="repost"></div></div><div class="row"><div class="field"><label>좋아요 수</label><input data-i="'+i+'" data-k="like"></div><div class="field"><label>조회 수</label><input data-i="'+i+'" data-k="views"></div></div><label class="check"><input type="checkbox" data-i="'+i+'" data-k="lock"><span>비공개 계정 자물쇠 표시</span></label>';
 box.appendChild(c);
 c.querySelectorAll('[data-i][data-k]').forEach(el=>{
 const k=el.dataset.k;
@@ -192,5 +192,17 @@ render()
 })();
 
 </script>
+
+<style id="FINAL_GLOBAL_PREVIEW_LAYOUT_V2">
+@media(min-width:901px){
+  .layout{align-items:start!important}
+  .layout>.preview,.layout>.preview-wrap,.layout>.previewSticky{grid-column:1!important;grid-row:1!important;min-width:0!important}
+  .layout>.settings,.layout>.panel{grid-column:2!important;grid-row:1!important;min-width:0!important}
+}
+@media(max-width:900px){
+  .layout>.preview,.layout>.preview-wrap,.layout>.previewSticky{order:1!important}
+  .layout>.settings,.layout>.panel{order:2!important}
+}
+</style>
 </body>
 </html>
