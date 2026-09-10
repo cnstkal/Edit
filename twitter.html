@@ -157,5 +157,40 @@ $('savePng').addEventListener('click',async()=>{const c=await html2canvas($('scr
 render()
 })();
 </script>
+
+<!-- TWITTER_UI_REFINEMENT_V1 -->
+<style>
+
+@media(min-width:901px){
+  .layout{width:min(1280px,100%);display:grid;grid-template-columns:minmax(420px,520px) minmax(520px,760px);gap:24px;align-items:start}
+  .preview-wrap{order:1;min-width:0}.settings{order:2;width:100%;max-width:760px;justify-self:center}.stage{width:min(100%,420px);margin:0 auto}
+}
+.actions{grid-template-columns:repeat(4,minmax(0,1fr)) 20px 20px!important;column-gap:0!important;align-items:center}
+.act{gap:3px!important}.act .tw-ui-icon{width:18px!important;height:18px!important;flex-basis:18px!important;opacity:.92}
+.act:nth-child(1){justify-content:flex-start!important}.act:nth-child(2),.act:nth-child(3),.act:nth-child(4){justify-content:center!important}
+.act:nth-child(5){justify-self:end!important;justify-content:center!important;margin-right:0!important}.act:nth-child(6){justify-self:start!important;justify-content:center!important;margin-left:0!important}
+.act.tw-extra-active{font-weight:600}.act.tw-extra-repost{color:#00ba7c!important}.act.tw-extra-like{color:#f91880!important}.act.tw-extra-bookmark{color:#1d9bf0!important}.act.tw-extra-active .tw-ui-icon{opacity:1}
+.tweet-extra-photo{display:block;width:100%;max-height:340px;object-fit:cover;border-radius:14px;margin-top:10px;border:1px solid #e5e7e9}
+.tweet-photo-editor{display:flex;align-items:center;gap:8px;margin-top:7px}.tweet-photo-editor input{flex:1;min-width:0}.tweet-photo-clear{border:1px solid #ffd4d4;background:#fff0f0;color:#c62828;border-radius:8px;padding:6px 9px;font-size:11px;white-space:nowrap}
+@media(max-width:560px){.act .tw-ui-icon{width:17px!important;height:17px!important;flex-basis:17px!important}}
+
+</style>
+<script>
+
+(()=>{
+  const KEY='twitter-extra-photo-v1', STATE='twitter-extra-action-state-v1';
+  const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')??d}catch(e){return d}};
+  const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+  let photos=read(KEY,{}), states=read(STATE,{});
+  const fileToData=file=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});
+  function addEditorControls(){const cards=document.querySelectorAll('#tweets .tweet-card');cards.forEach((card,i)=>{if(card.querySelector('.tweet-photo-editor'))return;const box=document.createElement('div');box.className='field tweet-photo-editor';box.innerHTML='<label style="display:block;font-size:13px;font-weight:700;margin-bottom:6px">게시글 사진</label><input type="file" accept="image/*"><button type="button" class="tweet-photo-clear">사진 삭제</button>';card.appendChild(box);const input=box.querySelector('input'),clear=box.querySelector('button');input.addEventListener('change',async()=>{const f=input.files&&input.files[0];if(!f)return;photos[i]=await fileToData(f);write(KEY,photos);syncPreview()});clear.addEventListener('click',()=>{delete photos[i];write(KEY,photos);syncPreview();input.value=''})})}
+  function syncPreview(){const feed=document.getElementById('feed');if(!feed)return;feed.querySelectorAll('.tweet').forEach((tweet,i)=>{let img=tweet.querySelector('.tweet-extra-photo'),src=photos[i];if(src){if(!img){img=document.createElement('img');img.className='tweet-extra-photo';const text=tweet.querySelector('.tweet-text');if(text)text.insertAdjacentElement('afterend',img);else tweet.appendChild(img)}img.src=src}else if(img)img.remove()});applyStates()}
+  function applyStates(){const feed=document.getElementById('feed');if(!feed)return;feed.querySelectorAll('.tweet').forEach((tweet,i)=>tweet.querySelectorAll('.act').forEach((b,j)=>{const on=!!states[i+':'+j];b.classList.toggle('tw-extra-active',on);b.classList.toggle('tw-extra-repost',on&&j===1);b.classList.toggle('tw-extra-like',on&&j===2);b.classList.toggle('tw-extra-bookmark',on&&j===4)}))}
+  function bindActions(){const feed=document.getElementById('feed');if(!feed||feed.dataset.extraBound)return;feed.dataset.extraBound='1';feed.addEventListener('click',e=>{const b=e.target.closest('.act');if(!b)return;const tweet=b.closest('.tweet');if(!tweet)return;const all=[...feed.querySelectorAll('.tweet')],i=all.indexOf(tweet),j=[...tweet.querySelectorAll('.act')].indexOf(b);if(j===1||j===2||j===4){const k=i+':'+j;states[k]=!states[k];write(STATE,states);setTimeout(applyStates,20)}})}
+  function start(){addEditorControls();syncPreview();bindActions();const mo=new MutationObserver(()=>{addEditorControls();syncPreview()});const feed=document.getElementById('feed'),tweets=document.getElementById('tweets');if(feed)mo.observe(feed,{childList:true,subtree:true});if(tweets)mo.observe(tweets,{childList:true,subtree:true})}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
+
+</script>
 </body>
 </html>
