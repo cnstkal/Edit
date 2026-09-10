@@ -1,0 +1,48 @@
+name: Twitter profile icons clean
+on:
+  push:
+    branches: [main]
+jobs:
+  clean:
+    if: github.event.head_commit.message != 'fix: clean Twitter profile icon toggle'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clean conflicting icon code
+        run: |
+          python3 - <<'PY'
+          import re
+          p='twitter-profile.html'
+          s=open(p,encoding='utf-8').read()
+          s=re.sub(r'<style id="TWITTER_PROFILE_FILLED_ICONS_V1">.*?</script>', '', s, flags=re.S)
+          s=re.sub(r'<style id="TWITTER_ACTION_ICONS_FINAL_V5">.*?</script>', '', s, flags=re.S)
+          block='''<style id="TWITTER_ACTION_ICONS_FINAL_V6">
+.tw-action-icons .tw-action{width:28px!important;min-width:28px!important;height:28px!important;min-height:28px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;box-sizing:border-box!important;flex-shrink:0!important;position:relative!important;overflow:visible!important}
+.tw-action-icons .tw-action svg{width:20px!important;height:20px!important;display:block!important;flex:none!important}
+.tw-action-icons .tw-action .tw-filled-v6{width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;max-width:20px!important;max-height:20px!important;object-fit:contain!important;display:block!important;flex:none!important}
+</style><script id="TWITTER_ACTION_ICONS_FINAL_V6_JS">(()=>{
+const imgs={repost:'이미지/twitter-repost-filled.webp',like:'이미지/twitter-like-filled.webp',bookmark:'이미지/twitter-bookmark-filled.webp'};
+const keys={1:'repost',2:'like',4:'bookmark'};
+function run(){document.querySelectorAll('.tw-action-icons').forEach(bar=>{bar.querySelectorAll('.tw-action').forEach((el,i)=>{const k=keys[i];if(!k)return;let im=el.querySelector('.tw-filled-v6');const active=el.classList.contains('active-'+k)||el.classList.contains('tw-profile-active-'+k);if(active){if(!im){im=document.createElement('img');im.className='tw-filled-v6';im.alt='';el.insertBefore(im,el.firstChild)}im.src=imgs[k];el.querySelectorAll('svg').forEach(x=>x.style.display='none')}else{if(im)im.remove();el.querySelectorAll('svg').forEach(x=>x.style.display='')}})})}
+const mo=new MutationObserver(run);const start=()=>{run();mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']})};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();</script>'''
+          s=s.replace('</head>',block+'</head>')
+          open(p,'w',encoding='utf-8').write(s)
+          PY
+          for n in like repost bookmark; do
+            if command -v magick >/dev/null 2>&1; then
+              magick "이미지/twitter-$n-filled.webp" -trim +repage -background none -gravity center -extent '%[fx:max(w,h)]+8x%[fx:max(w,h)]+8' -resize 64x64 "이미지/twitter-$n-filled.webp"
+            else
+              convert "이미지/twitter-$n-filled.webp" -trim +repage -background none -gravity center -extent '%[fx:max(w,h)]+8x%[fx:max(w,h)]+8' -resize 64x64 "이미지/twitter-$n-filled.webp"
+            fi
+          done
+      - name: Commit and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/twitter-profile-icons-clean.yml
+          git add twitter-profile.html 이미지/twitter-like-filled.webp 이미지/twitter-repost-filled.webp 이미지/twitter-bookmark-filled.webp .github/workflows/twitter-profile-icons-clean.yml
+          git diff --cached --quiet || git commit -m "fix: clean Twitter profile icon toggle"
+          git push
