@@ -1,0 +1,33 @@
+name: Fit news top bar
+on:
+  push:
+    paths:
+      - '.news-topbar-fit-trigger'
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply top bar sizing
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('news-editor.html')
+          s=p.read_text(encoding='utf-8')
+          marker='/* NEWS_TOPBAR_FIT_V1 */'
+          if marker not in s:
+              s=s.replace('</head>', '''<style>\n/* NEWS_TOPBAR_FIT_V1 */\n@media (min-width:901px){\n  .top{height:68px!important;padding:0 28px!important}\n  .top button{width:62px!important;height:44px!important;border-radius:11px!important}\n  .top button:after{font-size:24px!important}\n  .top:after{width:190px!important;height:44px!important;border-radius:11px!important;font-size:15px!important}\n  .top:before{font-size:26px!important;letter-spacing:14px!important}\n  .layout{min-height:calc(100vh - 68px)!important}\n  .settings{height:calc(100vh - 68px)!important;max-height:calc(100vh - 68px)!important}\n}\n@media (max-width:900px){\n  .top{height:64px!important;padding:0 12px!important}\n  .top button{width:50px!important;height:38px!important}\n  .top:after{width:116px!important;height:38px!important;font-size:12px!important}\n}\n</style>\n</head>''')
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit and clean
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add news-editor.html
+          git diff --cached --quiet || git commit -m 'style: reduce news editor top bar'
+          rm -f .github/workflows/news-topbar-fit.yml .news-topbar-fit-trigger
+          git add -A
+          git diff --cached --quiet || git commit -m 'chore: remove temporary top bar workflow'
+          git push
