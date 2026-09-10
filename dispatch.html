@@ -147,4 +147,22 @@ file('logoFile',x=>logo=x);file('photoFile',x=>photo=x);file('miniFile1',x=>mini
 
 <!-- SIMPLE_EDITOR_FIELDS_V1 -->
 <style>.panel>h2{display:none!important}.panel .group:has(#logoFile),.panel .group:has(#photoFile),.panel .group:has(#credit),.panel .group:has(#miniFile1),.panel .group:has(#miniFile2),.panel .group:has(#miniFile3){display:none!important}</style><script>(()=>{function f(){const g=document.querySelector('.panel .group:has(#date)'),l=g?.querySelector('label'),d=document.getElementById('date');if(l)l.textContent='시간';if(d)d.placeholder='시간'}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',f);else f()})();</script>
+
+<!-- DISPATCH_MOBILE_916_FINAL_V2 -->
+<style>
+/* Mobile mode = 9:16 preview. PC mode keeps its 16:9 frame. */
+.stage:not(.pc-frame){width:min(100%,390px)!important;max-width:390px!important;height:auto!important;min-height:0!important;aspect-ratio:9/16!important}
+.stage:not(.pc-frame) .side{display:none!important}
+.stage:not(.pc-frame) .dispatch{width:720px!important;min-width:720px!important;min-height:1280px!important}
+</style>
+
+<!-- SIMPLE_EDITOR_FIELDS_FINAL_V2 -->
+<style>
+.panel>h2{display:none!important}
+.panel .group:has(#logoFile),.panel .group:has(#photoFile),.panel .group:has(#credit),.panel .group:has(#miniFile1),.panel .group:has(#miniFile2),.panel .group:has(#miniFile3){display:none!important}
+.panel .group:has(#title),.panel .group:has(#date),.panel .group:has(#body){display:block!important}
+</style>
+<script>
+(()=>{function clean(){const g=document.querySelector('.panel .group:has(#date)'),l=g?.querySelector('label'),d=document.getElementById('date');if(l)l.textContent='시간';if(d)d.placeholder='시간'}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean);else clean()})();
+</script>
 </body></html>

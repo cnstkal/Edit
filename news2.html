@@ -56,4 +56,15 @@
 
 <!-- SIMPLE_EDITOR_FIELDS_V1 -->
 <style>.settings .card:first-child{display:none!important}.settings .card:nth-child(2) .field:has(#subtitle),.settings .card:nth-child(2) .photoRow{display:none!important}.settings .card:nth-child(n+3){display:none!important}.settings .card:nth-child(2) .cardHead{display:none!important}</style><script>(()=>{function f(){const c=document.querySelectorAll('.settings .card'),t=c[0]?.querySelector('.field:has(#time)'),b=c[1]?.querySelector('.field:has(#body)');if(t&&b&&!t.dataset.moved){t.dataset.moved='1';const l=t.querySelector('.label');if(l)l.textContent='시간';const i=t.querySelector('#time');if(i)i.placeholder='시간';c[1].insertBefore(t,b)}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',f);else f()})();</script>
+
+<!-- SIMPLE_EDITOR_FIELDS_FINAL_V2 -->
+<style>
+.settings .card:first-child{display:none!important}
+.settings .card:nth-child(2) .field:has(#subtitle),.settings .card:nth-child(2) .photoRow{display:none!important}
+.settings .card:nth-child(n+3){display:none!important}
+.settings .card:nth-child(2) .cardHead{display:none!important}
+</style>
+<script>
+(()=>{function clean(){const c=document.querySelectorAll('.settings .card');if(!c[0]||!c[1])return;const t=c[0].querySelector('.field:has(#time)'),b=c[1].querySelector('.field:has(#body)');if(t&&b&&!t.dataset.simpleMoved){t.dataset.simpleMoved='1';const l=t.querySelector('.label'),i=t.querySelector('#time');if(l)l.textContent='시간';if(i)i.placeholder='시간';c[1].insertBefore(t,b)}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean);else clean()})();
+</script>
 </body></html>
