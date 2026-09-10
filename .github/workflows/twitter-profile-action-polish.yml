@@ -1,7 +1,9 @@
 name: Twitter profile action polish
 
 on:
-  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/twitter-profile-action-polish.yml'
 
 permissions:
   contents: write
@@ -29,8 +31,6 @@ jobs:
               'twitter-share.webp',
           ]
 
-          # Create slightly thinner versions of the supplied icons by
-          # eroding the alpha channel before the 20px display size.
           for name in names:
               src = img_dir / name
               dst = img_dir / name.replace('.webp', '-thin.webp')
@@ -41,14 +41,10 @@ jobs:
 
           p = Path('twitter-profile.html')
           s = p.read_text(encoding='utf-8')
-
-          # Remove old position override so this becomes the single source
-          # of truth for the action row.
           s = re.sub(r'<style[^>]*id="TWITTER_PROFILE_POSITION_CLEAN_V1"[^>]*>.*?</style>\s*', '', s, flags=re.S)
+          s = re.sub(r'<style[^>]*id="TWITTER_PROFILE_ACTION_POLISH_V2"[^>]*>.*?</style>\s*', '', s, flags=re.S)
 
           css = '''<style id="TWITTER_PROFILE_ACTION_POLISH_V2">
-          /* Keep all six actions as one compact group. Its first icon starts
-             exactly where the post body starts (the post's 61px left inset). */
           .tw-post .tw-action-icons{
             display:flex!important;
             flex-direction:row!important;
@@ -77,7 +73,6 @@ jobs:
           </style>'''
           s = s.replace('</head>', css + '\n</head>', 1)
 
-          # Make the final static icon layer use the thinned assets.
           for name in names:
               s = s.replace(name, name.replace('.webp', '-thin.webp'))
 
