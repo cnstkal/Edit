@@ -116,6 +116,60 @@ body{padding:0!important}
   }
   window.addEventListener('DOMContentLoaded',fixed);window.addEventListener('load',fixed);window.addEventListener('resize',fixed);setTimeout(fixed,250);setTimeout(fixed,1000);
 })();
+</script><style id="EDITOR_UNIFICATION_FINAL_V4">
+html,body{background:#f5f3ee!important;color:#171717!important}
+body{padding:0!important;margin:0!important}
+.top{position:relative!important;width:100%!important;max-width:none!important;height:68px!important;min-height:68px!important;margin:0!important;padding:0 28px!important;background:#fbfaf7!important;border-bottom:1px solid #e2dfda!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}
+.top a,.top button.home,.top .home{position:absolute!important;left:28px!important;right:auto!important;top:12px!important;width:76px!important;min-width:76px!important;height:44px!important;margin:0!important;padding:0!important;border:1px solid #d8d4ce!important;border-radius:11px!important;background:#fff!important;color:#4d4b49!important;text-decoration:none!important;font-size:13px!important;font-weight:700!important;line-height:1!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:none!important}
+.top a:hover,.top button.home:hover,.top .home:hover{background:#fff!important}
+.top a{font-size:13px!important}
+.top button.home:after,.top .home:after{content:'홈으로'!important;font-size:13px!important;color:#4d4b49!important}
+.top button.home,.top .home{font-size:0!important}
+.top .top-right{position:absolute!important;right:28px!important;top:12px!important;display:flex!important;align-items:center!important;gap:8px!important}
+.top #savePng,.top #save,.top .save{position:static!important;right:auto!important;top:auto!important;width:190px!important;min-width:190px!important;height:44px!important;margin:0!important;padding:0!important;border:0!important;border-radius:11px!important;background:#4b4948!important;color:#fff!important;font-size:14px!important;font-weight:750!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:none!important}
+.layout{width:100%!important;max-width:none!important;margin:0!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:0!important;align-items:start!important}
+.preview,.preview-wrap{grid-column:1!important;grid-row:1!important;width:100%!important;min-width:0!important;margin:0!important;padding:24px 28px 24px!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-items:center!important}
+.previewSticky{width:100%!important;position:static!important;display:flex!important;flex-direction:column!important;align-items:center!important}
+.tools,.preview-tools{width:min(100%,760px)!important;max-width:760px!important;margin:0 auto 12px!important;padding:8px 12px!important;box-sizing:border-box!important}
+.stage-wrap{width:min(100%,920px)!important;max-width:920px!important;margin:0 auto!important}
+.stage{margin-left:auto!important;margin-right:auto!important}
+.settings,.panel{grid-column:2!important;grid-row:1!important;width:100%!important;max-width:none!important;margin:24px 28px 24px!important;padding:24px 20px 20px!important;box-sizing:border-box!important;border:1px solid #ddd9d3!important;border-radius:16px!important;background:#fbfaf7!important;box-shadow:0 1px 5px #7771!important;overflow-y:auto!important;overflow-x:hidden!important;align-self:start!important}
+.settings>h2,.panel>h2{margin-top:0!important}
+.settings .card,.settings .group,.settings .section,.panel .card,.panel .group,.panel .section{width:100%!important;max-width:none!important;box-sizing:border-box!important}
+.settings .reset,.panel .reset{width:100%!important;margin:14px 0 0!important}
+@media(min-width:901px){
+  .settings,.panel{height:calc(100vh - 116px)!important;max-height:calc(100vh - 116px)!important}
+  .preview,.preview-wrap{min-height:0!important}
+}
+@media(max-width:900px){
+  .top{height:60px!important;min-height:60px!important;padding:0 10px!important}
+  .top a,.top button.home,.top .home{left:10px!important;top:10px!important;width:68px!important;min-width:68px!important;height:40px!important;font-size:12px!important}
+  .top button.home:after,.top .home:after{font-size:12px!important}
+  .top .top-right{right:10px!important;top:10px!important}
+  .top #savePng,.top #save,.top .save{width:125px!important;min-width:125px!important;height:40px!important;font-size:12px!important}
+  .layout{display:flex!important;flex-direction:column!important}
+  .preview,.preview-wrap{order:1!important;width:100%!important;padding:10px 8px 0!important}
+  .previewSticky{width:100%!important}
+  .settings,.panel{order:2!important;width:calc(100% - 16px)!important;margin:16px 8px 30px!important;height:auto!important;max-height:none!important;padding:18px 14px 20px!important;border-radius:16px!important}
+  .tools,.preview-tools{width:100%!important;margin-bottom:10px!important}
+  .stage-wrap{width:100%!important}
+}
+</style><script id="EDITOR_UNIFICATION_FINAL_V4_JS">
+(()=>{
+  function findText(root, rx){return [...root.querySelectorAll('button,a,[role="button"]')].find(x=>rx.test((x.textContent||'').trim()))}
+  function run(){
+    const top=document.querySelector('.top'); if(!top)return;
+    let home=findText(top,/홈|home/i);
+    if(home){home.classList.add('home');home.textContent='홈으로';home.setAttribute('aria-label','홈으로')}
+    let save=findText(document,/PNG\s*로\s*저장|PNG\s*저장/i);
+    if(save){let box=top.querySelector('.top-right');if(!box){box=document.createElement('div');box.className='top-right';top.appendChild(box)}box.appendChild(save);save.textContent='PNG로 저장';save.classList.add('save')}
+    const settings=document.querySelector('.settings,.panel');
+    const reset=findText(document,/기본값\s*복원|기본값\s*초기화|초기화/i);
+    if(reset && settings && !settings.contains(reset)){reset.classList.add('reset');settings.appendChild(reset)}
+    if(reset){reset.textContent='기본값 복원';reset.classList.add('reset')}
+  }
+  window.addEventListener('DOMContentLoaded',run);window.addEventListener('load',run);setTimeout(run,300);setTimeout(run,1000);
+})();
 </script></head>
 <body><header class="top"><a href="twitter-menu.html">← 트위터</a><h1>트위터 프로필 설정</h1><span style="width:34px"></span></header><main class="layout"><div class="stage"><div class="screen" id="screen"><div class="cover" id="pvCover"><button class="back" aria-label="뒤로"><svg class="profile-control-icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button><button class="cover-more" aria-label="더보기"><svg class="profile-control-icon" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></button></div><div class="profile"><img id="pvAvatar" class="avatar"><button class="share" aria-label="공유"><svg class="profile-control-icon" viewBox="0 0 24 24"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 13v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg></button><div class="name" id="pvName"></div><div class="handle" id="pvHandle"></div><div class="bio" id="pvBio"></div><div class="meta" id="pvMeta"></div><div class="counts"><span><b id="pvFollowing"></b> 팔로잉</span><span><b id="pvFollowers"></b> 팔로워</span></div><div class="buttons"><button>쪽지</button><button class="follow">팔로우</button></div></div><div class="profile-tabs"><div class="profile-tab active">게시물</div><div class="profile-tab">답글</div><div class="profile-tab">미디어</div><div class="profile-tab">좋아요</div></div><div class="pinned"><img id="pvPostAvatar" class="mini-avatar"><div class="pin"><svg class="tw-pin-icon" viewBox="0 0 24 24"><path d="M8 3h8v4l2 3v2h-5v7l-1 2-1-2v-7H6v-2l2-3V3Z"/></svg> 메인에 올림</div><span class="post-name" id="pvPostName"></span> <span class="post-handle" id="pvPostHandle"></span><div class="post-text" id="pvPostText"></div></div></div></div>
 <section class="section"><h2>프로필</h2><div class="field"><label>커버 이미지</label><label class="upload">커버<input id="coverFile" type="file" accept="image/*"></label></div><div class="field"><label>프로필 사진</label><label class="upload">프로필 사진<input id="avatarFile" type="file" accept="image/*"></label></div><div class="row"><div class="field"><label>이름</label><input id="name" placeholder="이름"></div><div class="field"><label>아이디</label><input id="handle" placeholder="@username"></div></div><div class="field"><label>소개</label><textarea id="bio" placeholder="프로필 소개를 입력하세요."></textarea></div><div class="field"><label>웹사이트</label><input id="website" placeholder="웹사이트 주소"></div><div class="field"><label>가입일</label><input id="joined" placeholder="2025년 6월에 가입함"></div><div class="row"><div class="field"><label>팔로잉</label><input id="following" placeholder="70"></div><div class="field"><label>팔로워</label><input id="followers" placeholder="2,146"></div></div><div class="field"><label>프로필 테마</label><select id="theme"><option value="white">화이트</option><option value="black">블랙</option></select></div></section>
