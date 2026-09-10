@@ -1,5 +1,10 @@
 name: Apply shared editor frame
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'dispatch-editor.html'
+      - 'kakao2.html'
   workflow_dispatch:
 permissions:
   contents: write
@@ -24,7 +29,6 @@ jobs:
             .preview-tools .zoom span,.tools .zoom span{font-size:11px!important;min-width:34px!important}
             .preview-tools .zoom button,.tools .zoom button{height:36px!important;min-width:36px!important;font-size:16px!important}
             .settings,.panel{align-self:start!important;margin-top:24px!important;margin-bottom:0!important;box-sizing:border-box!important;overflow-y:auto!important;overflow-x:hidden!important}
-            .settings,.panel{height:calc(100vh - 92px)!important;max-height:calc(100vh - 92px)!important}
           }
           @media (max-width:900px){
             .preview-tools,.tools{width:100%!important;max-width:none!important;box-sizing:border-box!important;min-height:50px!important;height:auto!important;padding:8px 10px!important;margin:0 0 10px!important;overflow:visible!important;flex-wrap:wrap!important}
