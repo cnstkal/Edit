@@ -1,0 +1,32 @@
+name: News bottom align
+on:
+  push:
+    paths:
+      - '.news-bottom-align-trigger'
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Align preview and settings bottom
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('news-editor.html')
+          s=p.read_text(encoding='utf-8')
+          marker='NEWS_BOTTOM_ALIGN_V1'
+          if marker not in s:
+              s=s.replace('</head>', '''<style>\n/* NEWS_BOTTOM_ALIGN_V1 */\n@media (min-width:901px){\n  .layout{height:calc(100vh - 68px)!important;min-height:0!important;align-items:stretch!important}\n  .preview{height:100%!important;min-height:0!important;padding-bottom:0!important}\n  .previewSticky{height:100%!important;display:flex!important;flex-direction:column!important}\n  .previewSticky .stage{flex:1 1 auto!important;min-height:0!important}\n  .settings{height:100%!important;max-height:none!important;min-height:0!important}\n}\n</style>\n</head>''')
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit and clean
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add news-editor.html
+          git commit -m "fix: align news preview and settings bottoms" || true
+          git push
+          rm -f .github/workflows/news-bottom-align.yml .news-bottom-align-trigger
+          git add -A
+          git commit -m "chore: remove temporary news alignment workflow" || true
+          git push || true
