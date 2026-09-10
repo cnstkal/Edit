@@ -1,6 +1,10 @@
 name: Twitter profile position clean
 
 on:
+  push:
+    paths:
+      - 'twitter-profile.html'
+      - '.github/workflows/twitter-profile-position-clean.yml'
   workflow_dispatch:
 
 permissions:
@@ -11,43 +15,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Adjust profile preview
         run: |
           python - <<'PY'
           from pathlib import Path
           import re
-
-          p = Path('twitter-profile.html')
-          s = p.read_text(encoding='utf-8')
-
-          # Remove legacy Twitter profile icon layers/observers so they cannot
-          # reinsert competing SVGs or active-state icons.
-          legacy_ids = [
-              'TWITTER_ACTION_ICONS_FINAL_V5',
-              'TWITTER_PROFILE_FILLED_ICONS_V1',
-              'FINAL_TWITTER_PROFILE_ICONS_V2',
-              'TWITTER_PROFILE_FINAL_ACTION_FIX_V3',
-          ]
+          p=Path('twitter-profile.html')
+          s=p.read_text(encoding='utf-8')
+          legacy_ids=['TWITTER_ACTION_ICONS_FINAL_V5','TWITTER_PROFILE_FILLED_ICONS_V1','FINAL_TWITTER_PROFILE_ICONS_V2','TWITTER_PROFILE_FINAL_ACTION_FIX_V3']
           for mid in legacy_ids:
-              s = re.sub(r'<style[^>]*id="' + re.escape(mid) + r'"[^>]*>.*?</style>\s*', '', s, flags=re.S)
-              s = re.sub(r'<script[^>]*id="' + re.escape(mid) + r'_JS"[^>]*>.*?</script>\s*', '', s, flags=re.S)
-
-          # Keep the supplied static WebP icons, move the entire action row
-          # slightly left, and remove the X mark from every post.
-          marker = 'TWITTER_PROFILE_POSITION_CLEAN_V1'
-          s = re.sub(r'<style[^>]*id="' + marker + r'"[^>]*>.*?</style>\s*', '', s, flags=re.S)
-          css = '''<style id="TWITTER_PROFILE_POSITION_CLEAN_V1">
-          /* Supplied action icons: shift the whole row slightly left. */
+              s=re.sub(r'<style[^>]*id="'+re.escape(mid)+r'"[^>]*>.*?</style>\s*','',s,flags=re.S)
+              s=re.sub(r'<script[^>]*id="'+re.escape(mid)+r'_JS"[^>]*>.*?</script>\s*','',s,flags=re.S)
+          marker='TWITTER_PROFILE_POSITION_CLEAN_V1'
+          s=re.sub(r'<style[^>]*id="'+marker+r'"[^>]*>.*?</style>\s*','',s,flags=re.S)
+          css='''<style id="TWITTER_PROFILE_POSITION_CLEAN_V1">
           .tw-action-icons{transform:translateX(-8px)!important;width:calc(100% - 8px)!important}
-          /* Remove the decorative X at the top-right of posts. */
           .tw-x,.tw-x-icon{display:none!important}
           </style>'''
-          s = s.replace('</head>', css + '\n</head>', 1)
-
-          p.write_text(s, encoding='utf-8')
+          s=s.replace('</head>',css+'\n</head>',1)
+          p.write_text(s,encoding='utf-8')
           PY
-
       - name: Commit profile fix
         run: |
           git config user.name "github-actions[bot]"
@@ -55,7 +42,6 @@ jobs:
           git add twitter-profile.html
           git diff --cached --quiet || git commit -m "fix: shift Twitter profile actions left and hide X"
           git push
-
       - name: Remove temporary workflow
         if: success()
         run: |
