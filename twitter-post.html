@@ -291,6 +291,19 @@ function run(){
   });
 }
 window.addEventListener('DOMContentLoaded',run);window.addEventListener('load',run);window.addEventListener('resize',run);setTimeout(run,300);setTimeout(run,1000);
+})();</script><style id="TWITTER_ACTION_ICONS_FINAL_V5">
+.tw-action .tw-profile-ui-icon,.act .tw-action-state-icon{width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;max-width:20px!important;max-height:20px!important;object-fit:contain!important;display:block!important;flex:0 0 20px!important;pointer-events:none!important}
+.act .tw-action-state-icon{border:0!important}
+</style>
+<script id="TWITTER_ACTION_ICONS_FINAL_V5_JS">(()=>{
+const base='이미지/';
+const filled={repost:base+'twitter-repost-filled.webp',like:base+'twitter-like-filled.webp',bookmark:base+'twitter-bookmark-filled.webp'};
+const keyFor=i=>i===1?'repost':i===2?'like':'bookmark';
+const activeFor=(el,key)=>el.classList.contains('active-'+key)||el.classList.contains('tw-profile-active-'+key);
+function profile(){document.querySelectorAll('.tw-action-icons').forEach(bar=>{[...bar.querySelectorAll('.tw-action')].forEach((el,i)=>{if(![1,2,4].includes(i))return;const key=keyFor(i);let im=el.querySelector('.tw-profile-ui-icon');if(!im){im=document.createElement('img');im.className='tw-profile-ui-icon';el.insertBefore(im,el.firstChild)}im.src=activeFor(el,key)?filled[key]:(base+'twitter-'+key+'.webp');im.alt='';el.querySelectorAll('svg').forEach(x=>x.style.display='none')})})}
+function post(){document.querySelectorAll('.actions').forEach(bar=>{[...bar.querySelectorAll('.act')].forEach((el,i)=>{if(![1,2,4].includes(i))return;const key=keyFor(i),ico=el.querySelector('.ico');if(!ico)return;ico.querySelectorAll('img').forEach(x=>x.remove());const svg=ico.querySelector('svg');const on=activeFor(el,key);if(on){if(svg)svg.style.display='none';let im=document.createElement('img');im.className='tw-action-state-icon';im.src=filled[key];im.alt='';ico.appendChild(im)}else if(svg){svg.style.display='';}})})}
+let scheduled=false;function run(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;profile();post()})}
+const mo=new MutationObserver(run);const start=()=>{run();if(document.body)mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']})};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();</script></head>
 <body>
 <header class="top"><a href="index.html">← 홈</a><h1>트위터 설정</h1><span style="width:34px"></span></header>
