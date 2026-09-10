@@ -1,0 +1,44 @@
+name: restore stable ui
+on: push
+permissions:
+  contents: write
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore known stable versions
+        run: |
+          git checkout 4917accdb977ddaaa9540a69c6ff14e1850afafe -- news2.html dispatch.html
+          git checkout 6ed63a4b354e8b18eae2c4f4aa842bd3ff7776bd -- twitter.html
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('dispatch.html'); s=p.read_text()
+          if 'DISPATCH_MOBILE_916_STABLE_V3' not in s:
+              s=s.replace('</body>','''\n<!-- DISPATCH_MOBILE_916_STABLE_V3 -->\n<style>\n.stage:not(.pc-frame){width:min(100%,390px)!important;max-width:390px!important;height:auto!important;min-height:0!important;aspect-ratio:9/16!important;align-self:center!important}\n.stage:not(.pc-frame) .side{display:none!important}\n.stage:not(.pc-frame) .pc-main{display:block!important;grid-template-columns:none!important}\n.stage:not(.pc-frame) .dispatch{width:720px!important;min-width:720px!important;min-height:1280px!important}\n.stage.pc-frame{aspect-ratio:16/9!important}\n</style>\n</body>''')
+              p.write_text(s)
+          p=Path('twitter.html'); s=p.read_text()
+          if 'TWITTER_SAFE_ACTIVE_STABLE_V1' not in s:
+              s=s.replace('</body>','''\n<!-- TWITTER_SAFE_ACTIVE_STABLE_V1 -->\n<style>\n.act.active-repost .tw-ui-icon{filter:brightness(0) saturate(100%) invert(55%) sepia(91%) saturate(1051%) hue-rotate(119deg) brightness(89%) contrast(101%)!important}\n.act.active-like .tw-ui-icon{filter:brightness(0) saturate(100%) invert(29%) sepia(93%) saturate(5486%) hue-rotate(323deg) brightness(101%) contrast(99%)!important}\n.act.active-bookmark .tw-ui-icon{filter:brightness(0) saturate(100%) invert(48%) sepia(96%) saturate(1855%) hue-rotate(184deg) brightness(96%) contrast(101%)!important}\n</style>\n</body>''')
+              p.write_text(s)
+          PY
+      - name: Verify
+        run: |
+          grep -q '댓글 설정' news2.html
+          grep -q 'addComment' news2.html
+          grep -q 'DISPATCH_MOBILE_916_STABLE_V3' dispatch.html
+          grep -q 'TWITTER_LOADING_LOOP_FIX_V1' twitter.html
+          grep -q 'TWITTER_SAFE_ACTIVE_STABLE_V1' twitter.html
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add news2.html dispatch.html twitter.html
+          git diff --cached --quiet || git commit -m 'fix: restore stable editor settings and Twitter loading'
+          git push
+      - name: Cleanup
+        if: always()
+        run: |
+          git rm -f .github/workflows/restore-stable-ui.yml || true
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'chore: remove temporary restore workflow' || true
+          git push || true
