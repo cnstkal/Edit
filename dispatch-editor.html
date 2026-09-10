@@ -123,6 +123,31 @@ textarea{padding:12px 13px!important;min-height:150px!important;line-height:1.6!
   .stage-wrap{padding:8px!important}
 }
 </style>
+
+<style id="DISPATCH_PREVIEW_LAYOUT_V2">
+/* Keep the editor split 50/50, but let the preview column end with the preview itself. */
+@media(min-width:901px){
+  .layout{width:100%!important;max-width:none!important;grid-template-columns:50% 50%!important;gap:0!important;margin:0!important;align-items:start!important}
+  .preview-wrap{grid-column:1!important;width:100%!important;min-width:0!important;padding:22px 0 40px!important;display:block!important;align-self:start!important}
+  .preview-wrap .previewSticky{position:static!important;width:100%!important}
+  .preview-wrap .preview-tools{width:max-content!important;max-width:calc(100% - 32px)!important;margin:0 auto 12px!important;padding:6px 8px!important;min-height:44px!important;border-radius:10px!important;gap:5px!important;flex-wrap:nowrap!important}
+  .preview-wrap .preview-tools .mode{height:32px!important;padding:0 8px!important;border-radius:8px!important;font-size:12px!important}
+  .preview-wrap .zoom{gap:4px!important;margin-left:4px!important;flex:none!important}
+  .preview-wrap .zoom button{height:32px!important;min-width:32px!important;border-radius:8px!important;font-size:17px!important}
+  .preview-wrap .zoom input{width:110px!important;height:24px!important;flex:none!important}
+  .preview-wrap .zoom span{font-size:10px!important;min-width:32px!important}
+  .preview-wrap .stage-wrap{width:100%!important;display:block!important;background:#e2ded6!important;border:0!important;border-radius:0!important;padding:0!important;box-shadow:none!important;overflow:visible!important}
+  .preview-wrap .stage{width:calc(100% - 32px)!important;max-width:none!important;margin:0 auto!important}
+  .panel{grid-column:2!important;width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important;padding:28px 24px 80px!important;border-left:1px solid #dedad4!important;border-radius:0!important;background:#fbfaf7!important;box-shadow:none!important;align-self:start!important}
+}
+@media(max-width:900px){
+  .preview-wrap{width:100%!important;padding:10px 0 20px!important}
+  .preview-wrap .previewSticky{position:static!important;width:100%!important}
+  .preview-wrap .preview-tools{width:max-content!important;max-width:calc(100% - 12px)!important;margin:0 auto 10px!important;padding:6px 8px!important;min-height:42px!important;border-radius:10px!important;gap:5px!important;flex-wrap:nowrap!important}
+  .preview-wrap .stage-wrap{width:100%!important;padding:0 4px!important;background:#e2ded6!important;border:0!important;border-radius:10px!important;overflow:hidden!important}
+  .preview-wrap .stage{width:100%!important;max-width:none!important;margin:0 auto!important}
+}
+</style>
 </head>
 <body>
 <div class="top"><button class="home" type="button" onclick="location.href='index.html'">← 홈으로</button><div class="brand">디스패치</div></div>
