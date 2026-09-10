@@ -1,0 +1,74 @@
+name: Apply shared editor frame
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply shared preview controls and settings frame
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          marker = 'SHARED_EDITOR_FRAME_LAYOUT_V1'
+          block = r'''
+          <style id="SHARED_EDITOR_FRAME_LAYOUT_V1">
+          /* SHARED_EDITOR_FRAME_LAYOUT_V1 */
+          @media (min-width:901px){
+            .preview-tools,.tools{width:min(100%,480px)!important;max-width:480px!important;min-height:52px!important;height:52px!important;padding:8px 12px!important;margin:0 auto 12px!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;flex-wrap:nowrap!important;overflow:hidden!important}
+            .preview-tools .mode,.tools .mode{height:36px!important;min-height:36px!important;padding:0 11px!important;font-size:12px!important;flex:none!important}
+            .preview-tools .zoom,.tools .zoom{min-width:0!important;flex:1!important;gap:6px!important;margin-left:auto!important;display:flex!important;align-items:center!important}
+            .preview-tools .zoom input,.tools .zoom input{min-width:80px!important;height:28px!important;flex:1!important}
+            .preview-tools .zoom span,.tools .zoom span{font-size:11px!important;min-width:34px!important}
+            .preview-tools .zoom button,.tools .zoom button{height:36px!important;min-width:36px!important;font-size:16px!important}
+            .settings,.panel{align-self:start!important;margin-top:24px!important;margin-bottom:0!important;box-sizing:border-box!important;overflow-y:auto!important;overflow-x:hidden!important}
+            .settings,.panel{height:calc(100vh - 92px)!important;max-height:calc(100vh - 92px)!important}
+          }
+          @media (max-width:900px){
+            .preview-tools,.tools{width:100%!important;max-width:none!important;box-sizing:border-box!important;min-height:50px!important;height:auto!important;padding:8px 10px!important;margin:0 0 10px!important;overflow:visible!important;flex-wrap:wrap!important}
+            .settings,.panel{height:auto!important;max-height:none!important;overflow:visible!important;margin-top:16px!important}
+          }
+          </style>
+          <script id="SHARED_EDITOR_FRAME_LAYOUT_V1_JS">
+          (()=>{
+            function syncFrame(){
+              if(!window.matchMedia('(min-width:901px)').matches)return;
+              const settings=document.querySelector('.settings,.panel');
+              const stage=document.querySelector('.stage');
+              if(!settings||!stage)return;
+              const sr=settings.getBoundingClientRect(), cr=stage.getBoundingClientRect();
+              const h=Math.max(320,Math.round(cr.bottom-sr.top));
+              settings.style.height=h+'px';
+              settings.style.maxHeight=h+'px';
+            }
+            window.addEventListener('DOMContentLoaded',()=>{syncFrame();setTimeout(syncFrame,300);setTimeout(syncFrame,1000)});
+            window.addEventListener('load',syncFrame);
+            window.addEventListener('resize',syncFrame);
+          })();
+          </script>
+          '''
+          for name in ['dispatch-editor.html','kakao2.html']:
+              p=Path(name)
+              s=p.read_text(encoding='utf-8')
+              if marker not in s:
+                  p.write_text(s+'\n'+block+'\n',encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dispatch-editor.html kakao2.html
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: match dispatch and kakao editor frames"
+          git push
+      - name: Remove temporary workflow
+        if: always()
+        run: |
+          rm -f .github/workflows/apply-shared-editor-frame.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/apply-shared-editor-frame.yml
+          git diff --cached --quiet || git commit -m "chore: remove temporary editor frame workflow"
+          git push || true
