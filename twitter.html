@@ -49,6 +49,7 @@ button{cursor:pointer}
 .save{background:#111;color:#fff;border:0}.toolbar{display:flex;justify-content:flex-end;margin-bottom:8px}.tool{width:auto;padding:0 12px;height:36px;font-size:12px}
 input:not([type="checkbox"]):not([type="radio"]),textarea,select{font-size:16px!important}
 @media(max-width:560px){.row{grid-template-columns:1fr}.top{height:56px}.section{padding:16px 14px}.tweet-text{font-size:16px}}
+.tw-ui-icon{width:21px;height:21px;display:block;object-fit:contain;flex:0 0 21px}
 </style>
 
 <style>
@@ -118,7 +119,7 @@ function load(){try{return normalize(JSON.parse(localStorage.getItem(KEY)||'null
 let S=load();
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function esc(v){return String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\\':'&#92;'}[c]||c))}
-const icon={reply:'<svg viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H7l-4 3v-5.1A7.5 7.5 0 1 1 20 11.5Z"/></svg>',repost:'<svg viewBox="0 0 24 24"><path d="M7 7h11v2l3-3-3-3v2H7c-1.1 0-2 .9-2 2v4h2V7zm10 10H6v-2l-3 3 3 3v-2h11c1.1 0 2-.9 2-2v-4h-2v4c0 .55-.45 1-1 1z"/></svg>',like:'<svg viewBox="0 0 24 24"><path d="M20.8 8.7c0 5.5-8.8 10.2-8.8 10.2S3.2 14.2 3.2 8.7A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.8 2.3Z"/></svg>',views:'<svg viewBox="0 0 24 24"><path d="M4 20V10M9 20V5M14 20v-8M19 20V2"/></svg>',bookmark:'<svg viewBox="0 0 24 24"><path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4Z"/></svg>',share:'<svg viewBox="0 0 24 24"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 13v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg>'};
+const icon={reply:'<img class="tw-ui-icon" src="이미지/twitter-reply.webp">',repost:'<img class="tw-ui-icon" src="이미지/twitter-repost.webp">',like:'<img class="tw-ui-icon" src="이미지/twitter-like.webp">',views:'<img class="tw-ui-icon" src="이미지/twitter-views.webp">',bookmark:'<img class="tw-ui-icon" src="이미지/twitter-bookmark.webp">',share:'<img class="tw-ui-icon" src="이미지/twitter-share.webp">'};
 function renderEditor(){
 $('tab1').value=S.tab1;$('tab2').value=S.tab2;$('activeTab').checked=S.activeTab;$('theme').value=S.theme;$('scale').value=S.scale;
 const box=$('tweets');box.innerHTML='';
