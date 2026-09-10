@@ -1,0 +1,67 @@
+name: Clean Twitter profile icons
+on:
+  push:
+    paths:
+      - '.github/workflows/twitter-profile-icons-clean.yml'
+      - 'twitter-profile.html'
+permissions:
+  contents: write
+jobs:
+  clean:
+    if: "!contains(github.event.head_commit.message, 'fix: clean Twitter profile icons')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove old icon layers and install one clean handler
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('twitter-profile.html')
+          s = p.read_text(encoding='utf-8')
+          patterns = [
+              r'<style id="TWITTER_PROFILE_FILLED_ICONS_V1">.*?</script>',
+              r'<style id="FINAL_TWITTER_PROFILE_ICONS_V2">.*?</script>',
+              r'<!-- TWITTER_PROFILE_FINAL_ACTION_FIX_V3 -->.*?</script>',
+              r'<style id="TWITTER_ACTION_ICONS_FINAL_V5">.*?</script>',
+          ]
+          for pat in patterns:
+              s, n = re.subn(pat, '', s, flags=re.S)
+              print(pat, n)
+          clean = r'''<style id="TWITTER_PROFILE_ICONS_CLEAN_V1">
+          .tw-action-icons{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr)) 24px 24px!important;align-items:center!important;column-gap:0!important;margin-top:10px!important}
+          .tw-action{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;min-width:0!important;width:auto!important;height:24px!important;min-height:24px!important;max-height:24px!important;position:relative!important;box-sizing:border-box!important;flex-shrink:0!important;overflow:visible!important}
+          .tw-action svg{width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;max-width:20px!important;max-height:20px!important;display:block!important;flex:0 0 20px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+          .tw-action span{font-size:12px!important;line-height:1!important;white-space:nowrap!important}
+          .tw-action:nth-child(1){justify-content:flex-start!important}
+          .tw-action:nth-child(2),.tw-action:nth-child(3),.tw-action:nth-child(4){justify-content:center!important}
+          .tw-action:nth-child(5){justify-self:end!important;margin-right:0!important}
+          .tw-action:nth-child(6){justify-self:start!important;margin-left:0!important}
+          .tw-action .tw-clean-filled{width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;max-width:20px!important;max-height:20px!important;display:block!important;object-fit:contain!important;flex:0 0 20px!important;pointer-events:none!important}
+          .tw-action.tw-profile-active-repost{color:#00ba7c!important}
+          .tw-action.tw-profile-active-like{color:#f91880!important}
+          .tw-action.tw-profile-active-bookmark{color:#1d9bf0!important}
+          </style>
+          <script id="TWITTER_PROFILE_ICONS_CLEAN_V1_JS">(()=>{
+          const filled={repost:'이미지/twitter-repost-filled.webp',like:'이미지/twitter-like-filled.webp',bookmark:'이미지/twitter-bookmark-filled.webp'};
+          const stateKey='twitter-profile-action-state-v3';
+          let states={};try{states=JSON.parse(localStorage.getItem(stateKey)||'{}')}catch(e){}
+          const getKey=(bar,i)=>[...document.querySelectorAll('.tw-action-icons')].indexOf(bar)+':'+i;
+          function paint(){document.querySelectorAll('.tw-action-icons').forEach(bar=>{[...bar.querySelectorAll('.tw-action')].forEach((a,i)=>{const key=i===1?'repost':i===2?'like':i===4?'bookmark':null;if(!key)return;const on=!!states[getKey(bar,i)];a.classList.toggle('tw-profile-active-repost',on&&key==='repost');a.classList.toggle('tw-profile-active-like',on&&key==='like');a.classList.toggle('tw-profile-active-bookmark',on&&key==='bookmark');const old=a.querySelector('.tw-clean-filled');if(on){a.querySelectorAll('img.tw-filled-icon,.tw-profile-ui-icon,.tw-filled-icon').forEach(x=>x.remove());if(!old){const img=document.createElement('img');img.className='tw-clean-filled';img.src=filled[key];img.alt='';a.insertBefore(img,a.firstChild)}a.querySelectorAll('svg').forEach(x=>x.style.display='none')}else{if(old)old.remove();a.querySelectorAll('svg').forEach(x=>x.style.display='block')}})})}
+          document.addEventListener('click',e=>{const a=e.target.closest?.('.tw-action-icons .tw-action');if(!a)return;const bar=a.closest('.tw-action-icons');const i=[...bar.querySelectorAll('.tw-action')].indexOf(a);if(![1,2,4].includes(i))return;e.preventDefault();e.stopImmediatePropagation();const key=getKey(bar,i);states[key]=!states[key];try{localStorage.setItem(stateKey,JSON.stringify(states))}catch(e){}paint()},true);
+          function start(){paint()}
+          if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+          })();</script>'''
+          if 'TWITTER_PROFILE_ICONS_CLEAN_V1' not in s:
+              s=s.replace('</head>', clean+'</head>')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit and remove temporary workflow
+        run: |
+          rm -f .github/workflows/twitter-profile-icons-clean.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add twitter-profile.html .github/workflows/twitter-profile-icons-clean.yml
+          git diff --cached --quiet && exit 0
+          git commit -m 'fix: clean Twitter profile icons'
+          git push
