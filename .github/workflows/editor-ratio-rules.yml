@@ -14,37 +14,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Enforce PC/mobile terminology and ratio behavior
+      - name: Enforce PC mobile terminology and distinct preview frames
         run: |
-          python - <<'PY'
+          python3 - <<'PY'
           from pathlib import Path
           import re, sys
-
-          html_files=list(Path('.').glob('*.html'))
           errors=[]
-          for p in html_files:
-              s=p.read_text(encoding='utf-8', errors='ignore')
-              visible=re.sub(r'<style\b.*?</style>', '', s, flags=re.S|re.I)
-              visible=re.sub(r'<script\b.*?</script>', '', visible, flags=re.S|re.I)
-              if re.search(r'16:9|9:16', visible):
-                  errors.append(f'{p}: user-facing ratio text must use PC 비율 / 모바일 비율')
-
-          news=Path('news-editor.html')
-          if news.exists():
-              s=news.read_text(encoding='utf-8')
-              for marker in ('EDITOR_RATIO_RULES_V2_NEWS','editor-mobile-ratio','editor-pc-ratio'):
-                  if marker not in s:
-                      errors.append(f'news-editor.html: missing mandatory ratio rule {marker}')
-
-          dispatch=Path('dispatch-editor.html')
-          if dispatch.exists():
-              s=dispatch.read_text(encoding='utf-8')
-              for marker in ('EDITOR_RATIO_RULES_V2_DISPATCH','editor-mobile-ratio','editor-pc-ratio'):
-                  if marker not in s:
-                      errors.append(f'dispatch-editor.html: missing mandatory ratio rule {marker}')
-
+          for p in Path('.').glob('*.html'):
+              s=p.read_text(encoding='utf-8',errors='ignore')
+              visible=re.sub(r'<style\b.*?</style>','',s,flags=re.S|re.I)
+              visible=re.sub(r'<script\b.*?</script>','',visible,flags=re.S|re.I)
+              if re.search(r'16:9|9:16',visible): errors.append(f'{p}: ratio numbers found in visible UI')
+          for fn, markers in {
+              'news-editor.html':('EDITOR_RATIO_RULES_FINAL','editor-mobile','editor-pc'),
+              'dispatch-editor.html':('EDITOR_RATIO_RULES_FINAL','editor-mobile','editor-pc')
+          }.items():
+              p=Path(fn)
+              if p.exists():
+                  s=p.read_text(encoding='utf-8')
+                  for m in markers:
+                      if m not in s: errors.append(f'{fn}: missing mandatory rule {m}')
           if errors:
-              print('\n'.join(errors))
-              sys.exit(1)
+              print('\n'.join(errors)); sys.exit(1)
           print('EDITOR RATIO RULES: PASS')
           PY
