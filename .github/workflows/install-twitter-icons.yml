@@ -1,0 +1,41 @@
+name: Install Twitter UI icons
+on:
+  push:
+    paths:
+      - '.github/workflows/install-twitter-icons.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Convert supplied icon sources to WebP
+        run: |
+          set -e
+          for name in reply repost like views bookmark share; do
+            convert -background none "이미지/twitter-$name.svg" -quality 100 "이미지/twitter-$name.webp"
+          done
+      - name: Connect icons to Twitter editor
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          p=Path('twitter.html')
+          s=p.read_text(encoding='utf-8')
+          icon_obj='const icon={reply:\'<img class="tw-ui-icon" src="이미지/twitter-reply.webp">\',repost:\'<img class="tw-ui-icon" src="이미지/twitter-repost.webp">\',like:\'<img class="tw-ui-icon" src="이미지/twitter-like.webp">\',views:\'<img class="tw-ui-icon" src="이미지/twitter-views.webp">\',bookmark:\'<img class="tw-ui-icon" src="이미지/twitter-bookmark.webp">\',share:\'<img class="tw-ui-icon" src="이미지/twitter-share.webp">\'};'
+          s2=re.sub(r'const icon=\{.*?\};',lambda m:icon_obj,s,count=1,flags=re.S)
+          if s2==s:
+              raise SystemExit('Twitter icon object not found')
+          if '.tw-ui-icon{' not in s2:
+              s2=s2.replace('</style>','.tw-ui-icon{width:21px;height:21px;display:block;object-fit:contain;flex:0 0 21px}\n</style>',1)
+          p.write_text(s2,encoding='utf-8')
+          PY
+      - name: Commit and remove temporary files
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add twitter.html 이미지/*.webp
+          git rm 이미지/twitter-reply.svg 이미지/twitter-repost.svg 이미지/twitter-like.svg 이미지/twitter-views.svg 이미지/twitter-bookmark.svg 이미지/twitter-share.svg .github/workflows/install-twitter-icons.yml
+          git commit -m "Use supplied Twitter action icons"
+          git push
