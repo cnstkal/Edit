@@ -12,10 +12,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Convert supplied icon sources to WebP
         run: |
-          set -e
-          for name in reply repost like views bookmark share; do
-            convert -background none "이미지/twitter-$name.svg" -quality 100 "이미지/twitter-$name.webp"
-          done
+          python3 -m pip install --quiet cairosvg pillow
+          python3 - <<'PY'
+          from pathlib import Path
+          import cairosvg
+          from PIL import Image
+          for name in ('reply','repost','like','views','bookmark','share'):
+              src=Path(f'이미지/twitter-{name}.svg')
+              png=Path(f'/tmp/twitter-{name}.png')
+              out=Path(f'이미지/twitter-{name}.webp')
+              cairosvg.svg2png(url=str(src),write_to=str(png),output_width=96,output_height=96)
+              Image.open(png).convert('RGBA').save(out,'WEBP',lossless=True,quality=100,method=6)
+          PY
       - name: Connect icons to Twitter editor
         run: |
           python3 - <<'PY'
