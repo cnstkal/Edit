@@ -1,0 +1,172 @@
+name: Final UI fix
+on:
+  push:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch UI
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def patch(path, marker, block):
+              p=Path(path)
+              s=p.read_text(encoding='utf-8')
+              if marker not in s:
+                  s=s.replace('</body>', block+'\n</body>')
+                  p.write_text(s,encoding='utf-8')
+
+          patch('dispatch.html','DISPATCH_MOBILE_RATIO_FIX_V1',r'''<!-- DISPATCH_MOBILE_RATIO_FIX_V1 -->
+          <style>
+          @media(max-width:800px){
+            .stage:not(.pc-frame){width:min(100%,390px)!important;max-width:390px!important;height:auto!important;min-height:0!important;aspect-ratio:9/16!important;align-self:center}
+            .stage:not(.pc-frame) .dispatch{width:100%!important;min-width:0!important;min-height:0!important;height:auto!important}
+            .stage:not(.pc-frame) .pc-main{display:block!important}
+            .stage:not(.pc-frame) .side{display:none!important}
+          }
+          </style>''')
+
+          patch('twitter.html','TWITTER_ICON_LAYOUT_FILL_FIX_V4',r'''<!-- TWITTER_ICON_LAYOUT_FILL_FIX_V4 -->
+          <style>
+          /* Four equal action slots + one compact bookmark/share group. */
+          .actions{grid-template-columns:repeat(4,minmax(0,1fr)) 48px!important;column-gap:0!important;align-items:center!important}
+          .act{width:100%!important;min-width:0!important;justify-content:center!important;gap:3px!important;overflow:visible!important}
+          .act:nth-child(1){justify-content:flex-start!important}
+          .act:nth-child(5){grid-column:5!important;grid-row:1!important;width:22px!important;justify-self:start!important;margin:0!important;padding:0!important}
+          .act:nth-child(6){grid-column:5!important;grid-row:1!important;width:22px!important;justify-self:end!important;margin:0!important;padding:0!important}
+          .act:nth-child(5)+.act{margin-left:4px!important}
+          .act .tw-ui-icon{width:18px!important;height:18px!important;min-width:18px!important;min-height:18px!important;max-width:18px!important;max-height:18px!important;flex:0 0 18px!important;object-fit:contain!important;pointer-events:none!important;display:block!important}
+          .act span{font-family:Pretendard,sans-serif!important;font-variant-numeric:tabular-nums!important;white-space:nowrap!important}
+          .tab{font-size:16px!important}
+          @media(max-width:560px){.tab{font-size:16px!important}.act .tw-ui-icon{width:17px!important;height:17px!important;min-width:17px!important;min-height:17px!important;max-width:17px!important;max-height:17px!important;flex-basis:17px!important}}
+          /* Active icons: repost keeps its original transparent artwork, while like/bookmark become solid glyphs. */
+          .act.tw-icon-repost-active .tw-ui-icon{filter:brightness(0) saturate(100%) invert(54%) sepia(86%) saturate(1094%) hue-rotate(118deg) brightness(91%) contrast(101%)!important;opacity:1!important}
+          .act.tw-icon-like-active .ico,.act.tw-icon-bookmark-active .ico{background-repeat:no-repeat;background-position:center;background-size:18px 18px}
+          .act.tw-icon-like-active .ico{background-color:#f91880;-webkit-mask:url('이미지/twitter-like.webp') center/18px 18px no-repeat;mask:url('이미지/twitter-like.webp') center/18px 18px no-repeat}
+          .act.tw-icon-bookmark-active .ico{background-color:#1d9bf0;-webkit-mask:url('이미지/twitter-bookmark.webp') center/18px 18px no-repeat;mask:url('이미지/twitter-bookmark.webp') center/18px 18px no-repeat}
+          .act.tw-icon-like-active .tw-ui-icon,.act.tw-icon-bookmark-active .tw-ui-icon{opacity:0!important}
+          .act.tw-icon-like-active,.act.tw-icon-bookmark-active,.act.tw-icon-repost-active{color:inherit!important}
+          .act.tw-icon-like-active span{color:#f91880!important}.act.tw-icon-bookmark-active span{color:#1d9bf0!important}.act.tw-icon-repost-active span{color:#00ba7c!important}
+          #feed,#tweets,.tweet-card,#feed *,.tweet-card *{font-family:Pretendard,sans-serif!important}
+          </style>
+          <script>
+          (()=>{
+            const K='twitter-final-action-state-v4';
+            let state={};try{state=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){}
+            const save=()=>{try{localStorage.setItem(K,JSON.stringify(state))}catch(e){}};
+            function paint(){
+              document.querySelectorAll('#feed .tweet').forEach((tweet,i)=>{
+                tweet.querySelectorAll('.act').forEach((b,j)=>{
+                  const on=!!state[i+':'+j];
+                  b.classList.toggle('tw-icon-repost-active',on&&j===1);
+                  b.classList.toggle('tw-icon-like-active',on&&j===2);
+                  b.classList.toggle('tw-icon-bookmark-active',on&&j===4);
+                  if(j===1)b.disabled=false;
+                });
+              });
+            }
+            function handle(e){
+              const b=e.target.closest?.('#feed .actions .act');
+              if(!b)return;
+              const tweet=b.closest('.tweet');
+              if(!tweet)return;
+              const j=[...tweet.querySelectorAll('.act')].indexOf(b);
+              if(![1,2,4].includes(j))return;
+              const i=[...document.querySelectorAll('#feed .tweet')].indexOf(tweet);
+              if(i<0)return;
+              e.preventDefault();e.stopImmediatePropagation();
+              const k=i+':'+j;state[k]=!state[k];save();paint();
+            }
+            function normalizeHandles(){
+              document.querySelectorAll('input,textarea').forEach(el=>{
+                const q=((el.id||'')+' '+(el.name||'')+' '+(el.placeholder||'')).toLowerCase();
+                if(!/handle|username|아이디/.test(q)||el.dataset.atRequired==='1')return;
+                el.dataset.atRequired='1';
+                const n=()=>{const r=(el.value||'').trim();if(r)el.value='@'+r.replace(/^@+/,'')};
+                el.addEventListener('input',()=>{if(el.value&&!el.value.startsWith('@'))el.value='@'+el.value.replace(/^@+/,'')});
+                el.addEventListener('blur',n);el.addEventListener('change',n);n();
+              });
+            }
+            function start(){
+              normalizeHandles();paint();
+              window.addEventListener('click',handle,true);
+              const mo=new MutationObserver(()=>{normalizeHandles();paint()});
+              mo.observe(document.body,{subtree:true,childList:true});
+            }
+            if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+          })();
+          </script>''')
+
+          patch('twitter.html','TWITTER_FOUR_PHOTOS_V1',r'''<!-- TWITTER_FOUR_PHOTOS_V1 -->
+          <style>
+          .tweet[data-photo-count]{overflow:hidden}
+          .tweet[data-photo-count="1"] .tweet-extra-photo{width:100%;display:block}
+          .tweet[data-photo-count="2"] .tweet-extra-photo,.tweet[data-photo-count="3"] .tweet-extra-photo,.tweet[data-photo-count="4"] .tweet-extra-photo{width:calc(50% - 3px);display:inline-block;vertical-align:top;margin-right:4px;margin-top:8px;height:170px;object-fit:cover}
+          .tweet[data-photo-count="3"] .tweet-extra-photo:nth-of-type(3){width:100%;margin-right:0}
+          .tweet[data-photo-count="4"] .tweet-extra-photo:nth-of-type(2n){margin-right:0}
+          .tweet-photo-editor input[type=file]{width:100%}
+          </style>
+          <script>
+          (()=>{
+            const K='twitter-extra-photos-v2';
+            const read=()=>{try{return JSON.parse(localStorage.getItem(K)||'{}')}catch(e){return{}}};
+            const write=v=>{try{localStorage.setItem(K,JSON.stringify(v))}catch(e){}};
+            let photos=read();
+            const toData=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f)});
+            async function bind(){
+              document.querySelectorAll('#tweets .tweet-photo-editor').forEach((box,i)=>{
+                const input=box.querySelector('input[type=file]');if(!input||input.dataset.multiBound==='1')return;
+                input.multiple=true;input.dataset.multiBound='1';
+                input.addEventListener('change',async()=>{
+                  const fs=[...(input.files||[])].slice(0,4);if(!fs.length)return;
+                  const arr=[];for(const f of fs)arr.push(await toData(f));
+                  photos[i]=arr;write(photos);sync();
+                });
+                const clear=box.querySelector('.tweet-photo-clear');
+                if(clear&&clear.dataset.multiBound!=='1'){
+                  clear.dataset.multiBound='1';clear.addEventListener('click',()=>{delete photos[i];write(photos);sync();input.value=''});
+                }
+              });
+              document.querySelectorAll('#tweets .tweet-photo-editor input[type=file]').forEach(i=>i.title='최대 4장까지 선택 가능');
+            }
+            function sync(){
+              const feed=document.getElementById('feed');if(!feed)return;
+              feed.querySelectorAll('.tweet').forEach((tweet,i)=>{
+                const arr=Array.isArray(photos[i])?photos[i].slice(0,4):(photos[i]?[photos[i]]:[]);
+                const old=[...tweet.querySelectorAll('.tweet-extra-photo')];
+                old.slice(arr.length).forEach(x=>x.remove());
+                const text=tweet.querySelector('.tweet-text');
+                arr.forEach((src,j)=>{
+                  let img=old[j]||tweet.querySelectorAll('.tweet-extra-photo')[j];
+                  if(!img){img=document.createElement('img');img.className='tweet-extra-photo';if(text)text.insertAdjacentElement('afterend',img);else tweet.appendChild(img)}
+                  img.src=src;img.alt='';
+                });
+                tweet.dataset.photoCount=String(arr.length);
+                if(!arr.length)delete tweet.dataset.photoCount;
+              });
+            }
+            function start(){bind();sync();const mo=new MutationObserver(()=>{bind();sync()});const t=document.getElementById('tweets'),f=document.getElementById('feed');if(t)mo.observe(t,{childList:true,subtree:true});if(f)mo.observe(f,{childList:true,subtree:true})}
+            if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+          })();
+          </script>''')
+          PY
+      - name: Validate
+        run: |
+          test -f dispatch.html
+          test -f twitter.html
+          grep -q 'DISPATCH_MOBILE_RATIO_FIX_V1' dispatch.html
+          grep -q 'TWITTER_ICON_LAYOUT_FILL_FIX_V4' twitter.html
+          grep -q 'TWITTER_FOUR_PHOTOS_V1' twitter.html
+      - name: Commit and cleanup
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dispatch.html twitter.html
+          git commit -m 'fix: restore Dispatch mobile ratio and Twitter media actions' || true
+          git rm .github/workflows/final-ui-fix.yml
+          git commit -m 'chore: remove temporary final UI workflow' || true
+          git push
