@@ -1,0 +1,101 @@
+name: Twitter profile action polish
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Thin supplied icons and align action group
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          from PIL import Image, ImageFilter
+
+          img_dir = Path('이미지')
+          names = [
+              'twitter-reply.webp',
+              'twitter-repost.webp',
+              'twitter-like.webp',
+              'twitter-views.webp',
+              'twitter-bookmark.webp',
+              'twitter-share.webp',
+          ]
+
+          # Create slightly thinner versions of the supplied icons by
+          # eroding the alpha channel before the 20px display size.
+          for name in names:
+              src = img_dir / name
+              dst = img_dir / name.replace('.webp', '-thin.webp')
+              im = Image.open(src).convert('RGBA')
+              alpha = im.getchannel('A').filter(ImageFilter.MinFilter(5))
+              im.putalpha(alpha)
+              im.save(dst, 'WEBP', lossless=True, method=6)
+
+          p = Path('twitter-profile.html')
+          s = p.read_text(encoding='utf-8')
+
+          # Remove old position override so this becomes the single source
+          # of truth for the action row.
+          s = re.sub(r'<style[^>]*id="TWITTER_PROFILE_POSITION_CLEAN_V1"[^>]*>.*?</style>\s*', '', s, flags=re.S)
+
+          css = '''<style id="TWITTER_PROFILE_ACTION_POLISH_V2">
+          /* Keep all six actions as one compact group. Its first icon starts
+             exactly where the post body starts (the post's 61px left inset). */
+          .tw-post .tw-action-icons{
+            display:flex!important;
+            flex-direction:row!important;
+            justify-content:flex-start!important;
+            align-items:center!important;
+            width:max-content!important;
+            max-width:100%!important;
+            margin-left:0!important;
+            margin-right:0!important;
+            transform:none!important;
+            gap:14px!important;
+          }
+          .tw-post .tw-action-icons .tw-action{
+            flex:0 0 auto!important;
+            min-width:0!important;
+            width:auto!important;
+            margin:0!important;
+            gap:3px!important;
+          }
+          .tw-post .tw-action-icons .tw-action img.tw-supplied-action-icon{
+            width:20px!important;
+            height:20px!important;
+            display:block!important;
+            object-fit:contain!important;
+          }
+          </style>'''
+          s = s.replace('</head>', css + '\n</head>', 1)
+
+          # Make the final static icon layer use the thinned assets.
+          for name in names:
+              s = s.replace(name, name.replace('.webp', '-thin.webp'))
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add twitter-profile.html 이미지/*-thin.webp
+          git diff --cached --quiet || git commit -m "fix: group and thin Twitter profile action icons"
+          git push
+
+      - name: Remove temporary workflow
+        if: success()
+        run: |
+          rm -f .github/workflows/twitter-profile-action-polish.yml
+          git add .github/workflows/twitter-profile-action-polish.yml
+          git commit -m "chore: remove temporary Twitter action polish workflow"
+          git push
