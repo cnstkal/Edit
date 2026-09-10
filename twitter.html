@@ -70,6 +70,26 @@ input:not([type="checkbox"]):not([type="radio"]),textarea,select{font-size:16px!
 .ico svg{width:20px;height:20px;stroke-width:1.7}
 @media(max-width:560px){.tweet{padding-left:72px}.tweet-text{font-size:16px}.actions{gap:0}.act{font-size:11px}.num{font-size:11px}.tab{font-size:18px}}
 </style>
+
+<style>
+/* ORIGINAL TWITTER FEED GEOMETRY v2 */
+.twitter-head{height:13%;min-height:78px}
+.tabs{padding:0 10%;gap:30px}
+.tab{font-size:clamp(18px,4vw,25px);height:57%}
+.tab.active:after{height:5px;border-radius:4px}
+.tweet{padding:18px 18px 16px 78px;min-height:18.2%;font-size:14px}
+.avatar{left:18px;top:20px;width:48px;height:48px}
+.identity{gap:5px;padding-right:22px}
+.name{font-size:16px}
+.handle,.time{font-size:14px}
+.more{right:17px;top:20px;font-size:16px;letter-spacing:3px}
+.tweet-text{font-size:17px;line-height:1.38;margin-top:9px}
+.actions{grid-template-columns:1.05fr 1fr 1fr 1.15fr 1fr 1fr;margin-top:13px}
+.act{justify-content:center;gap:4px;font-size:13px}
+.ico{width:21px;height:21px;flex-basis:21px}
+.ico svg{width:20px;height:20px;stroke-width:1.7}
+@media(max-width:560px){.tweet{padding-left:72px}.tweet-text{font-size:16px}.actions{gap:0}.act{font-size:11px}.num{font-size:11px}.tab{font-size:18px}}
+</style>
 </head>
 <body>
 <header class="top"><a href="index.html">← 홈</a><h1>트위터 설정</h1><span style="width:34px"></span></header>
