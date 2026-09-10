@@ -1,0 +1,142 @@
+name: Twitter final fix
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch Twitter UI
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def patch(path, marker, block):
+              p=Path(path)
+              s=p.read_text(encoding='utf-8')
+              if marker not in s:
+                  s=s.replace('</body>', block+'</body>')
+                  p.write_text(s,encoding='utf-8')
+
+          main=r'''<!-- TWITTER_FINAL_ACTION_FIX_V3 -->
+          <style>
+          /* Keep the four main actions evenly spaced; bookmark/share are one compact group. */
+          .actions{grid-template-columns:repeat(4,minmax(0,1fr)) 48px!important;column-gap:0!important;align-items:center!important}
+          .act{min-width:0!important;gap:3px!important;justify-content:center!important;overflow:visible!important}
+          .act:nth-child(1){justify-content:flex-start!important}
+          .act:nth-child(5){grid-column:5!important;grid-row:1!important;justify-self:start!important;margin:0!important;padding:0!important}
+          .act:nth-child(6){grid-column:5!important;grid-row:1!important;justify-self:end!important;margin:0!important;padding:0!important}
+          .act .tw-ui-icon{width:18px!important;height:18px!important;min-width:18px!important;min-height:18px!important;max-width:18px!important;max-height:18px!important;flex:0 0 18px!important;object-fit:contain!important;pointer-events:none!important;display:block!important}
+          .act span,.act b,.act strong{font-family:Pretendard,sans-serif!important;font-variant-numeric:tabular-nums!important;white-space:nowrap!important}
+          .act:nth-child(5){margin-right:2px!important}
+          .act:nth-child(6){margin-left:2px!important}
+          /* Every numeric/text element in the tweet preview uses Pretendard. */
+          #feed,#tweets,.tweet-card,.tweet-card *{font-family:Pretendard,sans-serif!important}
+          </style>
+          <script>
+          (()=>{
+            const stateKey='twitter-extra-action-state-v1';
+            let states={};try{states=JSON.parse(localStorage.getItem(stateKey)||'{}')}catch(e){}
+            const save=()=>{try{localStorage.setItem(stateKey,JSON.stringify(states))}catch(e){}};
+            function normalizeHandleInput(el){
+              if(!el || el.dataset.atRequired==='1') return;
+              el.dataset.atRequired='1';
+              const norm=()=>{
+                const raw=(el.value||'').trim();
+                if(raw) el.value='@'+raw.replace(/^@+/,'');
+              };
+              el.addEventListener('blur',norm);
+              el.addEventListener('change',norm);
+              el.addEventListener('input',()=>{
+                const raw=el.value||'';
+                if(raw && !raw.startsWith('@')) el.value='@'+raw.replace(/^@+/,'');
+              });
+              norm();
+            }
+            function findHandleInputs(){
+              document.querySelectorAll('input,textarea').forEach(el=>{
+                const key=((el.id||'')+' '+(el.name||'')+' '+(el.placeholder||'')).toLowerCase();
+                if(/handle|username|아이디/.test(key)) normalizeHandleInput(el);
+              });
+            }
+            function actionIndex(a){
+              const bar=a.closest('.actions');
+              if(!bar)return -1;
+              return [...bar.querySelectorAll('.act')].indexOf(a);
+            }
+            function apply(){
+              document.querySelectorAll('.actions').forEach((bar,bi)=>{
+                [...bar.querySelectorAll('.act')].forEach((a,i)=>{
+                  const on=!!states[bi+':'+i];
+                  a.classList.toggle('tw-extra-active',on);
+                  a.classList.toggle('tw-extra-repost',on&&i===1);
+                  a.classList.toggle('tw-extra-like',on&&i===2);
+                  a.classList.toggle('tw-extra-bookmark',on&&i===4);
+                });
+              });
+            }
+            document.addEventListener('click',e=>{
+              const a=e.target.closest?.('.actions .act');
+              if(!a)return;
+              const i=actionIndex(a);
+              if(![1,2,4].includes(i))return;
+              const bar=a.closest('.actions');
+              const bi=[...document.querySelectorAll('.actions')].indexOf(bar);
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              const key=bi+':'+i;
+              states[key]=!states[key];
+              save();
+              apply();
+            },true);
+            function start(){findHandleInputs();apply();const mo=new MutationObserver(()=>{findHandleInputs();apply()});mo.observe(document.body,{subtree:true,childList:true});}
+            if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+          })();
+          </script>
+          '''
+          patch('twitter.html','TWITTER_FINAL_ACTION_FIX_V3',main)
+
+          profile=r'''<!-- TWITTER_PROFILE_FINAL_ACTION_FIX_V3 -->
+          <style>
+          .tw-action-icons{grid-template-columns:repeat(4,minmax(0,1fr)) 48px!important;column-gap:0!important;align-items:center!important}
+          .tw-action{min-width:0!important;gap:3px!important;justify-content:center!important;overflow:visible!important}
+          .tw-action:nth-child(1){justify-content:flex-start!important}
+          .tw-action:nth-child(5){grid-column:5!important;grid-row:1!important;justify-self:start!important;margin:0 2px 0 0!important;padding:0!important}
+          .tw-action:nth-child(6){grid-column:5!important;grid-row:1!important;justify-self:end!important;margin:0 0 0 2px!important;padding:0!important}
+          .tw-action .tw-profile-ui-icon{width:18px!important;height:18px!important;min-width:18px!important;min-height:18px!important;max-width:18px!important;max-height:18px!important;flex:0 0 18px!important;object-fit:contain!important;pointer-events:none!important;display:block!important}
+          .tw-action span,.tw-action b,.tw-action strong{font-family:Pretendard,sans-serif!important;font-variant-numeric:tabular-nums!important;white-space:nowrap!important}
+          #screen,#tweetEditorList,#screen *{font-family:Pretendard,sans-serif!important}
+          </style>
+          <script>
+          (()=>{
+            const stateKey='twitter-profile-action-state-v2';
+            let states={};try{states=JSON.parse(localStorage.getItem(stateKey)||'{}')}catch(e){}
+            const save=()=>{try{localStorage.setItem(stateKey,JSON.stringify(states))}catch(e){}};
+            function actionIndex(a){const bar=a.closest('.tw-action-icons');return bar?[...bar.querySelectorAll('.tw-action')].indexOf(a):-1}
+            function apply(){document.querySelectorAll('.tw-action-icons').forEach((bar,bi)=>[...bar.querySelectorAll('.tw-action')].forEach((a,i)=>{const on=!!states[bi+':'+i];a.classList.toggle('tw-profile-active',on);a.classList.toggle('tw-profile-active-repost',on&&i===1);a.classList.toggle('tw-profile-active-like',on&&i===2);a.classList.toggle('tw-profile-active-bookmark',on&&i===4)}))}
+            document.addEventListener('click',e=>{const a=e.target.closest?.('.tw-action-icons .tw-action');if(!a)return;const i=actionIndex(a);if(![1,2,4].includes(i))return;const bar=a.closest('.tw-action-icons');const bi=[...document.querySelectorAll('.tw-action-icons')].indexOf(bar);e.preventDefault();e.stopImmediatePropagation();const key=bi+':'+i;states[key]=!states[key];save();apply()},true);
+            function normalize(){document.querySelectorAll('input,textarea').forEach(el=>{const key=((el.id||'')+' '+(el.name||'')+' '+(el.placeholder||'')).toLowerCase();if(!/handle|username|아이디/.test(key)||el.dataset.atRequired==='1')return;el.dataset.atRequired='1';const norm=()=>{const raw=(el.value||'').trim();if(raw)el.value='@'+raw.replace(/^@+/,'')};el.addEventListener('blur',norm);el.addEventListener('change',norm);el.addEventListener('input',()=>{if(el.value&&!el.value.startsWith('@'))el.value='@'+el.value.replace(/^@+/,'')});norm()})}
+            function start(){normalize();apply();const mo=new MutationObserver(()=>{normalize();apply()});mo.observe(document.body,{subtree:true,childList:true})}
+            if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+          })();
+          </script>
+          '''
+          patch('twitter-profile.html','TWITTER_PROFILE_FINAL_ACTION_FIX_V3',profile)
+          PY
+      - name: Validate
+        run: |
+          test -f twitter.html
+          test -f twitter-profile.html
+          grep -q 'TWITTER_FINAL_ACTION_FIX_V3' twitter.html
+          grep -q 'TWITTER_PROFILE_FINAL_ACTION_FIX_V3' twitter-profile.html
+      - name: Commit and remove workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add twitter.html twitter-profile.html
+          git commit -m 'fix: normalize Twitter actions handles and fonts' || true
+          git rm .github/workflows/twitter-final-fix.yml
+          git commit -m 'chore: remove temporary Twitter fix workflow' || true
+          git push
