@@ -1,0 +1,76 @@
+name: Twitter profile icons final
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'twitter-profile.html'
+      - '.github/workflows/twitter-profile-icons-final.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore supplied icons and remove state behavior
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('twitter-profile.html')
+          s = p.read_text(encoding='utf-8')
+
+          # Remove every previous generated Twitter action-icon override block so
+          # old MutationObservers cannot add a second layer of icons.
+          s = re.sub(r'<style id="TWITTER_ACTION_ICONS_[^"]+">.*?</style>\s*<script id="TWITTER_ACTION_ICONS_[^"]+_JS">.*?</script>', '', s, flags=re.S)
+          s = re.sub(r'<style id="TWITTER_PROFILE_ICONS_[^"]+">.*?</style>\s*<script id="TWITTER_PROFILE_ICONS_[^"]+_JS">.*?</script>', '', s, flags=re.S)
+
+          final = r'''<style id="TWITTER_PROFILE_ICONS_STATIC_FINAL">
+          /* Use exactly one supplied image icon per action. No active/inactive color state. */
+          .tw-action-icons .tw-action > img.tw-supplied-action-icon{
+            width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;
+            max-width:20px!important;max-height:20px!important;display:block!important;object-fit:contain!important;
+            flex:0 0 20px!important;margin:0!important;padding:0!important;border:0!important;
+          }
+          .tw-action-icons .tw-action{color:#53636d!important}
+          .tw-action-icons .tw-action > span{color:#53636d!important}
+          .theme-black .tw-action-icons .tw-action,
+          .theme-black .tw-action-icons .tw-action > span{color:#8b98a5!important}
+          </style>
+          <script id="TWITTER_PROFILE_ICONS_STATIC_FINAL_JS">(()=>{
+          const base='이미지/';
+          const icons=['twitter-reply.webp','twitter-repost.webp','twitter-like.webp','twitter-views.webp','twitter-bookmark.webp','twitter-share.webp'];
+          function apply(){
+            document.querySelectorAll('.tw-action-icons').forEach(bar=>{
+              const actions=[...bar.querySelectorAll(':scope > .tw-action')];
+              actions.forEach((el,i)=>{
+                if(!icons[i]) return;
+                el.querySelectorAll('svg, .tw-profile-ui-icon, .tw-action-state-icon, img').forEach(x=>x.remove());
+                el.insertBefore(Object.assign(document.createElement('img'),{className:'tw-supplied-action-icon',src:base+icons[i],alt:''}),el.firstChild);
+                el.removeAttribute('onclick');
+                el.onmousedown=null; el.onmouseup=null; el.ontouchstart=null; el.ontouchend=null;
+              });
+            });
+          }
+          let scheduled=false;
+          function run(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;apply()})}
+          const mo=new MutationObserver(run);
+          function start(){apply();if(document.body)mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']})}
+          if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+          })();</script>'''
+
+          s = s.replace('</head>', final + '\n</head>', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit and clean up
+        run: |
+          rm -f .github/workflows/twitter-profile-icons-final.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add twitter-profile.html .github/workflows/twitter-profile-icons-final.yml
+          git commit -m 'fix: use supplied Twitter profile icons without active state' || exit 0
+          git push
