@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Enforce PC mobile terminology and distinct preview frames
+      - name: Enforce PC/mobile terminology and distinct preview frames
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -24,7 +24,10 @@ jobs:
               s=p.read_text(encoding='utf-8',errors='ignore')
               visible=re.sub(r'<style\b.*?</style>','',s,flags=re.S|re.I)
               visible=re.sub(r'<script\b.*?</script>','',visible,flags=re.S|re.I)
-              if re.search(r'16:9|9:16',visible): errors.append(f'{p}: ratio numbers found in visible UI')
+              if re.search(r'16:9|9:16',visible):
+                  errors.append(f'{p}: ratio numbers found in visible UI; use only PC 비율 / 모바일 비율')
+              if re.search(r'(PC 비율|모바일 비율)\s*[^<\n]{0,20}(16:9|9:16)',visible,re.I):
+                  errors.append(f'{p}: PC 비율 / 모바일 비율 labels must not contain numeric ratios')
           for fn, markers in {
               'news-editor.html':('EDITOR_RATIO_RULES_FINAL','editor-mobile','editor-pc'),
               'dispatch-editor.html':('EDITOR_RATIO_RULES_FINAL','editor-mobile','editor-pc')
@@ -33,7 +36,8 @@ jobs:
               if p.exists():
                   s=p.read_text(encoding='utf-8')
                   for m in markers:
-                      if m not in s: errors.append(f'{fn}: missing mandatory rule {m}')
+                      if m not in s:
+                          errors.append(f'{fn}: missing mandatory rule {m}')
           if errors:
               print('\n'.join(errors)); sys.exit(1)
           print('EDITOR RATIO RULES: PASS')
