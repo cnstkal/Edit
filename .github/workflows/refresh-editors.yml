@@ -1,0 +1,33 @@
+name: refresh editor links
+on:
+  push:
+    paths:
+      - '.refresh-editors-trigger'
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create cache-busted editor copies
+        run: |
+          cp news2.html news-editor.html
+          cp dispatch.html dispatch-editor.html
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text()
+          s=s.replace("news2.html?v=20260910a","news-editor.html?v=20260910j")
+          s=s.replace("dispatch.html?dispatch=1&v=20260910a","dispatch-editor.html?dispatch=1&v=20260910j")
+          s=s.replace("twitter-menu.html?v=20260910f","twitter-menu.html?v=20260910i")
+          p.write_text(s)
+          Path('.github/workflows/refresh-editors.yml').unlink(missing_ok=True)
+          Path('.refresh-editors-trigger').unlink(missing_ok=True)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html news-editor.html dispatch-editor.html .github/workflows/refresh-editors.yml .refresh-editors-trigger
+          git commit -m 'fix: refresh editor links and preserve full settings'
+          git push
