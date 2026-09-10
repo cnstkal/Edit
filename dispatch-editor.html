@@ -148,6 +148,23 @@ textarea{padding:12px 13px!important;min-height:150px!important;line-height:1.6!
   .preview-wrap .stage{width:100%!important;max-width:none!important;margin:0 auto!important}
 }
 </style>
+
+<style id="DISPATCH_5050_LAYOUT_FINAL">
+@media(min-width:801px){
+  .layout{width:100%!important;max-width:none!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:0!important;align-items:start!important}
+  .layout>.preview-wrap{grid-column:1!important;width:100%!important;min-width:0!important;align-self:start!important;padding:28px 28px 22px 0!important}
+  .layout>.panel{grid-column:2!important;width:100%!important;max-width:none!important;justify-self:stretch!important;align-self:start!important;margin:0!important;border-radius:0!important;border-left:1px solid #dedad4!important;box-shadow:none!important;min-width:0!important}
+  .layout>.preview-wrap .preview-tools{width:min(100%,720px)!important;margin:0 auto 12px!important}
+  .layout>.preview-wrap .stage-wrap{width:100%!important;margin:0!important}
+}
+@media(max-width:800px){
+  .layout{width:100%!important;max-width:none!important}
+  .layout>.preview-wrap{width:100%!important;padding:10px 0 0!important}
+  .layout>.preview-wrap .preview-tools{width:100%!important;margin:0 auto 10px!important}
+  .layout>.preview-wrap .stage-wrap{width:100%!important;padding:6px!important}
+  .layout>.preview-wrap .stage.editor-mobile{width:min(520px,calc(100vw - 12px))!important;max-width:520px!important;margin:0 auto!important}
+}
+</style>
 </head>
 <body>
 <div class="top"><button class="home" type="button" onclick="location.href='index.html'">← 홈으로</button><div class="brand">디스패치</div></div>
