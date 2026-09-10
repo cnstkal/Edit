@@ -135,4 +135,13 @@ file('logoFile',x=>logo=x);file('photoFile',x=>photo=x);file('miniFile1',x=>mini
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 </script>
+<!-- DISPATCH_MOBILE_RATIO_FIX_V1 -->
+<style>
+@media(max-width:800px){
+  .stage:not(.pc-frame){width:min(100%,390px)!important;max-width:390px!important;height:auto!important;min-height:0!important;aspect-ratio:9/16!important;align-self:center}
+  .stage:not(.pc-frame) .dispatch{width:100%!important;min-width:0!important;min-height:0!important;height:auto!important}
+  .stage:not(.pc-frame) .pc-main{display:block!important}
+  .stage:not(.pc-frame) .side{display:none!important}
+}
+</style>
 </body></html>
