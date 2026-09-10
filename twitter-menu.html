@@ -108,4 +108,31 @@ function run(){
   });
 }
 window.addEventListener('DOMContentLoaded',run);window.addEventListener('load',run);window.addEventListener('resize',run);setTimeout(run,300);setTimeout(run,1000);
-})();</script></head><body><header class="top"><a href="index.html">← 홈으로</a><h1>트위터</h1><span style="width:34px"></span></header><main class="wrap"><header class="head"><h2>트위터</h2><p>만들 소스 종류를 선택하세요</p></header><section class="grid"><a class="card" href="twitter-post.html?v=20260910h"><div class="icon">𝕏</div><div class="name">게시글</div><div class="desc">트위터 게시글 · 반응 · 피드</div></a><a class="card" href="twitter-profile.html?v=20260910f"><div class="icon">👤</div><div class="name">프로필</div><div class="desc">트위터 프로필 · 소개 · 게시물</div></a></section></main></body></html>
+})();</script></head><body><header class="top"><a href="index.html">← 홈으로</a><h1>트위터</h1><span style="width:34px"></span></header><main class="wrap"><header class="head"><h2>트위터</h2><p>만들 소스 종류를 선택하세요</p></header><section class="grid"><a class="card" href="twitter-post.html?v=20260910h"><div class="icon">𝕏</div><div class="name">게시글</div><div class="desc">트위터 게시글 · 반응 · 피드</div></a><a class="card" href="twitter-profile.html?v=20260910f"><div class="icon">👤</div><div class="name">프로필</div><div class="desc">트위터 프로필 · 소개 · 게시물</div></a></section></main><script id="HIGH_QUALITY_PNG_EXPORT_V1">
+(()=>{
+  const TARGETS=['.stage','.screen','.preview-stage'];
+  function target(){for(const s of TARGETS){const e=document.querySelector(s);if(e)return e}return null}
+  function load(){return new Promise((ok,fail)=>{if(window.html2canvas)return ok();const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=ok;s.onerror=fail;document.head.appendChild(s)})}
+  async function save(btn){
+    const el=target();if(!el)return;
+    const old=btn?.textContent;if(btn){btn.disabled=true;btn.textContent='PNG 생성 중…'}
+    try{
+      await load();
+      const w=el.scrollWidth||el.getBoundingClientRect().width,h=el.scrollHeight||el.getBoundingClientRect().height;
+      const scale=Math.min(4,8192/Math.max(w,h));
+      const canvas=await html2canvas(el,{scale:Math.max(2,scale),useCORS:true,allowTaint:false,backgroundColor:null,logging:false,imageTimeout:15000,windowWidth:Math.max(document.documentElement.clientWidth,w),windowHeight:Math.max(document.documentElement.clientHeight,h),scrollX:0,scrollY:-window.scrollY});
+      canvas.toBlob(blob=>{
+        if(!blob)throw new Error('PNG 생성 실패');
+        const a=document.createElement('a');a.download='editor.png';a.href=URL.createObjectURL(blob);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+      },'image/png');
+    }catch(e){console.error('High quality PNG export failed',e);alert('PNG 저장에 실패했습니다.');}
+    finally{if(btn){btn.disabled=false;btn.textContent=old||'PNG로 저장'}}
+  }
+  function bind(){
+    const btn=document.querySelector('#savePng,#save,.save');if(!btn||btn.dataset.hqBound)return;
+    btn.dataset.hqBound='1';
+    btn.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();save(btn)},true);
+  }
+  window.addEventListener('DOMContentLoaded',bind);window.addEventListener('load',bind);setInterval(bind,1000);
+})();
+</script></body></html>
