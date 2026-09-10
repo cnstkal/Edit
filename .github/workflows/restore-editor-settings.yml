@@ -3,6 +3,8 @@ on:
   push:
     paths:
       - '.github/workflows/restore-editor-settings.yml'
+permissions:
+  contents: write
 jobs:
   restore:
     runs-on: ubuntu-latest
@@ -26,7 +28,7 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add news-editor.html dispatch-editor.html
-          git commit -m "fix: restore full news and dispatch editor settings" || exit 0
+          git commit -m "fix: restore full news and dispatch editor settings"
           git push
       - name: Remove temporary workflow
         shell: bash
