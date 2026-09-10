@@ -1,0 +1,72 @@
+name: editor final fix
+on:
+  push:
+    paths:
+      - '.github/workflows/editor-final-fix.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch editor layouts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # Dispatch mobile preview must always be a real 9:16 frame when mobile mode is selected.
+          p=Path('dispatch.html'); s=p.read_text()
+          marker='<!-- DISPATCH_MOBILE_916_FINAL_V2 -->'
+          if marker not in s:
+              patch='''\n<!-- DISPATCH_MOBILE_916_FINAL_V2 -->\n<style>\n/* Mobile mode = 9:16 preview. PC mode keeps its 16:9 frame. */\n.stage:not(.pc-frame){width:min(100%,390px)!important;max-width:390px!important;height:auto!important;min-height:0!important;aspect-ratio:9/16!important}\n.stage:not(.pc-frame) .side{display:none!important}\n.stage:not(.pc-frame) .dispatch{width:720px!important;min-width:720px!important;min-height:1280px!important}\n</style>\n'''
+              s=s.replace('</body>',patch+'</body>')
+              p.write_text(s)
+
+          # News/Dispatch settings: only title, time, body.
+          p=Path('news2.html'); s=p.read_text()
+          marker='<!-- SIMPLE_EDITOR_FIELDS_FINAL_V2 -->'
+          if marker not in s:
+              patch='''\n<!-- SIMPLE_EDITOR_FIELDS_FINAL_V2 -->\n<style>\n.settings .card:first-child{display:none!important}\n.settings .card:nth-child(2) .field:has(#subtitle),.settings .card:nth-child(2) .photoRow{display:none!important}\n.settings .card:nth-child(n+3){display:none!important}\n.settings .card:nth-child(2) .cardHead{display:none!important}\n</style>\n<script>\n(()=>{function clean(){const c=document.querySelectorAll('.settings .card');if(!c[0]||!c[1])return;const t=c[0].querySelector('.field:has(#time)'),b=c[1].querySelector('.field:has(#body)');if(t&&b&&!t.dataset.simpleMoved){t.dataset.simpleMoved='1';const l=t.querySelector('.label'),i=t.querySelector('#time');if(l)l.textContent='시간';if(i)i.placeholder='시간';c[1].insertBefore(t,b)}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean);else clean()})();\n</script>\n'''
+              s=s.replace('</body>',patch+'</body>')
+              p.write_text(s)
+
+          p=Path('dispatch.html'); s=p.read_text()
+          marker='<!-- SIMPLE_EDITOR_FIELDS_FINAL_V2 -->'
+          if marker not in s:
+              patch='''\n<!-- SIMPLE_EDITOR_FIELDS_FINAL_V2 -->\n<style>\n.panel>h2{display:none!important}\n.panel .group:has(#logoFile),.panel .group:has(#photoFile),.panel .group:has(#credit),.panel .group:has(#miniFile1),.panel .group:has(#miniFile2),.panel .group:has(#miniFile3){display:none!important}\n.panel .group:has(#title),.panel .group:has(#date),.panel .group:has(#body){display:block!important}\n</style>\n<script>\n(()=>{function clean(){const g=document.querySelector('.panel .group:has(#date)'),l=g?.querySelector('label'),d=document.getElementById('date');if(l)l.textContent='시간';if(d)d.placeholder='시간'}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean);else clean()})();\n</script>\n'''
+              s=s.replace('</body>',patch+'</body>')
+              p.write_text(s)
+
+          # Twitter: do not let the auxiliary paint observer create a mutation loop; active icon color is painted once after rendering/click.
+          p=Path('twitter.html'); s=p.read_text()
+          s=s.replace("window.addEventListener('click',handle,true);", "window.addEventListener('click',handle,false);")
+          marker='<!-- TWITTER_ACTIVE_FINAL_V2 -->'
+          if marker not in s:
+              patch='''\n<!-- TWITTER_ACTIVE_FINAL_V2 -->\n<style>\n.act.tw-icon-repost-active .tw-ui-icon{filter:brightness(0) saturate(100%) invert(55%) sepia(91%) saturate(1051%) hue-rotate(119deg) brightness(89%) contrast(101%)!important}\n.act.tw-icon-like-active .tw-ui-icon{filter:brightness(0) saturate(100%) invert(29%) sepia(93%) saturate(5486%) hue-rotate(323deg) brightness(101%) contrast(99%)!important}\n.act.tw-icon-bookmark-active .tw-ui-icon{filter:brightness(0) saturate(100%) invert(48%) sepia(96%) saturate(1855%) hue-rotate(184deg) brightness(96%) contrast(101%)!important}\n</style>\n<script>\n(()=>{\nfunction paint(){let s={};try{s=JSON.parse(localStorage.getItem('twitter-final-action-state-v4')||'{}')}catch(e){}document.querySelectorAll('#feed .tweet').forEach((t,i)=>t.querySelectorAll('.act').forEach((b,j)=>{const a=!!s[i+':'+j];b.classList.toggle('tw-icon-repost-active',a&&j===1);b.classList.toggle('tw-icon-like-active',a&&j===2);b.classList.toggle('tw-icon-bookmark-active',a&&j===4)}))}\nfunction click(e){const b=e.target.closest?.('#feed .actions .act');if(!b)return;const t=b.closest('.tweet');if(!t)return;const j=[...t.querySelectorAll('.act')].indexOf(b);if(![1,2,4].includes(j))return;setTimeout(paint,20)}\ndocument.addEventListener('click',click,false);\nif(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paint);else paint();\n})();\n</script>\n'''
+              s=s.replace('</body>',patch+'</body>')
+              p.write_text(s)
+          PY
+      - name: Verify
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          assert 'DISPATCH_MOBILE_916_FINAL_V2' in Path('dispatch.html').read_text()
+          assert 'SIMPLE_EDITOR_FIELDS_FINAL_V2' in Path('news2.html').read_text()
+          assert 'SIMPLE_EDITOR_FIELDS_FINAL_V2' in Path('dispatch.html').read_text()
+          assert 'TWITTER_ACTIVE_FINAL_V2' in Path('twitter.html').read_text()
+          print('verification ok')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add news2.html dispatch.html twitter.html
+          git diff --cached --quiet || git commit -m 'fix: enforce editor fields and dispatch mobile ratio'
+          git push
+      - name: Remove workflow
+        if: always()
+        run: |
+          git rm -f .github/workflows/editor-final-fix.yml || true
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'chore: remove temporary editor fix workflow' || true
+          git push || true
