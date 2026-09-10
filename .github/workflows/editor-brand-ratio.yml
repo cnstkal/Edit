@@ -12,27 +12,27 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
           files=['news-editor.html','dispatch-editor.html','kakao.html','kakao2.html','kakao-profile.html','twitter-menu.html','twitter-post.html','twitter-profile.html','index.html']
           for fn in files:
             p=Path(fn)
             if not p.exists(): continue
             s=p.read_text(encoding='utf-8')
-            # User-facing mode labels: never expose raw ratio names.
+            # Only user-facing ratio labels are changed; CSS aspect-ratio rules remain numeric.
             s=s.replace('PC · 16:9','PC 비율').replace('모바일 · 9:16','모바일 비율')
             s=s.replace('PC · 9:16','PC 비율').replace('모바일 · 16:9','모바일 비율')
             s=s.replace('PC / 16:9','PC 비율').replace('모바일 / 9:16','모바일 비율')
-            s=s.replace('16:9', 'PC 비율').replace('9:16', '모바일 비율')
-            # App/page branding.
-            if '<title>' in s:
-              import re
-              s=re.sub(r'<title>.*?</title>', '<title>Editor</title>', s, count=1, flags=re.S)
+            # Page/app branding.
+            s=re.sub(r'<title>.*?</title>', '<title>Editor</title>', s, count=1, flags=re.S) if '<title>' in s else s
+            if fn=='index.html':
+              s=re.sub(r'<h1>.*?</h1>', '<h1>Editor</h1>', s, count=1, flags=re.S)
             if '<head>' in s and 'editor-pwa-v1' not in s:
-              s=s.replace('<head>', '<head><meta name="application-name" content="Editor"><meta name="apple-mobile-web-app-title" content="Editor"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="assets/editor-icon.png"><link rel="apple-touch-icon" href="assets/editor-icon.png"><!-- editor-pwa-v1 -->',1)
-            # News: force stage ratio to follow actual selected mode, even on desktop browser.
+              s=s.replace('<head>', '<head><meta name="application-name" content="Editor"><meta name="apple-mobile-web-app-title" content="Editor"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/svg+xml" href="assets/editor-icon.svg"><link rel="apple-touch-icon" href="assets/editor-icon.svg"><!-- editor-pwa-v1 -->',1)
+            elif '<head>' in s:
+              s=s.replace('assets/editor-icon.png','assets/editor-icon.svg').replace('type="image/png"','type="image/svg+xml"')
+            # News: PC and mobile preview frames must be genuinely different on desktop too.
             if fn=='news-editor.html' and 'NEWS_DISTINCT_RATIO_V1' not in s:
               s=s.replace('</head>', '''<style>/* NEWS_DISTINCT_RATIO_V1 */\n@media (min-width:901px){.stage{aspect-ratio:16/9!important}.stage.mobile-mode{aspect-ratio:9/16!important}}\n</style></head>''',1)
-              s=s.replace("document.querySelectorAll('.stage').forEach", "document.querySelectorAll('.stage').forEach")
-              # Add a small mode watcher that reads the existing selector without changing any editor fields.
               s=s.replace('</body>', '''<script>/* NEWS_DISTINCT_RATIO_JS_V1 */\n(function(){function sync(){var sel=[...document.querySelectorAll('select')].find(function(x){return [...x.options].some(function(o){return /PC|모바일|mobile/i.test(o.textContent||'')})});if(!sel)return;var label=sel.options[sel.selectedIndex]?.textContent||'';document.querySelectorAll('.stage').forEach(function(st){st.classList.toggle('mobile-mode',/모바일|mobile/i.test(label)&&!/PC/i.test(label));});}document.addEventListener('change',sync,true);sync();})();\n</script></body>''',1)
             p.write_text(s,encoding='utf-8')
           PY
