@@ -1,0 +1,50 @@
+name: Editor ratio rules
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.html'
+      - 'assets/**'
+      - 'manifest.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce PC/mobile terminology and ratio behavior
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, sys
+
+          html_files=list(Path('.').glob('*.html'))
+          errors=[]
+          for p in html_files:
+              s=p.read_text(encoding='utf-8', errors='ignore')
+              visible=re.sub(r'<style\b.*?</style>', '', s, flags=re.S|re.I)
+              visible=re.sub(r'<script\b.*?</script>', '', visible, flags=re.S|re.I)
+              if re.search(r'16:9|9:16', visible):
+                  errors.append(f'{p}: user-facing ratio text must use PC 비율 / 모바일 비율')
+
+          news=Path('news-editor.html')
+          if news.exists():
+              s=news.read_text(encoding='utf-8')
+              for marker in ('EDITOR_RATIO_RULES_V2_NEWS','editor-mobile-ratio','editor-pc-ratio'):
+                  if marker not in s:
+                      errors.append(f'news-editor.html: missing mandatory ratio rule {marker}')
+
+          dispatch=Path('dispatch-editor.html')
+          if dispatch.exists():
+              s=dispatch.read_text(encoding='utf-8')
+              for marker in ('EDITOR_RATIO_RULES_V2_DISPATCH','editor-mobile-ratio','editor-pc-ratio'):
+                  if marker not in s:
+                      errors.append(f'dispatch-editor.html: missing mandatory ratio rule {marker}')
+
+          if errors:
+              print('\n'.join(errors))
+              sys.exit(1)
+          print('EDITOR RATIO RULES: PASS')
+          PY
