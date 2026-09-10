@@ -18,7 +18,7 @@ jobs:
           s=p.read_text(encoding='utf-8')
           css='''
           <style>
-          /* Match the original Twitter feed geometry/icons */
+          /* ORIGINAL TWITTER FEED GEOMETRY v2 */
           .twitter-head{height:13%;min-height:78px}
           .tabs{padding:0 10%;gap:30px}
           .tab{font-size:clamp(18px,4vw,25px);height:57%}
@@ -37,7 +37,7 @@ jobs:
           @media(max-width:560px){.tweet{padding-left:72px}.tweet-text{font-size:16px}.actions{gap:0}.act{font-size:11px}.num{font-size:11px}.tab{font-size:18px}}
           </style>
           '''
-          if '/* Match the original Twitter feed geometry/icons */' not in s:
+          if '/* ORIGINAL TWITTER FEED GEOMETRY v2 */' not in s:
               s=s.replace('</head>',css+'</head>',1)
           old="$('screen').style.background=S.theme==='black'?'#000':'#fff';$('feed').style.background='transparent';"
           new=old+"\nconst profileData=(()=>{try{return JSON.parse(localStorage.getItem('twitter-profile-v1')||'{}')}catch(e){return{}}})();\nconst profileAvatar=profileData.avatar||'';"
