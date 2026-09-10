@@ -1,0 +1,93 @@
+name: repair ui
+on:
+  push:
+    paths:
+      - '.repair-ui-trigger'
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore settings and stabilize Twitter
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          # Undo only the accidental "simple fields" presentation overrides.
+          for fn in ['news2.html','dispatch.html']:
+              p=Path(fn); s=p.read_text()
+              for marker in ['SIMPLE_EDITOR_FIELDS_V1','SIMPLE_EDITOR_FIELDS_FINAL_V2']:
+                  s=re.sub(r'\\n?<!-- '+re.escape(marker)+r' -->.*?(?=</body>)','',s,flags=re.S)
+              p.write_text(s)
+
+          # Remove the unstable late Twitter patches. Keep the stable base and the
+          # earlier single-photo implementation intact.
+          p=Path('twitter.html'); s=p.read_text()
+          s=re.sub(r'\\n?<!-- TWITTER_ICON_LAYOUT_FILL_FIX_V4 -->.*?(?=</body>)','',s,flags=re.S)
+          # If the marker naming changed, remove the later photo/action blocks explicitly.
+          for marker in ['TWITTER_FOUR_PHOTOS_V1','TWITTER_ACTIVE_CLICK_STABILITY_V1','TWITTER_ACTIVE_FINAL_V2']:
+              s=re.sub(r'\\n?<!-- '+re.escape(marker)+r' -->.*?(?=</body>)','',s,flags=re.S)
+
+          # Safe active-icon behavior: no MutationObserver, no capture-phase event,
+          # and no DOM observer at all. The native renderPreview handler owns state.
+          patch=r'''
+          <!-- TWITTER_SAFE_ACTIVE_V3 -->
+          <style>
+          .act.active-repost .tw-ui-icon{filter:brightness(0) saturate(100%) invert(55%) sepia(91%) saturate(1051%) hue-rotate(119deg) brightness(89%) contrast(101%)!important}
+          .act.active-like .tw-ui-icon{filter:brightness(0) saturate(100%) invert(29%) sepia(93%) saturate(5486%) hue-rotate(323deg) brightness(101%) contrast(99%)!important}
+          .act.active-bookmark .tw-ui-icon{filter:brightness(0) saturate(100%) invert(48%) sepia(96%) saturate(1855%) hue-rotate(184deg) brightness(96%) contrast(101%)!important}
+          </style>
+          <script>
+          (()=>{
+            const feed=document.getElementById('feed');
+            if(!feed)return;
+            const original=feed.onclick;
+            feed.onclick=e=>{
+              const btn=e.target.closest?.('[data-action]');
+              if(!btn)return;
+              const i=+btn.dataset.i, action=btn.dataset.action;
+              if(!Number.isFinite(i))return;
+              if(action==='repost'&&S.tweets[i].lock)return;
+              if(action==='repost')S.tweets[i].reposted=!S.tweets[i].reposted;
+              if(action==='like')S.tweets[i].liked=!S.tweets[i].liked;
+              if(action==='bookmark')S.tweets[i].bookmarked=!S.tweets[i].bookmarked;
+              persist();renderPreview();
+            };
+          })();
+          </script>
+          '''
+          # The safe script is intentionally inserted before body end, after the app's
+          # own script so feed/S/persist/renderPreview already exist.
+          s=s.replace('</body>',patch+'\\n</body>')
+          p.write_text(s)
+          PY
+      - name: Verify
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for f in ['news2.html','dispatch.html']:
+              s=Path(f).read_text()
+              assert 'SIMPLE_EDITOR_FIELDS_V1' not in s
+              assert 'SIMPLE_EDITOR_FIELDS_FINAL_V2' not in s
+          s=Path('twitter.html').read_text()
+          assert 'TWITTER_SAFE_ACTIVE_V3' in s
+          assert 'MutationObserver' not in s
+          assert 'TWITTER_FOUR_PHOTOS_V1' not in s
+          print('repair verification ok')
+          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add news2.html dispatch.html twitter.html
+          git diff --cached --quiet || git commit -m 'fix: restore editor settings and stabilize Twitter'
+          git push
+      - name: Cleanup
+        if: always()
+        run: |
+          git rm -f .github/workflows/repair-ui.yml .repair-ui-trigger || true
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'chore: remove temporary repair workflow' || true
+          git push || true
