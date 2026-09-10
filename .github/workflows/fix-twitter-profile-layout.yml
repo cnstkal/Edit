@@ -1,0 +1,44 @@
+name: Fix Twitter profile layout
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-twitter-profile-layout.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch existing profile file
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('twitter-profile.html')
+          s=p.read_text(encoding='utf-8')
+          css='''<style>
+          /* Keep the existing profile file, but let the preview grow vertically. */
+          .stage{aspect-ratio:auto;height:auto;min-height:693px;overflow:visible}
+          .screen{height:auto;min-height:693px;overflow:visible}
+          .cover{height:166px}
+          .tw-posts,.tw-post{height:auto;overflow:visible}
+          .tw-text{overflow:visible;overflow-wrap:anywhere;word-break:break-word}
+          .tw-action-icons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto auto;align-items:center;column-gap:0}
+          .tw-action-icons .tw-action:nth-last-child(2){justify-self:end;margin-right:2px}
+          .tw-action-icons .tw-action:last-child{justify-self:start;margin-left:2px}
+          .tw-action-icons .tw-action{min-width:28px}
+          .tw-repost-icon{width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+          </style>'''
+          if '/* Keep the existing profile file, but let the preview grow vertically. */' not in s:
+              s=s.replace('</head>',css+'</head>',1)
+          # Replace the old repost Unicode glyph wherever the existing profile renderer uses it.
+          s=s.replace('↔','<svg class="tw-repost-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10l-3-3m3 3-3 3M17 17H7l3 3m-3-3 3-3"/></svg>')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit existing file change
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add twitter-profile.html
+          git diff --cached --quiet || git commit -m 'Fix Twitter profile repost icon and vertical preview'
+          git push
