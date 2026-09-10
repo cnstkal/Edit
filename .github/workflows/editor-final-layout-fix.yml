@@ -1,0 +1,99 @@
+name: Final editor layout fix
+on:
+  push:
+    branches: [main]
+    paths: ['.news-final-layout-fix-trigger']
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply final news editor geometry
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('news-editor.html')
+          s=p.read_text(encoding='utf-8')
+          css=r'''
+          <style id="NEWS_EDITOR_GEOMETRY_FINAL_V1">
+          html,body{margin:0!important;padding:0!important;background:#f5f3ee!important;overflow-x:hidden!important}
+          .top{width:100vw!important;max-width:none!important;height:64px!important;min-height:64px!important;margin:0!important;padding:0 20px!important;box-sizing:border-box!important;background:#fffdf9!important;border-bottom:1px solid #ddd7cc!important;position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important}
+          .top:before,.top:after{content:none!important;display:none!important}
+          .top .home,.top #cancel,.top button.cancel{position:absolute!important;left:20px!important;right:auto!important;top:10px!important;width:82px!important;min-width:82px!important;height:44px!important;margin:0!important;padding:0!important;box-sizing:border-box!important;border:1px solid #d8d4ce!important;border-radius:11px!important;background:#fff!important;color:#4b4948!important;font-size:13px!important;font-weight:700!important;display:flex!important;align-items:center!important;justify-content:center!important;line-height:1!important}
+          .top .home:before,.top .home:after,.top #cancel:before,.top #cancel:after{content:none!important;display:none!important}
+          .top .editor-save-wrap{position:absolute!important;right:20px!important;top:10px!important;height:44px!important;display:flex!important;align-items:center!important}
+          .top .editor-save-wrap button,.top .editor-save-wrap .save,.top .editor-save-wrap #save,.top .editor-save-wrap #savePng{width:190px!important;min-width:190px!important;height:44px!important;margin:0!important;padding:0!important;border:0!important;border-radius:11px!important;background:#4b4948!important;color:#fff!important;font-size:14px!important;font-weight:750!important;display:flex!important;align-items:center!important;justify-content:center!important;line-height:1!important}
+          .layout{width:100vw!important;max-width:none!important;margin:0!important;padding:0!important;display:grid!important;grid-template-columns:50vw 50vw!important;gap:0!important;align-items:start!important;box-sizing:border-box!important}
+          .preview{grid-column:1!important;grid-row:1!important;width:50vw!important;min-width:0!important;margin:0!important;padding:20px 18px!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-items:center!important}
+          .previewSticky{position:static!important;width:100%!important;display:flex!important;flex-direction:column!important;align-items:center!important}
+          .tools{width:min(60%,620px)!important;max-width:620px!important;min-width:0!important;height:48px!important;min-height:48px!important;margin:0 auto 12px!important;padding:6px 9px!important;box-sizing:border-box!important;background:#fffdfa!important;border:1px solid #ddd9d3!important;border-radius:10px!important;box-shadow:0 1px 5px #7771!important;display:flex!important;align-items:center!important;gap:5px!important}
+          .tools select{width:auto!important;height:34px!important;min-height:34px!important;padding:0 8px!important;border:1px solid #dedad5!important;border-radius:8px!important;font-size:12px!important}
+          .zoom{display:flex!important;align-items:center!important;gap:4px!important;margin-left:auto!important;flex:none!important}
+          .zoom button{height:34px!important;min-width:34px!important;padding:0!important;border:1px solid #ddd!important;border-radius:8px!important;font-size:18px!important}
+          .zoom input{width:100px!important;min-width:70px!important;height:26px!important}
+          .zoom span{font-size:10px!important;min-width:30px!important}
+          .stage{width:calc(100% - 8px)!important;max-width:none!important;height:auto!important;margin:0 auto!important;padding:10px!important;box-sizing:border-box!important;border:1px solid #d8d4ce!important;border-radius:12px!important;background:#e2ded6!important;box-shadow:none!important}
+          .stage.editor-mobile{aspect-ratio:9/16!important}
+          .stage.editor-pc{aspect-ratio:16/9!important}
+          .settings{grid-column:2!important;grid-row:1!important;width:50vw!important;max-width:none!important;margin:0!important;padding:20px 20px 24px!important;box-sizing:border-box!important;background:#fffdfa!important;border:1px solid #dedbd6!important;border-radius:16px!important;box-shadow:0 1px 5px #7771!important;overflow-y:auto!important;overflow-x:hidden!important}
+          .settings:before{content:'설정'!important;display:block!important;font-size:25px!important;font-weight:750!important;margin:0 0 16px 2px!important;color:#202020!important}
+          .card{width:100%!important;max-width:none!important;box-sizing:border-box!important;background:#fffdfa!important;border:1px solid #ddd9d3!important;border-radius:14px!important;box-shadow:0 1px 5px #7771!important;padding:18px!important;margin:0 0 14px!important}
+          .actions{display:block!important;margin:0!important;padding:0!important}
+          .actions #reset{display:block!important;width:100%!important;height:44px!important;margin:18px 0 0!important;border:1px solid #d8d4ce!important;border-radius:11px!important;background:#fff!important;color:#333!important;font-weight:700!important}
+          @media(min-width:901px){
+            .settings{height:auto!important;min-height:300px!important}
+          }
+          @media(max-width:900px){
+            .top{height:58px!important;min-height:58px!important;padding:0 10px!important}
+            .top .home,.top #cancel,.top button.cancel{left:10px!important;top:9px!important;width:72px!important;min-width:72px!important;height:40px!important;font-size:12px!important}
+            .top .editor-save-wrap{right:10px!important;top:9px!important;height:40px!important}
+            .top .editor-save-wrap button,.top .editor-save-wrap .save,.top .editor-save-wrap #save,.top .editor-save-wrap #savePng{width:130px!important;min-width:130px!important;height:40px!important;font-size:12px!important}
+            .layout{display:flex!important;flex-direction:column!important;width:100%!important}
+            .preview{order:1!important;width:100%!important;padding:10px 6px 0!important}
+            .previewSticky{width:100%!important}
+            .tools{width:min(100%,620px)!important;height:46px!important;min-height:46px!important;margin-bottom:8px!important}
+            .zoom input{flex:1!important;width:auto!important}
+            .stage{width:100%!important;padding:6px!important}
+            .settings{order:2!important;width:100%!important;min-height:0!important;height:auto!important;margin:14px 6px 30px!important;padding:18px 12px 24px!important;border-radius:14px!important;overflow:visible!important}
+          }
+          </style>
+          <script id="NEWS_EDITOR_GEOMETRY_FINAL_V1_JS">
+          (()=>{
+            const q=(s,r=document)=>r.querySelector(s), qa=(s,r=document)=>[...r.querySelectorAll(s)];
+            function chrome(){
+              const top=q('.top'); if(!top)return;
+              const home=q('#cancel',top)||q('.home',top); if(home){home.textContent='홈으로';home.classList.add('unified-home')}
+              let saves=qa('button,a',document).filter(x=>{const t=(x.textContent||'').replace(/\\s/g,'');return x.id==='save'||x.id==='savePng'||t.includes('PNG로저장')});
+              const real=saves[0];
+              if(real){let wrap=q('.editor-save-wrap',top);if(!wrap){wrap=document.createElement('div');wrap.className='editor-save-wrap';top.appendChild(wrap)}wrap.appendChild(real);real.textContent='PNG로 저장';saves.slice(1).forEach(x=>{if(x!==real)x.style.display='none'})}
+              const reset=q('#reset');const settings=q('.settings');
+              if(reset&&settings){settings.appendChild(reset)}
+            }
+            function size(){
+              if(innerWidth<=900)return;
+              const layout=q('.layout'), preview=q('.preview'), settings=q('.settings'), stage=q('#stage');
+              if(!layout||!preview||!settings||!stage)return;
+              const a=preview.getBoundingClientRect(), b=settings.getBoundingClientRect(), c=stage.getBoundingClientRect();
+              const h=Math.max(300,Math.round(c.bottom-b.top));
+              settings.style.height=h+'px';settings.style.maxHeight=h+'px';settings.style.overflowY='auto';
+            }
+            function run(){chrome();requestAnimationFrame(size)}
+            addEventListener('DOMContentLoaded',run);addEventListener('load',run);addEventListener('resize',run);setTimeout(run,300);setTimeout(run,1000);
+          })();
+          </script>
+          '''
+          if 'NEWS_EDITOR_GEOMETRY_FINAL_V1' not in s:
+              s=s.replace('</head>',css+'</head>')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit and remove temporary files
+        run: |
+          rm -f .news-final-layout-fix-trigger .github/workflows/editor-final-layout-fix.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add news-editor.html .news-final-layout-fix-trigger .github/workflows/editor-final-layout-fix.yml
+          git diff --cached --quiet && exit 0
+          git commit -m 'fix: finalize news editor geometry'
+          git push
