@@ -50,6 +50,26 @@ button{cursor:pointer}
 input:not([type="checkbox"]):not([type="radio"]),textarea,select{font-size:16px!important}
 @media(max-width:560px){.row{grid-template-columns:1fr}.top{height:56px}.section{padding:16px 14px}.tweet-text{font-size:16px}}
 </style>
+
+<style>
+/* Match the original Twitter feed geometry/icons */
+.twitter-head{height:13%;min-height:78px}
+.tabs{padding:0 10%;gap:30px}
+.tab{font-size:clamp(18px,4vw,25px);height:57%}
+.tab.active:after{height:5px;border-radius:4px}
+.tweet{padding:18px 18px 16px 78px;min-height:18.2%;font-size:14px}
+.avatar{left:18px;top:20px;width:48px;height:48px}
+.identity{gap:5px;padding-right:22px}
+.name{font-size:16px}
+.handle,.time{font-size:14px}
+.more{right:17px;top:20px;font-size:16px;letter-spacing:3px}
+.tweet-text{font-size:17px;line-height:1.38;margin-top:9px}
+.actions{grid-template-columns:1.05fr 1fr 1fr 1.15fr 1fr 1fr;margin-top:13px}
+.act{justify-content:center;gap:4px;font-size:13px}
+.ico{width:21px;height:21px;flex-basis:21px}
+.ico svg{width:20px;height:20px;stroke-width:1.7}
+@media(max-width:560px){.tweet{padding-left:72px}.tweet-text{font-size:16px}.actions{gap:0}.act{font-size:11px}.num{font-size:11px}.tab{font-size:18px}}
+</style>
 </head>
 <body>
 <header class="top"><a href="index.html">← 홈</a><h1>트위터 설정</h1><span style="width:34px"></span></header>
@@ -103,7 +123,9 @@ box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{S.tweets.splice(+b.
 }
 function renderPreview(){
 $('pvTab1').textContent=S.tab1;$('pvTab2').textContent=S.tab2;$('pvTab1').classList.toggle('active',!S.activeTab);$('pvTab2').classList.toggle('active',S.activeTab);$('screen').dataset.scale=S.scale;$('screen').classList.toggle('theme-dark',S.theme==='black');$('screen').style.background=S.theme==='black'?'#000':'#fff';$('feed').style.background='transparent';
-$('feed').innerHTML=S.tweets.map((t,i)=>'<article class="tweet">'+(t.avatar?'<img class="avatar" src="'+esc(t.avatar)+'" alt="">':'<div class="avatar" aria-hidden="true"></div>')+'<div class="identity"><span class="name">'+esc(t.name)+'</span>'+(t.lock?'<img class="lock" src="'+LOCK+'" alt="">':'')+'<span class="handle">'+esc(t.handle)+'</span><span class="time">'+(t.time?'· '+esc(t.time):'')+'</span></div><span class="more">•••</span><div class="tweet-text">'+esc(t.text)+'</div><div class="actions"><button class="act '+(t.reply?'':'empty')+'" type="button"><i class="ico">'+icon.reply+'</i><span>'+esc(t.reply)+'</span></button><button class="act '+(t.reposted?'active-repost':'')+(t.lock?' disabled':'')+'" type="button" data-action="repost" data-i="'+i+'" '+(t.lock?'disabled':'')+'><i class="ico">'+icon.repost+'</i><span>'+esc(t.repost)+'</span></button><button class="act '+(t.liked?'active-like':'')+'" type="button" data-action="like" data-i="'+i+'"><i class="ico">'+icon.like+'</i><span>'+esc(t.like)+'</span></button><button class="act" type="button"><i class="ico">'+icon.views+'</i><span>'+esc(t.views)+'</span></button><button class="act '+(t.bookmarked?'active-bookmark':'')+'" type="button" data-action="bookmark" data-i="'+i+'"><i class="ico">'+icon.bookmark+'</i></button><button class="act" type="button"><i class="ico">'+icon.share+'</i></button></div></article>').join('')}
+const profileData=(()=>{try{return JSON.parse(localStorage.getItem('twitter-profile-v1')||'{}')}catch(e){return{}}})();
+const profileAvatar=profileData.avatar||'';
+$('feed').innerHTML=S.tweets.map((t,i)=>'<article class="tweet">'+((t.avatar||profileAvatar)?'<img class="avatar" src="'+esc(t.avatar||profileAvatar)+'" alt="">':'<div class="avatar" aria-hidden="true"></div>')+'<div class="identity"><span class="name">'+esc(t.name)+'</span>'+(t.lock?'<img class="lock" src="'+LOCK+'" alt="">':'')+'<span class="handle">'+esc(t.handle)+'</span><span class="time">'+(t.time?'· '+esc(t.time):'')+'</span></div><span class="more">•••</span><div class="tweet-text">'+esc(t.text)+'</div><div class="actions"><button class="act '+(t.reply?'':'empty')+'" type="button"><i class="ico">'+icon.reply+'</i><span>'+esc(t.reply)+'</span></button><button class="act '+(t.reposted?'active-repost':'')+(t.lock?' disabled':'')+'" type="button" data-action="repost" data-i="'+i+'" '+(t.lock?'disabled':'')+'><i class="ico">'+icon.repost+'</i><span>'+esc(t.repost)+'</span></button><button class="act '+(t.liked?'active-like':'')+'" type="button" data-action="like" data-i="'+i+'"><i class="ico">'+icon.like+'</i><span>'+esc(t.like)+'</span></button><button class="act" type="button"><i class="ico">'+icon.views+'</i><span>'+esc(t.views)+'</span></button><button class="act '+(t.bookmarked?'active-bookmark':'')+'" type="button" data-action="bookmark" data-i="'+i+'"><i class="ico">'+icon.bookmark+'</i></button><button class="act" type="button"><i class="ico">'+icon.share+'</i></button></div></article>').join('')}
 $('feed').onclick=e=>{const btn=e.target.closest('[data-action]');if(!btn)return;const i=+btn.dataset.i,action=btn.dataset.action;if(action==='repost'&&S.tweets[i].lock)return;if(action==='repost')S.tweets[i].reposted=!S.tweets[i].reposted;if(action==='like')S.tweets[i].liked=!S.tweets[i].liked;if(action==='bookmark')S.tweets[i].bookmarked=!S.tweets[i].bookmarked;persist();renderPreview()};
 function render(){renderEditor();renderPreview()}
 ['tab1','tab2','theme','scale'].forEach(id=>$(id).addEventListener('input',e=>{S[id]=e.target.value;persist();renderPreview()}));
