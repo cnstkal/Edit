@@ -1,0 +1,43 @@
+name: UI cleanup runner
+on: push
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('news2.html'); s=p.read_text()
+          if '<!-- SIMPLE_EDITOR_FIELDS_V1 -->' not in s:
+            s=s.replace('</body>', '''\n<!-- SIMPLE_EDITOR_FIELDS_V1 -->\n<style>.settings .card:first-child{display:none!important}.settings .card:nth-child(2) .field:has(#subtitle),.settings .card:nth-child(2) .photoRow{display:none!important}.settings .card:nth-child(n+3){display:none!important}.settings .card:nth-child(2) .cardHead{display:none!important}</style><script>(()=>{function f(){const c=document.querySelectorAll('.settings .card'),t=c[0]?.querySelector('.field:has(#time)'),b=c[1]?.querySelector('.field:has(#body)');if(t&&b&&!t.dataset.moved){t.dataset.moved='1';const l=t.querySelector('.label');if(l)l.textContent='시간';const i=t.querySelector('#time');if(i)i.placeholder='시간';c[1].insertBefore(t,b)}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',f);else f()})();</script>\n</body>''')
+            p.write_text(s)
+          p=Path('dispatch.html'); s=p.read_text()
+          if '<!-- SIMPLE_EDITOR_FIELDS_V1 -->' not in s:
+            s=s.replace('</body>', '''\n<!-- SIMPLE_EDITOR_FIELDS_V1 -->\n<style>.panel>h2{display:none!important}.panel .group:has(#logoFile),.panel .group:has(#photoFile),.panel .group:has(#credit),.panel .group:has(#miniFile1),.panel .group:has(#miniFile2),.panel .group:has(#miniFile3){display:none!important}</style><script>(()=>{function f(){const g=document.querySelector('.panel .group:has(#date)'),l=g?.querySelector('label'),d=document.getElementById('date');if(l)l.textContent='시간';if(d)d.placeholder='시간'}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',f);else f()})();</script>\n</body>''')
+            p.write_text(s)
+          p=Path('twitter.html'); s=p.read_text()
+          s=s.replace("window.addEventListener('click',handle,true);", "window.addEventListener('click',handle,false);")
+          if '<!-- TWITTER_ACTIVE_CLICK_STABILITY_V1 -->' not in s:
+            s=s.replace('</body>', '''\n<!-- TWITTER_ACTIVE_CLICK_STABILITY_V1 -->\n<style>.act.tw-icon-repost-active .tw-ui-icon{filter:brightness(0) saturate(100%) invert(55%) sepia(91%) saturate(1051%) hue-rotate(119deg) brightness(89%) contrast(101%)!important}.act.tw-icon-like-active .tw-ui-icon{filter:brightness(0) saturate(100%) invert(29%) sepia(93%) saturate(5486%) hue-rotate(323deg) brightness(101%) contrast(99%)!important}.act.tw-icon-bookmark-active .tw-ui-icon{filter:brightness(0) saturate(100%) invert(48%) sepia(96%) saturate(1855%) hue-rotate(184deg) brightness(96%) contrast(101%)!important}.act.tw-icon-like-active .ico,.act.tw-icon-bookmark-active .ico{background:none!important;mask:none!important;-webkit-mask:none!important}.act.tw-icon-like-active .tw-ui-icon,.act.tw-icon-bookmark-active .tw-ui-icon{opacity:1!important}</style>\n<script>(()=>{function p(){let s={};try{s=JSON.parse(localStorage.getItem('twitter-final-action-state-v4')||'{}')}catch(e){}document.querySelectorAll('#feed .tweet').forEach((t,i)=>t.querySelectorAll('.act').forEach((b,j)=>{const a=!!s[i+':'+j];b.classList.toggle('tw-icon-repost-active',a&&j===1);b.classList.toggle('tw-icon-like-active',a&&j===2);b.classList.toggle('tw-icon-bookmark-active',a&&j===4)}))}document.addEventListener('click',e=>{const b=e.target.closest?.('#feed .actions .act');if(!b)return;const j=[...b.closest('.tweet').querySelectorAll('.act')].indexOf(b);if([1,2,4].includes(j))setTimeout(p,0)},false);new MutationObserver(()=>setTimeout(p,0)).observe(document.body,{childList:true,subtree:true});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',p);else p()})();</script>\n</body>''')
+            p.write_text(s)
+          PY
+      - name: Verify and commit
+        run: |
+          grep -q 'SIMPLE_EDITOR_FIELDS_V1' news2.html
+          grep -q 'SIMPLE_EDITOR_FIELDS_V1' dispatch.html
+          grep -q 'window.addEventListener.*handle,false' twitter.html
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add news2.html dispatch.html twitter.html
+          git diff --cached --quiet || git commit -m 'fix: simplify editors and stabilize Twitter actions'
+          git push
+      - name: Remove temporary workflows
+        if: always()
+        run: |
+          git rm -f .github/workflows/ui-cleanup.yml .github/workflows/ui-cleanup2.yml || true
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'chore: remove temporary cleanup workflows' || true
+          git push || true
