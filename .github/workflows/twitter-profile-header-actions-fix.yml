@@ -1,0 +1,57 @@
+name: Twitter profile header and actions fix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/twitter-profile-header-actions-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch profile UI
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('twitter-profile.html')
+          s=p.read_text(encoding='utf-8')
+          css='''<style id="TWITTER_PROFILE_HEADER_ACTIONS_FINAL">
+          .tw-profile-meta-final{display:flex!important;align-items:center!important;gap:10px!important;flex-wrap:wrap!important;margin-top:10px!important;color:#53636d!important;font-size:15px!important}
+          .tw-profile-meta-final .meta-item{display:inline-flex!important;align-items:center!important;gap:7px!important;white-space:nowrap!important}
+          .tw-profile-meta-final .meta-link{color:#1d9bf0!important;text-decoration:none!important}
+          .tw-profile-meta-final .meta-icon{width:19px!important;height:19px!important;display:block!important;fill:none!important;stroke:currentColor!important;stroke-width:2!important;stroke-linecap:round!important;stroke-linejoin:round!important;flex:0 0 auto!important}
+          .tw-post .tw-action-icons{display:flex!important;align-items:center!important;justify-content:flex-start!important;width:max-content!important;margin-left:0!important;margin-right:0!important;gap:24px!important}
+          .tw-post .tw-action-icons .tw-action{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;min-width:0!important;width:auto!important;margin:0!important;flex:0 0 auto!important}
+          .tw-post .tw-action-icons .tw-action img.tw-supplied-action-icon{width:20px!important;height:20px!important;display:block!important;object-fit:contain!important}
+          .tw-post .tw-action-icons .tw-action:nth-last-child(2){margin-left:0!important}
+          .tw-post .tw-action-icons .tw-action:last-child{margin-left:-12px!important}
+          </style>'''
+          s=s.replace('</head>',css+'\n</head>',1)
+          js='''<script id="TWITTER_PROFILE_HEADER_ACTIONS_FINAL_JS">
+          (()=>{
+            const icons=['twitter-reply.webp','twitter-repost.webp','twitter-like.webp','twitter-views.webp','twitter-bookmark.webp','twitter-share.webp'];
+            function cleanActions(){document.querySelectorAll('.tw-post .tw-action-icons').forEach(group=>{const actions=[...group.querySelectorAll(':scope > .tw-action')];actions.forEach((a,i)=>{if(i>=6)return;a.querySelectorAll('svg,img.tw-supplied-action-icon').forEach(n=>n.remove());const img=document.createElement('img');img.className='tw-supplied-action-icon';img.src='이미지/'+icons[i];img.alt='';const span=a.querySelector('span');span?a.insertBefore(img,span):a.appendChild(img);a.removeAttribute('onclick');a.onmousedown=null;a.onmouseup=null;a.ontouchstart=null;a.ontouchend=null})})}
+            function header(){document.querySelectorAll('.meta').forEach(meta=>{if(meta.dataset.finalMeta==='1')return;const text=meta.textContent.trim();const link=(text.match(/https?:\\/\\/[^\\s]+|lit\\.link\\/[^\\s]+/)||[''])[0];const date=(text.match(/\\d{4}년\\s*\\d{1,2}월(?:에)?\\s*가입함/)||[''])[0];if(!link&&!date)return;meta.dataset.finalMeta='1';meta.innerHTML='';meta.className='tw-profile-meta-final';if(link){const a=document.createElement('a');a.className='meta-item meta-link';a.href=link.startsWith('http')?link:'https://'+link;a.target='_blank';a.innerHTML='<svg class="meta-icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l2-2a5 5 0 0 0-7.07-7.07l-1.15 1.15"/><path d="M14 11a5 5 0 0 0-7.07 0l-2 2A5 5 0 0 0 12 20.07l1.15-1.15"/></svg><span>'+link.replace(/^https?:\\/\\//,'')+'</span>';meta.appendChild(a)}if(date){const d=document.createElement('span');d.className='meta-item';d.innerHTML='<svg class="meta-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>'+date+'</span>';meta.appendChild(d)}})}
+            function run(){cleanActions();header()}window.addEventListener('DOMContentLoaded',run);window.addEventListener('load',run);setTimeout(run,250);setTimeout(run,1000);
+          })();</script>'''
+          s=s.replace('</body>',js+'\n</body>',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add twitter-profile.html
+          git diff --cached --quiet || git commit -m "fix: align Twitter actions and profile metadata"
+          git push
+      - name: Remove workflow
+        if: success()
+        run: |
+          rm -f .github/workflows/twitter-profile-header-actions-fix.yml
+          git add .github/workflows/twitter-profile-header-actions-fix.yml
+          git commit -m "chore: remove temporary Twitter profile fix workflow"
+          git push
