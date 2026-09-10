@@ -1,0 +1,55 @@
+name: update-twitter-actions
+on:
+  push:
+    paths:
+      - '.github/workflows/update-twitter-actions.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update twitter editor
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('twitter.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('.identity{display:flex;align-items:center;gap:5px;', '.identity{display:flex;align-items:center;gap:3px;')
+          s=s.replace('margin-left:1px;object-fit:contain;', 'margin-left:0;object-fit:contain;')
+          s=s.replace('margin-top:8px;white-space:pre-wrap;', 'margin-top:5px;white-space:pre-wrap;')
+          s=s.replace('margin-top:11px;color:#647783;align-items:center}', 'margin-top:11px;color:#53636d;align-items:center}')
+          s=s.replace('.act{display:flex;justify-content:flex-start;align-items:center;gap:3px;font-size:11px;min-width:0;white-space:nowrap}', '.act{display:flex;justify-content:flex-start;align-items:center;gap:3px;font-size:11px;min-width:0;white-space:nowrap;border:0;background:transparent;padding:0;color:inherit}')
+          s=s.replace('.act:nth-child(5),.act:nth-child(6){justify-content:center}', '.act:nth-child(5),.act:nth-child(6){justify-content:center;gap:0}')
+          s=s.replace('.empty{color:#c8ced2}', '.act.active-repost{color:#00ba7c}.act.active-like{color:#f91880}.act.active-bookmark{color:#1d9bf0}.act.disabled{color:#b9c1c5;cursor:default}.empty{color:#aeb7bc}')
+          s=s.replace("const blank=()=>({name:'여기에 이름을 입력하세요.',handle:'@username***',time:'여기에 시간을 입력하세요.',text:'여기에 게시글을 입력하세요.',reply:'',repost:'',like:'',views:'',avatar:'',lock:true});", "const blank=()=>({name:'',handle:'@username***',time:'',text:'',reply:'',repost:'',like:'',views:'',avatar:'',lock:true,reposted:false,liked:false,bookmarked:false});")
+          s=s.replace("function normalize(x){const d=defaults();if(!x||typeof x!=='object')return d;x.tweets=Array.isArray(x.tweets)&&x.tweets.length?x.tweets.map(t=>Object.assign(blank(),t||{})):d.tweets;", "function normalize(x){const d=defaults();if(!x||typeof x!=='object')return d;x.tweets=Array.isArray(x.tweets)&&x.tweets.length?x.tweets.map(t=>{const n=Object.assign(blank(),t||{});if(n.name==='여기에 이름을 입력하세요.')n.name='';if(n.time==='여기에 시간을 입력하세요.')n.time='';if(n.text==='여기에 게시글을 입력하세요.')n.text='';return n}):d.tweets;")
+          s=s.replace('<input data-i="\'+i+\'" data-k="name">', '<input placeholder="이름" data-i="\'+i+\'" data-k="name">')
+          s=s.replace('<input data-i="\'+i+\'" data-k="handle">', '<input placeholder="@username" data-i="\'+i+\'" data-k="handle">')
+          s=s.replace('<input data-i="\'+i+\'" data-k="time">', '<input placeholder="시간" data-i="\'+i+\'" data-k="time">')
+          s=s.replace('<textarea data-i="\'+i+\'" data-k="text"></textarea>', '<textarea placeholder="여기에 게시글을 입력하세요." data-i="\'+i+\'" data-k="text"></textarea>')
+          old="<div class=\"actions\"><span class=\"act '+(t.reply?'':'empty')+'\"><i class=\"ico\">'+icon.reply+'</i><span>'+esc(t.reply)+'</span></span><span class=\"act '+(t.repost?'':'empty')+'\"><i class=\"ico\">'+icon.repost+'</i><span>'+esc(t.repost)+'</span></span><span class=\"act '+(t.like?'':'empty')+'\"><i class=\"ico\">'+icon.like+'</i><span>'+esc(t.like)+'</span></span><span class=\"act '+(t.views?'':'empty')+'\"><i class=\"ico\">'+icon.views+'</i><span>'+esc(t.views)+'</span></span><span class=\"act\"><i class=\"ico\">'+icon.bookmark+'</i></span><span class=\"act\"><i class=\"ico\">'+icon.share+'</i></span></div>"
+          new="<div class=\"actions\"><button class=\"act '+(t.reply?'':'empty')+'\" type=\"button\"><i class=\"ico\">'+icon.reply+'</i><span>'+esc(t.reply)+'</span></button><button class=\"act '+(t.reposted?'active-repost':'')+(t.lock?' disabled':'')+'\" type=\"button\" data-action=\"repost\" data-i=\"'+i+'\" '+(t.lock?'disabled':'')+'><i class=\"ico\">'+icon.repost+'</i><span>'+esc(t.repost)+'</span></button><button class=\"act '+(t.liked?'active-like':'')+'\" type=\"button\" data-action=\"like\" data-i=\"'+i+'\"><i class=\"ico\">'+icon.like+'</i><span>'+esc(t.like)+'</span></button><button class=\"act '+(t.views?'':'empty')+'\" type=\"button\"><i class=\"ico\">'+icon.views+'</i><span>'+esc(t.views)+'</span></button><button class=\"act '+(t.bookmarked?'active-bookmark':'')+'\" type=\"button\" data-action=\"bookmark\" data-i=\"'+i+'\"><i class=\"ico\">'+icon.bookmark+'</i></button><button class=\"act\" type=\"button\"><i class=\"ico\">'+icon.share+'</i></button></div>"
+          if old not in s: raise SystemExit('actions pattern not found')
+          s=s.replace(old,new)
+          needle="$('feed').style.background=S.bg;"
+          add="$('feed').style.background=S.bg;"
+          s=s.replace(needle,add)
+          old_end="$('feed').innerHTML=S.tweets.map(t=>"
+          if old_end not in s: raise SystemExit('render marker not found')
+          marker="\nfunction render(){renderEditor();renderPreview()}"
+          handlers="\n$('feed').querySelectorAll('[data-action]').forEach(btn=>btn.addEventListener('click',()=>{const i=+btn.dataset.i,action=btn.dataset.action;if(action==='repost'&&S.tweets[i].lock)return;if(action==='repost')S.tweets[i].reposted=!S.tweets[i].reposted;if(action==='like')S.tweets[i].liked=!S.tweets[i].liked;if(action==='bookmark')S.tweets[i].bookmarked=!S.tweets[i].bookmarked;persist();renderPreview()}));"
+          if handlers.strip() not in s:
+              s=s.replace(marker, handlers+marker)
+          p.write_text(s,encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add twitter.html
+          git diff --cached --quiet || git commit -m 'Update Twitter interactions and placeholders'
+          git push
+          rm -f .github/workflows/update-twitter-actions.yml
+          git add .github/workflows/update-twitter-actions.yml
+          git commit -m 'Remove temporary Twitter update workflow'
+          git push
