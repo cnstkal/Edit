@@ -228,7 +228,30 @@ function run(){
 window.addEventListener('DOMContentLoaded',run);window.addEventListener('load',run);window.addEventListener('resize',run);setTimeout(run,300);setTimeout(run,1000);
 })();</script>
 
-<style id="TWITTER_ACTION_ICONS_FINAL_V6">.tw-action-icons .tw-action{width:28px!important;min-width:28px!important;height:28px!important;min-height:28px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;box-sizing:border-box!important;flex-shrink:0!important;position:relative!important;overflow:visible!important}.tw-action-icons .tw-action svg{width:20px!important;height:20px!important;display:block!important;flex:none!important}.tw-action-icons .tw-action .tw-filled-v6{display:block!important;object-fit:contain!important;flex:none!important}.tw-action-icons .tw-action .tw-filled-repost{width:28px!important;height:28px!important}.tw-action-icons .tw-action .tw-filled-like{width:40px!important;height:40px!important}.tw-action-icons .tw-action .tw-filled-bookmark{width:36px!important;height:36px!important}</style><script id="TWITTER_ACTION_ICONS_FINAL_V6_JS">(()=>{const imgs={repost:'이미지/twitter-repost-filled.webp',like:'이미지/twitter-like-filled.webp',bookmark:'이미지/twitter-bookmark-filled.webp'};const keys={1:'repost',2:'like',4:'bookmark'};function run(){document.querySelectorAll('.tw-action-icons').forEach(bar=>{bar.querySelectorAll('.tw-action').forEach((el,i)=>{const k=keys[i];if(!k)return;let im=el.querySelector('.tw-filled-v6');const active=el.classList.contains('active-'+k)||el.classList.contains('tw-profile-active-'+k);if(active){if(!im){im=document.createElement('img');im.className='tw-filled-v6 tw-filled-'+k;im.alt='';el.insertBefore(im,el.firstChild)}im.src=imgs[k];el.querySelectorAll('svg').forEach(x=>x.style.display='none')}else{if(im)im.remove();el.querySelectorAll('svg').forEach(x=>x.style.display='')}})})}const mo=new MutationObserver(run);const start=()=>{run();mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']})};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();})();</script></head>
+<style id="TWITTER_ACTION_ICONS_FINAL_V6">.tw-action-icons .tw-action{width:28px!important;min-width:28px!important;height:28px!important;min-height:28px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;box-sizing:border-box!important;flex-shrink:0!important;position:relative!important;overflow:visible!important}.tw-action-icons .tw-action svg{width:20px!important;height:20px!important;display:block!important;flex:none!important}.tw-action-icons .tw-action .tw-filled-v6{display:block!important;object-fit:contain!important;flex:none!important}.tw-action-icons .tw-action .tw-filled-repost{width:28px!important;height:28px!important}.tw-action-icons .tw-action .tw-filled-like{width:40px!important;height:40px!important}.tw-action-icons .tw-action .tw-filled-bookmark{width:36px!important;height:36px!important}</style><script id="TWITTER_ACTION_ICONS_FINAL_V6_JS">(()=>{const imgs={repost:'이미지/twitter-repost-filled.webp',like:'이미지/twitter-like-filled.webp',bookmark:'이미지/twitter-bookmark-filled.webp'};const keys={1:'repost',2:'like',4:'bookmark'};function run(){document.querySelectorAll('.tw-action-icons').forEach(bar=>{bar.querySelectorAll('.tw-action').forEach((el,i)=>{const k=keys[i];if(!k)return;let im=el.querySelector('.tw-filled-v6');const active=el.classList.contains('active-'+k)||el.classList.contains('tw-profile-active-'+k);if(active){if(!im){im=document.createElement('img');im.className='tw-filled-v6 tw-filled-'+k;im.alt='';el.insertBefore(im,el.firstChild)}im.src=imgs[k];el.querySelectorAll('svg').forEach(x=>x.style.display='none')}else{if(im)im.remove();el.querySelectorAll('svg').forEach(x=>x.style.display='')}})})}const mo=new MutationObserver(run);const start=()=>{run();mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']})};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();})();</script><style id="TWITTER_PROFILE_ICONS_CLEAN_V1">
+.tw-action-icons{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr)) 24px 24px!important;align-items:center!important;column-gap:0!important;margin-top:10px!important}
+.tw-action{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;min-width:0!important;width:auto!important;height:24px!important;min-height:24px!important;max-height:24px!important;position:relative!important;box-sizing:border-box!important;flex-shrink:0!important;overflow:visible!important}
+.tw-action svg{width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;max-width:20px!important;max-height:20px!important;display:block!important;flex:0 0 20px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+.tw-action span{font-size:12px!important;line-height:1!important;white-space:nowrap!important}
+.tw-action:nth-child(1){justify-content:flex-start!important}
+.tw-action:nth-child(2),.tw-action:nth-child(3),.tw-action:nth-child(4){justify-content:center!important}
+.tw-action:nth-child(5){justify-self:end!important;margin-right:0!important}
+.tw-action:nth-child(6){justify-self:start!important;margin-left:0!important}
+.tw-action .tw-clean-filled{width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;max-width:20px!important;max-height:20px!important;display:block!important;object-fit:contain!important;flex:0 0 20px!important;pointer-events:none!important}
+.tw-action.tw-profile-active-repost{color:#00ba7c!important}
+.tw-action.tw-profile-active-like{color:#f91880!important}
+.tw-action.tw-profile-active-bookmark{color:#1d9bf0!important}
+</style>
+<script id="TWITTER_PROFILE_ICONS_CLEAN_V1_JS">(()=>{
+const filled={repost:'이미지/twitter-repost-filled.webp',like:'이미지/twitter-like-filled.webp',bookmark:'이미지/twitter-bookmark-filled.webp'};
+const stateKey='twitter-profile-action-state-v3';
+let states={};try{states=JSON.parse(localStorage.getItem(stateKey)||'{}')}catch(e){}
+const getKey=(bar,i)=>[...document.querySelectorAll('.tw-action-icons')].indexOf(bar)+':'+i;
+function paint(){document.querySelectorAll('.tw-action-icons').forEach(bar=>{[...bar.querySelectorAll('.tw-action')].forEach((a,i)=>{const key=i===1?'repost':i===2?'like':i===4?'bookmark':null;if(!key)return;const on=!!states[getKey(bar,i)];a.classList.toggle('tw-profile-active-repost',on&&key==='repost');a.classList.toggle('tw-profile-active-like',on&&key==='like');a.classList.toggle('tw-profile-active-bookmark',on&&key==='bookmark');const old=a.querySelector('.tw-clean-filled');if(on){a.querySelectorAll('img.tw-filled-icon,.tw-profile-ui-icon,.tw-filled-icon').forEach(x=>x.remove());if(!old){const img=document.createElement('img');img.className='tw-clean-filled';img.src=filled[key];img.alt='';a.insertBefore(img,a.firstChild)}a.querySelectorAll('svg').forEach(x=>x.style.display='none')}else{if(old)old.remove();a.querySelectorAll('svg').forEach(x=>x.style.display='block')}})})}
+document.addEventListener('click',e=>{const a=e.target.closest?.('.tw-action-icons .tw-action');if(!a)return;const bar=a.closest('.tw-action-icons');const i=[...bar.querySelectorAll('.tw-action')].indexOf(a);if(![1,2,4].includes(i))return;e.preventDefault();e.stopImmediatePropagation();const key=getKey(bar,i);states[key]=!states[key];try{localStorage.setItem(stateKey,JSON.stringify(states))}catch(e){}paint()},true);
+function start(){paint()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();</script></head>
 <body><header class="top"><a href="twitter-menu.html">← 트위터</a><h1>트위터 프로필 설정</h1><span style="width:34px"></span></header><main class="layout"><div class="stage"><div class="screen" id="screen"><div class="cover" id="pvCover"><button class="back" aria-label="뒤로"><svg class="profile-control-icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button><button class="cover-more" aria-label="더보기"><svg class="profile-control-icon" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></button></div><div class="profile"><img id="pvAvatar" class="avatar"><button class="share" aria-label="공유"><svg class="profile-control-icon" viewBox="0 0 24 24"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 13v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg></button><div class="name" id="pvName"></div><div class="handle" id="pvHandle"></div><div class="bio" id="pvBio"></div><div class="meta" id="pvMeta"></div><div class="counts"><span><b id="pvFollowing"></b> 팔로잉</span><span><b id="pvFollowers"></b> 팔로워</span></div><div class="buttons"><button>쪽지</button><button class="follow">팔로우</button></div></div><div class="profile-tabs"><div class="profile-tab active">게시물</div><div class="profile-tab">답글</div><div class="profile-tab">미디어</div><div class="profile-tab">좋아요</div></div><div class="pinned"><img id="pvPostAvatar" class="mini-avatar"><div class="pin"><svg class="tw-pin-icon" viewBox="0 0 24 24"><path d="M8 3h8v4l2 3v2h-5v7l-1 2-1-2v-7H6v-2l2-3V3Z"/></svg> 메인에 올림</div><span class="post-name" id="pvPostName"></span> <span class="post-handle" id="pvPostHandle"></span><div class="post-text" id="pvPostText"></div></div></div></div>
 <section class="section"><h2>프로필</h2><div class="field"><label>커버 이미지</label><label class="upload">커버<input id="coverFile" type="file" accept="image/*"></label></div><div class="field"><label>프로필 사진</label><label class="upload">프로필 사진<input id="avatarFile" type="file" accept="image/*"></label></div><div class="row"><div class="field"><label>이름</label><input id="name" placeholder="이름"></div><div class="field"><label>아이디</label><input id="handle" placeholder="@username"></div></div><div class="field"><label>소개</label><textarea id="bio" placeholder="프로필 소개를 입력하세요."></textarea></div><div class="field"><label>웹사이트</label><input id="website" placeholder="웹사이트 주소"></div><div class="field"><label>가입일</label><input id="joined" placeholder="2025년 6월에 가입함"></div><div class="row"><div class="field"><label>팔로잉</label><input id="following" placeholder="70"></div><div class="field"><label>팔로워</label><input id="followers" placeholder="2,146"></div></div><div class="field"><label>프로필 테마</label><select id="theme"><option value="white">화이트</option><option value="black">블랙</option></select></div></section>
 <section class="section"><h2>메인에 올린 게시글</h2><div class="row"><div class="field"><label>게시글 이름</label><input id="postName" placeholder="이름"></div><div class="field"><label>게시글 아이디</label><input id="postHandle" placeholder="@username · 2025. 11. 22."></div></div><div class="field"><label>게시글 내용</label><textarea id="postText" placeholder="게시글"></textarea></div></section><section class="section" id="tweetEditor"><h2>게시글</h2><div id="tweetEditorList"></div><button class="tw-add" id="addTweet">＋ 게시글 추가</button></section><button class="save" id="save">PNG로 저장</button></main>
@@ -253,57 +276,7 @@ window.addEventListener('DOMContentLoaded',run);window.addEventListener('load',r
 
 </script>
 
-<style id="FINAL_TWITTER_PROFILE_ICONS_V2">
-.tw-action-icons{grid-template-columns:repeat(4,minmax(0,1fr)) 20px 20px!important;column-gap:0!important;align-items:center!important}
-.tw-action{gap:3px!important;min-width:0!important}
-.tw-action .tw-profile-ui-icon{width:18px!important;height:18px!important;display:block!important;object-fit:contain!important;opacity:.92}
-.tw-action:nth-child(1){justify-content:flex-start!important}
-.tw-action:nth-child(2),.tw-action:nth-child(3),.tw-action:nth-child(4){justify-content:center!important}
-.tw-action:nth-child(5){justify-self:end!important;margin-right:0!important}
-.tw-action:nth-child(6){justify-self:start!important;margin-left:0!important}
-.tw-action.tw-profile-active-repost{color:#00ba7c!important;font-weight:600}
-.tw-action.tw-profile-active-like{color:#f91880!important;font-weight:600}
-.tw-action.tw-profile-active-bookmark{color:#1d9bf0!important;font-weight:600}
-.tw-action.tw-profile-active .tw-profile-ui-icon{opacity:1}
-.profile-tab{font-size:12px!important}
-</style>
-<script>
-(()=>{
-  const icons={
-    reply:'이미지/twitter-reply.webp',repost:'이미지/twitter-repost.webp',like:'이미지/twitter-like.webp',
-    views:'이미지/twitter-views.webp',bookmark:'이미지/twitter-bookmark.webp',share:'이미지/twitter-share.webp'
-  };
-  const stateKey='twitter-profile-action-state-v2';
-  let states={};try{states=JSON.parse(localStorage.getItem(stateKey)||'{}')}catch(e){}
-  const save=()=>{try{localStorage.setItem(stateKey,JSON.stringify(states))}catch(e){}};
-  function apply(){
-    document.querySelectorAll('.tw-action-icons').forEach((bar,bi)=>{
-      const acts=[...bar.querySelectorAll('.tw-action')];
-      acts.forEach((a,i)=>{
-        const key=bi+':'+i;
-        const src=icons[['reply','repost','like','views','bookmark','share'][i]];
-        let img=a.querySelector('.tw-profile-ui-icon');
-        if(!img){img=document.createElement('img');img.className='tw-profile-ui-icon';a.insertBefore(img,a.firstChild)}
-        img.src=src;
-        a.querySelectorAll('svg').forEach(x=>x.style.display='none');
-        const on=!!states[key];
-        a.classList.toggle('tw-profile-active',on);
-        a.classList.toggle('tw-profile-active-repost',on&&i===1);
-        a.classList.toggle('tw-profile-active-like',on&&i===2);
-        a.classList.toggle('tw-profile-active-bookmark',on&&i===4);
-      });
-    });
-  }
-  function bind(){
-    document.querySelectorAll('.tw-action-icons').forEach((bar,bi)=>{
-      if(bar.dataset.profileIconBound)return;bar.dataset.profileIconBound='1';
-      bar.addEventListener('click',e=>{const a=e.target.closest('.tw-action');if(!a)return;const i=[...bar.querySelectorAll('.tw-action')].indexOf(a);if(![1,2,4].includes(i))return;const key=bi+':'+i;states[key]=!states[key];save();apply();});
-    });
-  }
-  function start(){apply();bind();const mo=new MutationObserver(()=>{apply();bind()});mo.observe(document.body,{subtree:true,childList:true});}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-})();
-</script>
+
 
 <style id="FINAL_GLOBAL_PREVIEW_LAYOUT_V2">
 @media(min-width:901px){
@@ -316,23 +289,7 @@ window.addEventListener('DOMContentLoaded',run);window.addEventListener('load',r
   .layout>.settings,.layout>.panel{order:2!important}
 }
 </style>
-<!-- TWITTER_PROFILE_FINAL_ACTION_FIX_V3 -->
-<style>
-.tw-action-icons{grid-template-columns:repeat(4,minmax(0,1fr)) 48px!important;column-gap:0!important;align-items:center!important}
-.tw-action{min-width:0!important;gap:3px!important;justify-content:center!important;overflow:visible!important}
-.tw-action:nth-child(1){justify-content:flex-start!important}
-.tw-action:nth-child(5){grid-column:5!important;grid-row:1!important;justify-self:start!important;margin:0 2px 0 0!important;padding:0!important}
-.tw-action:nth-child(6){grid-column:5!important;grid-row:1!important;justify-self:end!important;margin:0 0 0 2px!important;padding:0!important}
-.tw-action .tw-profile-ui-icon{width:18px!important;height:18px!important;min-width:18px!important;min-height:18px!important;max-width:18px!important;max-height:18px!important;flex:0 0 18px!important;object-fit:contain!important;pointer-events:none!important;display:block!important}
-.tw-action span,.tw-action b,.tw-action strong,#screen,#screen *{font-family:Pretendard,sans-serif!important}
-</style>
-<script>
-(()=>{const k='twitter-profile-action-state-v2';let s={};try{s=JSON.parse(localStorage.getItem(k)||'{}')}catch(e){};const save=()=>{try{localStorage.setItem(k,JSON.stringify(s))}catch(e){}},ai=a=>{const b=a.closest('.tw-action-icons');return b?[...b.querySelectorAll('.tw-action')].indexOf(a):-1};
-const apply=()=>document.querySelectorAll('.tw-action-icons').forEach((b,bi)=>[...b.querySelectorAll('.tw-action')].forEach((a,i)=>{const on=!!s[bi+':'+i];a.classList.toggle('tw-profile-active',on);a.classList.toggle('tw-profile-active-repost',on&&i===1);a.classList.toggle('tw-profile-active-like',on&&i===2);a.classList.toggle('tw-profile-active-bookmark',on&&i===4)}));
-document.addEventListener('click',e=>{const a=e.target.closest?.('.tw-action-icons .tw-action');if(!a)return;const i=ai(a);if(![1,2,4].includes(i))return;const b=a.closest('.tw-action-icons'),bi=[...document.querySelectorAll('.tw-action-icons')].indexOf(b);e.preventDefault();e.stopImmediatePropagation();const key=bi+':'+i;s[key]=!s[key];save();apply()},true);
-function normalize(){document.querySelectorAll('input,textarea').forEach(el=>{const q=((el.id||'')+' '+(el.name||'')+' '+(el.placeholder||'')).toLowerCase();if(!/handle|username|아이디/.test(q)||el.dataset.atRequired==='1')return;el.dataset.atRequired='1';const n=()=>{const r=(el.value||'').trim();if(r)el.value='@'+r.replace(/^@+/,'')};el.addEventListener('input',()=>{if(el.value&&!el.value.startsWith('@'))el.value='@'+el.value.replace(/^@+/,'')});el.addEventListener('blur',n);el.addEventListener('change',n);n()})}
-function start(){normalize();apply();new MutationObserver(()=>{normalize();apply()}).observe(document.body,{subtree:true,childList:true})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start()})();
-</script>
+
 <script id="HIGH_QUALITY_PNG_EXPORT_V1">
 (()=>{
   const TARGETS=['.stage','.screen','.preview-stage'];
