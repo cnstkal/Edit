@@ -1,0 +1,40 @@
+name: Editor ratio migration
+on:
+  push:
+    paths:
+      - '.editor-ratio-migration-trigger'
+permissions:
+  contents: write
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply strict PC mobile rules
+        run: |
+          sed -i 's/PC · 16:9/PC 비율/g; s/모바일 · 9:16/모바일 비율/g; s/PC \/ 16:9/PC 비율/g; s/모바일 \/ 9:16/모바일 비율/g' news-editor.html dispatch-editor.html kakao.html kakao2.html kakao-profile.html twitter-menu.html twitter-post.html twitter-profile.html index.html
+          python3 - <<'PY'
+          from pathlib import Path
+          news=Path('news-editor.html')
+          s=news.read_text(encoding='utf-8')
+          if 'EDITOR_RATIO_RULES_FINAL' not in s:
+              s=s.replace('</head>','''<style id="EDITOR_RATIO_RULES_FINAL">@media(min-width:901px){.stage.editor-pc{aspect-ratio:16/9!important;width:100%!important;height:auto!important;flex:none!important}.stage.editor-mobile{aspect-ratio:9/16!important;width:min(390px,100%)!important;max-width:390px!important;height:auto!important;flex:none!important;margin:0 auto!important}}</style></head>''',1)
+              s=s.replace('</body>','''<script id="EDITOR_RATIO_RULES_FINAL_JS">(function(){function f(){var q=[...document.querySelectorAll('select')].find(x=>[...x.options].some(o=>/PC 비율|모바일 비율/.test(o.textContent||'')));if(!q)return;var t=q.options[q.selectedIndex]?.textContent||'';document.querySelectorAll('.stage').forEach(x=>{x.classList.toggle('editor-mobile',/모바일 비율/.test(t));x.classList.toggle('editor-pc',/PC 비율/.test(t));});}document.addEventListener('change',f,true);window.addEventListener('load',f);setTimeout(f,100)})();</script></body>''',1)
+          news.write_text(s,encoding='utf-8')
+          d=Path('dispatch-editor.html')
+          s=d.read_text(encoding='utf-8')
+          if 'EDITOR_RATIO_RULES_FINAL' not in s:
+              s=s.replace('</head>','''<style id="EDITOR_RATIO_RULES_FINAL">@media(min-width:801px){.stage.editor-pc{aspect-ratio:16/9!important;width:100%!important;height:auto!important}.stage.editor-mobile{aspect-ratio:9/16!important;width:min(390px,100%)!important;max-width:390px!important;height:auto!important;margin:0 auto!important}.stage.editor-mobile .dispatch{width:720px!important;min-width:720px!important;min-height:1280px!important}}</style></head>''',1)
+              s=s.replace('</body>','''<script id="EDITOR_RATIO_RULES_FINAL_JS">(function(){function f(){var q=[...document.querySelectorAll('select')].find(x=>[...x.options].some(o=>/PC 비율|모바일 비율/.test(o.textContent||'')));if(!q)return;var t=q.options[q.selectedIndex]?.textContent||'';document.querySelectorAll('.stage').forEach(x=>{var m=/모바일 비율/.test(t),p=/PC 비율/.test(t);x.classList.toggle('editor-mobile',m&&!p);x.classList.toggle('editor-pc',p&&!m);if(m&&!p)x.classList.remove('pc-frame');if(p&&!m)x.classList.add('pc-frame')});}document.addEventListener('change',f,true);window.addEventListener('load',f);setTimeout(f,100)})();</script></body>''',1)
+          d.write_text(s,encoding='utf-8')
+          PY
+          rm -f .editor-ratio-migration-trigger
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "fix: enforce distinct PC and mobile preview ratios" || true
+          git push
+          rm -f .github/workflows/editor-ratio-migration.yml
+          git add -A
+          git commit -m "chore: remove temporary ratio migration workflow" || true
+          git push || true
