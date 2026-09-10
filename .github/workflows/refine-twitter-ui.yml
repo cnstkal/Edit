@@ -3,6 +3,8 @@ on:
   push:
     paths:
       - '.github/workflows/refine-twitter-ui.yml'
+permissions:
+  contents: write
 jobs:
   patch:
     runs-on: ubuntu-latest
@@ -12,7 +14,6 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re
 
           def append_once(path, marker, css='', js=''):
               p=Path(path); s=p.read_text(encoding='utf-8')
@@ -24,30 +25,17 @@ jobs:
               p.write_text(s,encoding='utf-8')
 
           twitter_css=r'''
-          /* Twitter desktop editor: preview left, settings right */
           @media(min-width:901px){
             .layout{width:min(1280px,100%);display:grid;grid-template-columns:minmax(420px,520px) minmax(520px,760px);gap:24px;align-items:start}
-            .preview-wrap{order:1;min-width:0}
-            .settings{order:2;width:100%;max-width:760px;justify-self:center}
-            .stage{width:min(100%,420px);margin:0 auto}
+            .preview-wrap{order:1;min-width:0}.settings{order:2;width:100%;max-width:760px;justify-self:center}.stage{width:min(100%,420px);margin:0 auto}
           }
-          /* Twitter action bar refinement */
           .actions{grid-template-columns:repeat(4,minmax(0,1fr)) 20px 20px!important;column-gap:0!important;align-items:center}
-          .act{gap:3px!important}
-          .act .tw-ui-icon{width:18px!important;height:18px!important;flex-basis:18px!important;opacity:.92}
-          .act:nth-child(1){justify-content:flex-start!important}
-          .act:nth-child(2),.act:nth-child(3),.act:nth-child(4){justify-content:center!important}
-          .act:nth-child(5){justify-self:end!important;justify-content:center!important;margin-right:0!important}
-          .act:nth-child(6){justify-self:start!important;justify-content:center!important;margin-left:0!important}
-          .act.tw-extra-active{font-weight:600}
-          .act.tw-extra-repost{color:#00ba7c!important}
-          .act.tw-extra-like{color:#f91880!important}
-          .act.tw-extra-bookmark{color:#1d9bf0!important}
-          .act.tw-extra-active .tw-ui-icon{opacity:1}
+          .act{gap:3px!important}.act .tw-ui-icon{width:18px!important;height:18px!important;flex-basis:18px!important;opacity:.92}
+          .act:nth-child(1){justify-content:flex-start!important}.act:nth-child(2),.act:nth-child(3),.act:nth-child(4){justify-content:center!important}
+          .act:nth-child(5){justify-self:end!important;justify-content:center!important;margin-right:0!important}.act:nth-child(6){justify-self:start!important;justify-content:center!important;margin-left:0!important}
+          .act.tw-extra-active{font-weight:600}.act.tw-extra-repost{color:#00ba7c!important}.act.tw-extra-like{color:#f91880!important}.act.tw-extra-bookmark{color:#1d9bf0!important}.act.tw-extra-active .tw-ui-icon{opacity:1}
           .tweet-extra-photo{display:block;width:100%;max-height:340px;object-fit:cover;border-radius:14px;margin-top:10px;border:1px solid #e5e7e9}
-          .tweet-photo-editor{display:flex;align-items:center;gap:8px;margin-top:7px}
-          .tweet-photo-editor input{flex:1;min-width:0}
-          .tweet-photo-clear{border:1px solid #ffd4d4;background:#fff0f0;color:#c62828;border-radius:8px;padding:6px 9px;font-size:11px;white-space:nowrap}
+          .tweet-photo-editor{display:flex;align-items:center;gap:8px;margin-top:7px}.tweet-photo-editor input{flex:1;min-width:0}.tweet-photo-clear{border:1px solid #ffd4d4;background:#fff0f0;color:#c62828;border-radius:8px;padding:6px 9px;font-size:11px;white-space:nowrap}
           @media(max-width:560px){.act .tw-ui-icon{width:17px!important;height:17px!important;flex-basis:17px!important}}
           '''
           twitter_js=r'''
@@ -57,117 +45,36 @@ jobs:
             const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
             let photos=read(KEY,{}), states=read(STATE,{});
             const fileToData=file=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});
-            function addEditorControls(){
-              const cards=document.querySelectorAll('#tweets .tweet-card');
-              cards.forEach((card,i)=>{
-                if(card.querySelector('.tweet-photo-editor')) return;
-                const box=document.createElement('div'); box.className='field tweet-photo-editor';
-                box.innerHTML='<label style="display:block;font-size:13px;font-weight:700;margin-bottom:6px">게시글 사진</label><input type="file" accept="image/*"><button type="button" class="tweet-photo-clear">사진 삭제</button>';
-                card.appendChild(box);
-                const input=box.querySelector('input'), clear=box.querySelector('button');
-                input.addEventListener('change',async()=>{const f=input.files&&input.files[0];if(!f)return;photos[i]=await fileToData(f);write(KEY,photos);syncPreview();});
-                clear.addEventListener('click',()=>{delete photos[i];write(KEY,photos);syncPreview();input.value='';});
-              });
-            }
-            function syncPreview(){
-              const feed=document.getElementById('feed'); if(!feed)return;
-              feed.querySelectorAll('.tweet').forEach((tweet,i)=>{
-                let img=tweet.querySelector('.tweet-extra-photo');
-                const src=photos[i];
-                if(src){
-                  if(!img){img=document.createElement('img');img.className='tweet-extra-photo';const text=tweet.querySelector('.tweet-text');if(text)text.insertAdjacentElement('afterend',img);else tweet.appendChild(img)}
-                  img.src=src;
-                }else if(img)img.remove();
-              });
-              applyStates();
-            }
-            function applyStates(){
-              const feed=document.getElementById('feed');if(!feed)return;
-              feed.querySelectorAll('.tweet').forEach((tweet,i)=>tweet.querySelectorAll('.act').forEach((b,j)=>{
-                const key=i+':'+j, on=!!states[key];
-                b.classList.toggle('tw-extra-active',on);
-                b.classList.toggle('tw-extra-repost',on&&j===1);
-                b.classList.toggle('tw-extra-like',on&&j===2);
-                b.classList.toggle('tw-extra-bookmark',on&&j===4);
-              }));
-            }
-            function bindActions(){
-              const feed=document.getElementById('feed');if(!feed||feed.dataset.extraBound)return;
-              feed.dataset.extraBound='1';
-              feed.addEventListener('click',e=>{
-                const b=e.target.closest('.act');if(!b)return;
-                const tweet=b.closest('.tweet');if(!tweet)return;
-                const all=[...feed.querySelectorAll('.tweet')], i=all.indexOf(tweet), j=[...tweet.querySelectorAll('.act')].indexOf(b);
-                if(j===1||j===2||j===4){const key=i+':'+j;states[key]=!states[key];write(STATE,states);setTimeout(applyStates,20);}
-              });
-            }
-            function start(){
-              addEditorControls();syncPreview();bindActions();
-              const mo=new MutationObserver(()=>{addEditorControls();syncPreview();});
-              const feed=document.getElementById('feed'), tweets=document.getElementById('tweets');
-              if(feed)mo.observe(feed,{childList:true,subtree:true});
-              if(tweets)mo.observe(tweets,{childList:true,subtree:true});
-            }
+            function addEditorControls(){const cards=document.querySelectorAll('#tweets .tweet-card');cards.forEach((card,i)=>{if(card.querySelector('.tweet-photo-editor'))return;const box=document.createElement('div');box.className='field tweet-photo-editor';box.innerHTML='<label style="display:block;font-size:13px;font-weight:700;margin-bottom:6px">게시글 사진</label><input type="file" accept="image/*"><button type="button" class="tweet-photo-clear">사진 삭제</button>';card.appendChild(box);const input=box.querySelector('input'),clear=box.querySelector('button');input.addEventListener('change',async()=>{const f=input.files&&input.files[0];if(!f)return;photos[i]=await fileToData(f);write(KEY,photos);syncPreview()});clear.addEventListener('click',()=>{delete photos[i];write(KEY,photos);syncPreview();input.value=''})})}
+            function syncPreview(){const feed=document.getElementById('feed');if(!feed)return;feed.querySelectorAll('.tweet').forEach((tweet,i)=>{let img=tweet.querySelector('.tweet-extra-photo'),src=photos[i];if(src){if(!img){img=document.createElement('img');img.className='tweet-extra-photo';const text=tweet.querySelector('.tweet-text');if(text)text.insertAdjacentElement('afterend',img);else tweet.appendChild(img)}img.src=src}else if(img)img.remove()});applyStates()}
+            function applyStates(){const feed=document.getElementById('feed');if(!feed)return;feed.querySelectorAll('.tweet').forEach((tweet,i)=>tweet.querySelectorAll('.act').forEach((b,j)=>{const on=!!states[i+':'+j];b.classList.toggle('tw-extra-active',on);b.classList.toggle('tw-extra-repost',on&&j===1);b.classList.toggle('tw-extra-like',on&&j===2);b.classList.toggle('tw-extra-bookmark',on&&j===4)}))}
+            function bindActions(){const feed=document.getElementById('feed');if(!feed||feed.dataset.extraBound)return;feed.dataset.extraBound='1';feed.addEventListener('click',e=>{const b=e.target.closest('.act');if(!b)return;const tweet=b.closest('.tweet');if(!tweet)return;const all=[...feed.querySelectorAll('.tweet')],i=all.indexOf(tweet),j=[...tweet.querySelectorAll('.act')].indexOf(b);if(j===1||j===2||j===4){const k=i+':'+j;states[k]=!states[k];write(STATE,states);setTimeout(applyStates,20)}})}
+            function start(){addEditorControls();syncPreview();bindActions();const mo=new MutationObserver(()=>{addEditorControls();syncPreview()});const feed=document.getElementById('feed'),tweets=document.getElementById('tweets');if(feed)mo.observe(feed,{childList:true,subtree:true});if(tweets)mo.observe(tweets,{childList:true,subtree:true})}
+            if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+          })();
+          '''
+          profile_css=r'''
+          .profile-extra-photo{display:block;width:100%;max-height:300px;object-fit:cover;border-radius:14px;margin-top:9px;border:1px solid #e5e7e9}.profile-photo-editor{margin-top:8px;padding-top:8px;border-top:1px solid #eee}.profile-photo-editor input{width:100%;font-size:12px!important}
+          @media(min-width:901px){.layout{width:min(1180px,100%);display:grid;grid-template-columns:minmax(420px,520px) minmax(520px,760px);gap:24px;align-items:start}.stage{grid-column:1;grid-row:1;width:min(100%,420px);margin:0 auto}.section{grid-column:2;width:100%}}
+          '''
+          profile_js=r'''
+          (()=>{
+            const KEY='twitter-profile-extra-photo-v1',read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}},write=v=>{try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){}};let media=read();
+            const fileToData=file=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});
+            function ensureEditor(){const list=document.getElementById('tweetEditorList');if(list)list.querySelectorAll('.tw-editor-post').forEach((card,i)=>{if(card.querySelector('.profile-photo-editor'))return;const box=document.createElement('div');box.className='profile-photo-editor';box.innerHTML='<label>게시글 사진</label><input type="file" accept="image/*">';card.appendChild(box);box.querySelector('input').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;media['post'+i]=await fileToData(f);write(media);sync()})});const section=document.getElementById('postText');if(section&&!document.getElementById('pinnedPhotoEditor')){const host=section.closest('.section');if(host){const box=document.createElement('div');box.id='pinnedPhotoEditor';box.className='field profile-photo-editor';box.innerHTML='<label>메인 게시글 사진</label><input id="pinnedPhotoFile" type="file" accept="image/*">';host.appendChild(box);box.querySelector('input').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;media.pinned=await fileToData(f);write(media);sync()})}}}
+            function sync(){const screen=document.getElementById('screen');if(!screen)return;const pinned=screen.querySelector('.pinned');if(pinned){let img=pinned.querySelector('.profile-extra-photo');if(media.pinned){if(!img){img=document.createElement('img');img.className='profile-extra-photo';pinned.appendChild(img)}img.src=media.pinned}else if(img)img.remove()}screen.querySelectorAll('.tw-post').forEach((post,i)=>{let img=post.querySelector('.profile-extra-photo'),src=media['post'+i];if(src){if(!img){img=document.createElement('img');img.className='profile-extra-photo';const text=post.querySelector('.tw-text');if(text)text.insertAdjacentElement('afterend',img);else post.appendChild(img)}img.src=src}else if(img)img.remove()})}
+            function start(){ensureEditor();sync();const mo=new MutationObserver(()=>{ensureEditor();sync()});const list=document.getElementById('tweetEditorList'),screen=document.getElementById('screen');if(list)mo.observe(list,{childList:true,subtree:true});if(screen)mo.observe(screen,{childList:true,subtree:true})}
             if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
           })();
           '''
           append_once('twitter.html','TWITTER_UI_REFINEMENT_V1',twitter_css,twitter_js)
-
-          profile_css=r'''
-          /* Twitter profile post media + desktop-friendly editor */
-          .profile-extra-photo{display:block;width:100%;max-height:300px;object-fit:cover;border-radius:14px;margin-top:9px;border:1px solid #e5e7e9}
-          .profile-photo-editor{margin-top:8px;padding-top:8px;border-top:1px solid #eee}
-          .profile-photo-editor input{width:100%;font-size:12px!important}
-          @media(min-width:901px){
-            .layout{width:min(1180px,100%);display:grid;grid-template-columns:minmax(420px,520px) minmax(520px,760px);gap:24px;align-items:start}
-            .stage{grid-column:1;grid-row:1;width:min(100%,420px);margin:0 auto}
-            .section{grid-column:2;width:100%;}
-          }
-          '''
-          profile_js=r'''
-          (()=>{
-            const KEY='twitter-profile-extra-photo-v1';
-            const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}};
-            const write=v=>{try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){}};
-            let media=read();
-            const fileToData=file=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});
-            function ensureEditor(){
-              const list=document.getElementById('tweetEditorList');if(!list)return;
-              list.querySelectorAll('.tw-editor-post').forEach((card,i)=>{
-                if(card.querySelector('.profile-photo-editor'))return;
-                const box=document.createElement('div');box.className='profile-photo-editor';
-                box.innerHTML='<label>게시글 사진</label><input type="file" accept="image/*">';
-                card.appendChild(box);
-                const input=box.querySelector('input');
-                input.addEventListener('change',async()=>{const f=input.files&&input.files[0];if(!f)return;media['post'+i]=await fileToData(f);write(media);sync();});
-              });
-              const section=document.getElementById('postText');
-              if(section&&!document.getElementById('pinnedPhotoEditor')){
-                const host=section.closest('.section');
-                if(host){const box=document.createElement('div');box.id='pinnedPhotoEditor';box.className='field profile-photo-editor';box.innerHTML='<label>메인 게시글 사진</label><input id="pinnedPhotoFile" type="file" accept="image/*">';host.appendChild(box);box.querySelector('input').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;media.pinned=await fileToData(f);write(media);sync();});}
-              }
-            }
-            function sync(){
-              const screen=document.getElementById('screen');if(!screen)return;
-              const pinned=screen.querySelector('.pinned');
-              if(pinned){let img=pinned.querySelector('.profile-extra-photo');if(media.pinned){if(!img){img=document.createElement('img');img.className='profile-extra-photo';pinned.appendChild(img)}img.src=media.pinned}else if(img)img.remove();}
-              screen.querySelectorAll('.tw-post').forEach((post,i)=>{let img=post.querySelector('.profile-extra-photo');const src=media['post'+i];if(src){if(!img){img=document.createElement('img');img.className='profile-extra-photo';const text=post.querySelector('.tw-text');if(text)text.insertAdjacentElement('afterend',img);else post.appendChild(img)}img.src=src}else if(img)img.remove();});
-            }
-            function start(){ensureEditor();sync();const mo=new MutationObserver(()=>{ensureEditor();sync()});const list=document.getElementById('tweetEditorList'),screen=document.getElementById('screen');if(list)mo.observe(list,{childList:true,subtree:true});if(screen)mo.observe(screen,{childList:true,subtree:true});}
-            if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-          })();
-          '''
           append_once('twitter-profile.html','TWITTER_PROFILE_MEDIA_V1',profile_css,profile_js)
           PY
       - name: Validate files
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          for f in ['twitter.html','twitter-profile.html']:
-            s=Path(f).read_text(encoding='utf-8')
-            assert '<!-- TWITTER_UI_REFINEMENT_V1 -->' in s or '<!-- TWITTER_PROFILE_MEDIA_V1 -->' in s
-            print(f, 'ok', len(s))
-          PY
+          test -f twitter.html && test -f twitter-profile.html
+          grep -q 'TWITTER_UI_REFINEMENT_V1' twitter.html
+          grep -q 'TWITTER_PROFILE_MEDIA_V1' twitter-profile.html
       - name: Commit changes and remove workflow
         run: |
           git config user.name 'github-actions[bot]'
