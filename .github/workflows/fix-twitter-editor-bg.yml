@@ -1,0 +1,26 @@
+name: Fix Twitter editor background
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-twitter-editor-bg.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update background
+        run: |
+          python - <<'PY'
+          p='twitter.html'
+          s=open(p,encoding='utf-8').read()
+          s=s.replace('body{margin:0;background:#f5f6f7;', 'body{margin:0;background:#f3efe7;', 1)
+          s=s.replace('.top{height:64px;background:#fff;', '.top{height:64px;background:#fffdf9;', 1)
+          open(p,'w',encoding='utf-8').write(s)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add twitter.html
+          git commit -m 'Soften Twitter editor background'
+          git push
