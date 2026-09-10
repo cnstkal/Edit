@@ -59,7 +59,23 @@ html,body{margin:0;background:#f3efe7;color:#111;font-family:Pretendard,sans-ser
   .preview-tools .zoom span{font-size:13px;min-width:38px}
 }
 
-</style></head>
+</style>
+<style>
+/* DISPATCH_MOBILE_UI_FIX_V2 */
+@media(max-width:800px){
+  .stage:not(.pc-frame) .brand-row{height:78px;justify-content:flex-start!important}
+  .stage:not(.pc-frame) .brand-row .logo{left:0!important;transform:none!important;width:220px!important;height:68px!important;object-position:left center!important}
+  .stage:not(.pc-frame) .nav{width:720px!important;margin-left:0!important;justify-content:flex-start!important;gap:42px!important;font-size:22px!important;height:54px!important;overflow:visible!important}
+  .stage:not(.pc-frame) .nav span{padding-bottom:8px!important}
+  .stage:not(.pc-frame) .pc-main{padding:34px 3% 52px!important}
+  .stage:not(.pc-frame) .article-head{padding-bottom:12px!important;margin-bottom:24px!important;border-bottom:1px solid #d8d8d8!important;width:94%!important}
+  .stage:not(.pc-frame) .title{font-size:38px!important;line-height:1.22!important;margin-bottom:12px!important;font-weight:550!important}
+  .stage:not(.pc-frame) .date{font-size:16px!important;margin-bottom:0!important;color:#999!important}
+  .stage:not(.pc-frame) .body{font-size:21px!important;line-height:1.82!important}
+  .stage:not(.pc-frame) .body p{margin-bottom:28px!important}
+}
+</style>
+</head>
 <body>
 <div class="top"><button class="home" type="button" onclick="location.href='index.html'">← 홈으로</button><div class="brand">디스패치</div></div>
 <div class="layout">
