@@ -1,0 +1,126 @@
+name: Fix Twitter profile spacing
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-twitter-profile-spacing.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply profile action spacing and icon weight fix
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('twitter-profile.html')
+          s=p.read_text(encoding='utf-8')
+          marker='TWITTER_PROFILE_ACTION_SPACING_FINAL_20260912'
+          if marker not in s:
+              patch='''<style id="TWITTER_PROFILE_ACTION_SPACING_FINAL_20260912">
+/* Action row: use the full post width. Five equal slots; bookmark + share share the last slot. */
+.tw-action-icons{
+  width:100%!important;
+  max-width:none!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  align-items:center!important;
+  justify-items:center!important;
+  gap:0!important;
+  margin:0!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+.tw-action-icons>.tw-action{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+}
+.tw-action-icons>.tw-bookmark-share-group{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:8px!important;
+  box-sizing:border-box!important;
+}
+.tw-action-icons>.tw-bookmark-share-group .tw-action{
+  width:auto!important;
+  min-width:20px!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+/* Match the visual stroke density of the supplied bookmark/share icons. */
+.tw-action-icons>.tw-action img.tw-supplied-action-icon{
+  width:20px!important;
+  height:20px!important;
+  object-fit:contain!important;
+  filter:drop-shadow(.3px 0 0 #536471) drop-shadow(-.3px 0 0 #536471)!important;
+}
+.tw-action-icons>.tw-bookmark-share-group img.tw-supplied-action-icon{
+  width:20px!important;
+  height:20px!important;
+  object-fit:contain!important;
+  filter:none!important;
+}
+</style>
+<script id="TWITTER_PROFILE_ACTION_SPACING_FINAL_20260912_JS">
+(()=>{
+  function fix(){
+    const row=document.querySelector('.tw-action-icons');
+    if(!row)return;
+    const actions=[...row.children].filter(el=>el.classList.contains('tw-action'));
+    let group=row.querySelector(':scope>.tw-bookmark-share-group');
+    if(!group){
+      group=document.createElement('div');
+      group.className='tw-bookmark-share-group';
+      const last=actions.slice(-2);
+      if(last.length===2) last.forEach(el=>group.appendChild(el));
+      row.appendChild(group);
+    }else{
+      const nested=[...group.querySelectorAll(':scope>.tw-action')];
+      if(nested.length<2){
+        actions.slice(-2).forEach(el=>group.appendChild(el));
+      }
+    }
+    row.style.gridTemplateColumns='repeat(5,minmax(0,1fr))';
+  }
+  window.addEventListener('DOMContentLoaded',fix);
+  window.addEventListener('load',fix);
+  setTimeout(fix,250);setTimeout(fix,1000);
+})();
+</script>'''
+              s=s.replace('</head>',patch+'\n</head>',1)
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add twitter-profile.html
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: space Twitter profile actions evenly"
+          git push
+      - name: Remove temporary workflow
+        if: always()
+        run: |
+          rm -f .github/workflows/fix-twitter-profile-spacing.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/fix-twitter-profile-spacing.yml
+          git diff --cached --quiet || git commit -m "chore: remove temporary Twitter spacing workflow"
+          git push || true
