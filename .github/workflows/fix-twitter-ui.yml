@@ -1,0 +1,100 @@
+name: Fix Twitter UI
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-twitter-ui.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch Twitter post and profile
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          # Post: supplied WebP icons, always visually active; no SVG fallback/state script.
+          p=Path('twitter-post.html'); s=p.read_text(encoding='utf-8')
+          marker='TWITTER_POST_SUPPLIED_ICONS_FINAL_V1'
+          block=r'''
+          <style id="TWITTER_POST_SUPPLIED_ICONS_FINAL_V1">
+          .actions .act > img.tw-supplied-post-icon{display:block!important;width:20px!important;height:20px!important;object-fit:contain!important;flex:0 0 20px!important}
+          .actions .act{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:0!important}
+          .actions .act svg,.actions .act .ico,.actions .act .tw-action-state-icon,.actions .act > img:not(.tw-supplied-post-icon){display:none!important}
+          </style>
+          <script id="TWITTER_POST_SUPPLIED_ICONS_FINAL_V1_JS">
+          (()=>{
+            const icons=['twitter-reply.webp','twitter-repost.webp','twitter-like.webp','twitter-views.webp','twitter-bookmark.webp','twitter-share.webp'];
+            function apply(){
+              document.querySelectorAll('.actions').forEach(row=>{
+                const acts=[...row.querySelectorAll(':scope > .act')];
+                acts.slice(0,6).forEach((a,i)=>{
+                  a.querySelectorAll('svg,.ico,.tw-action-state-icon,img').forEach(n=>n.remove());
+                  const img=document.createElement('img');
+                  img.className='tw-supplied-post-icon';
+                  img.src='이미지/'+icons[i];
+                  img.alt='';
+                  a.insertBefore(img,a.firstChild);
+                });
+              });
+            }
+            window.addEventListener('DOMContentLoaded',apply);window.addEventListener('load',apply);setTimeout(apply,300);
+            new MutationObserver(apply).observe(document.documentElement,{subtree:true,childList:true});
+          })();
+          </script>
+          '''
+          if marker not in s: s=s.replace('</head>',block+'\n</head>',1); p.write_text(s,encoding='utf-8')
+
+          # Remove profile X/logo and normalize action spacing: reply/repost/like/views evenly spaced;
+          # bookmark+share are one combined visual unit.
+          p=Path('twitter-profile.html'); s=p.read_text(encoding='utf-8')
+          marker='TWITTER_PROFILE_UI_FINAL_V2'
+          block=r'''
+          <style id="TWITTER_PROFILE_UI_FINAL_V2">
+          .tw-profile-post .tw-post-x,.tw-profile-post .post-x,.tw-profile-post .x,.tw-profile-post [aria-label="X"],.tw-profile-post [title="X"]{display:none!important}
+          .tw-profile-post .tw-action-icons{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;align-items:center!important;width:100%!important;gap:0!important}
+          .tw-profile-post .tw-action-icons > .tw-action{width:100%!important;min-width:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
+          .tw-profile-post .tw-action-icons > .tw-action:nth-child(5){grid-column:4!important}
+          .tw-profile-post .tw-action-icons > .tw-action:nth-child(6){grid-column:4!important;margin-left:20px!important}
+          .tw-profile-post .tw-action-icons > .tw-action:nth-child(5) .tw-supplied-action-icon,.tw-profile-post .tw-action-icons > .tw-action:nth-child(6) .tw-supplied-action-icon{width:20px!important;height:20px!important}
+          </style>
+          <script id="TWITTER_PROFILE_UI_FINAL_V2_JS">
+          (()=>{
+            function apply(){
+              document.querySelectorAll('.tw-profile-post,.tw-post').forEach(post=>{
+                post.querySelectorAll('.tw-post-x,.post-x,.x,[aria-label="X"],[title="X"]').forEach(n=>n.remove());
+                const row=post.querySelector('.tw-action-icons'); if(!row) return;
+                row.style.display='grid';row.style.gridTemplateColumns='repeat(4,minmax(0,1fr))';row.style.gap='0';
+                const acts=[...row.children].filter(x=>x.classList.contains('tw-action'));
+                if(acts.length>=6){acts[0].style.gridColumn='1';acts[1].style.gridColumn='2';acts[2].style.gridColumn='3';acts[3].style.gridColumn='4';acts[4].style.gridColumn='4';acts[5].style.gridColumn='4';acts[5].style.marginLeft='20px';}
+              });
+            }
+            window.addEventListener('DOMContentLoaded',apply);window.addEventListener('load',apply);setTimeout(apply,300);
+            new MutationObserver(apply).observe(document.documentElement,{subtree:true,childList:true});
+          })();
+          </script>
+          '''
+          if marker not in s: s=s.replace('</head>',block+'\n</head>',1); p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add twitter-post.html twitter-profile.html
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: use supplied Twitter post icons and refine profile actions"
+          git push
+      - name: Remove temporary workflow
+        if: always()
+        run: |
+          rm -f .github/workflows/fix-twitter-ui.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/fix-twitter-ui.yml
+          git diff --cached --quiet || git commit -m "chore: remove temporary Twitter UI workflow"
+          git push || true
