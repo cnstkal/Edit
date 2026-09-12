@@ -8,32 +8,12 @@ on:
       - 'manifest.json'
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Fix Twitter profile action spacing
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('twitter-profile.html')
-          s=p.read_text(encoding='utf-8')
-          marker='TW_PROFILE_SPACING_PERMANENT_20260912'
-          if marker not in s:
-              patch = '''<style id="TW_PROFILE_SPACING_PERMANENT_20260912">
-          .tw-action-icons{width:100%!important;max-width:none!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:0!important;align-items:center!important;justify-items:center!important;margin:0!important;padding:0!important;box-sizing:border-box!important}
-          .tw-action-icons>.tw-action{width:100%!important;display:flex!important;justify-content:center!important;align-items:center!important;margin:0!important;padding:0!important}
-          .tw-action-icons>.tw-bookmark-share-group{width:100%!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;gap:8px!important;margin:0!important;padding:0!important}
-          .tw-action-icons>.tw-bookmark-share-group .tw-action{width:auto!important;min-width:20px!important;margin:0!important;padding:0!important;display:flex!important;justify-content:center!important;align-items:center!important}
-          .tw-action-icons img.tw-supplied-action-icon{width:20px!important;height:20px!important;object-fit:contain!important}
-          .tw-action-icons>.tw-action img.tw-supplied-action-icon{filter:drop-shadow(.3px 0 0 #536471) drop-shadow(-.3px 0 0 #536471)!important}
-          .tw-action-icons>.tw-bookmark-share-group img.tw-supplied-action-icon{filter:none!important}
-          </style>'''
-              s=s.replace('</head>',patch+'\n</head>',1)
-              p.write_text(s,encoding='utf-8')
-          PY
       - name: Enforce PC/mobile terminology and distinct preview frames
         run: |
           python3 - <<'PY'
@@ -44,22 +24,21 @@ jobs:
               s=p.read_text(encoding='utf-8',errors='ignore')
               visible=re.sub(r'<style\b.*?</style>','',s,flags=re.S|re.I)
               visible=re.sub(r'<script\b.*?</script>','',visible,flags=re.S|re.I)
-              if re.search(r'16:9|9:16',visible): errors.append(f'{p}: ratio numbers found in visible UI; use only PC 비율 / 모바일 비율')
-              if re.search(r'(PC 비율|모바일 비율)\s*[^<\n]{0,20}(16:9|9:16)',visible,re.I): errors.append(f'{p}: PC 비율 / 모바일 비율 labels must not contain numeric ratios')
-          for fn, markers in {'news-editor.html':('EDITOR_RATIO_RULES_FINAL','editor-mobile','editor-pc'),'dispatch-editor.html':('EDITOR_RATIO_RULES_FINAL','editor-mobile','editor-pc')}.items():
+              if re.search(r'16:9|9:16',visible):
+                  errors.append(f'{p}: ratio numbers found in visible UI; use only PC 비율 / 모바일 비율')
+              if re.search(r'(PC 비율|모바일 비율)\s*[^<\n]{0,20}(16:9|9:16)',visible,re.I):
+                  errors.append(f'{p}: PC 비율 / 모바일 비율 labels must not contain numeric ratios')
+          for fn, markers in {
+              'news-editor.html':('EDITOR_RATIO_RULES_FINAL','editor-mobile','editor-pc'),
+              'dispatch-editor.html':('EDITOR_RATIO_RULES_FINAL','editor-mobile','editor-pc')
+          }.items():
               p=Path(fn)
               if p.exists():
                   s=p.read_text(encoding='utf-8')
                   for m in markers:
-                      if m not in s: errors.append(f'{fn}: missing mandatory rule {m}')
-          if errors: print('\n'.join(errors)); sys.exit(1)
+                      if m not in s:
+                          errors.append(f'{fn}: missing mandatory rule {m}')
+          if errors:
+              print('\n'.join(errors)); sys.exit(1)
           print('EDITOR RATIO RULES: PASS')
           PY
-      - name: Commit Twitter profile fix
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add twitter-profile.html
-          git diff --cached --quiet && exit 0
-          git commit -m "fix: align Twitter profile action icons"
-          git push
