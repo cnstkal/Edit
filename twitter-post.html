@@ -304,7 +304,34 @@ function profile(){document.querySelectorAll('.tw-action-icons').forEach(bar=>{[
 function post(){document.querySelectorAll('.actions').forEach(bar=>{[...bar.querySelectorAll('.act')].forEach((el,i)=>{if(![1,2,4].includes(i))return;const key=keyFor(i),ico=el.querySelector('.ico');if(!ico)return;ico.querySelectorAll('img').forEach(x=>x.remove());const svg=ico.querySelector('svg');const on=activeFor(el,key);if(on){if(svg)svg.style.display='none';let im=document.createElement('img');im.className='tw-action-state-icon';im.src=filled[key];im.alt='';ico.appendChild(im)}else if(svg){svg.style.display='';}})})}
 let scheduled=false;function run(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;profile();post()})}
 const mo=new MutationObserver(run);const start=()=>{run();if(document.body)mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']})};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-})();</script></head>
+})();</script>
+<style id="TWITTER_POST_SUPPLIED_ICONS_FINAL_V1">
+.actions .act > img.tw-supplied-post-icon{display:block!important;width:20px!important;height:20px!important;object-fit:contain!important;flex:0 0 20px!important}
+.actions .act{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:0!important}
+.actions .act svg,.actions .act .ico,.actions .act .tw-action-state-icon,.actions .act > img:not(.tw-supplied-post-icon){display:none!important}
+</style>
+<script id="TWITTER_POST_SUPPLIED_ICONS_FINAL_V1_JS">
+(()=>{
+  const icons=['twitter-reply.webp','twitter-repost.webp','twitter-like.webp','twitter-views.webp','twitter-bookmark.webp','twitter-share.webp'];
+  function apply(){
+    document.querySelectorAll('.actions').forEach(row=>{
+      const acts=[...row.querySelectorAll(':scope > .act')];
+      acts.slice(0,6).forEach((a,i)=>{
+        a.querySelectorAll('svg,.ico,.tw-action-state-icon,img').forEach(n=>n.remove());
+        const img=document.createElement('img');
+        img.className='tw-supplied-post-icon';
+        img.src='이미지/'+icons[i];
+        img.alt='';
+        a.insertBefore(img,a.firstChild);
+      });
+    });
+  }
+  window.addEventListener('DOMContentLoaded',apply);window.addEventListener('load',apply);setTimeout(apply,300);
+  new MutationObserver(apply).observe(document.documentElement,{subtree:true,childList:true});
+})();
+</script>
+
+</head>
 <body>
 <header class="top"><a href="index.html">← 홈</a><h1>트위터 설정</h1><span style="width:34px"></span></header>
 <main class="layout">
