@@ -305,29 +305,32 @@ function post(){document.querySelectorAll('.actions').forEach(bar=>{[...bar.quer
 let scheduled=false;function run(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;profile();post()})}
 const mo=new MutationObserver(run);const start=()=>{run();if(document.body)mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']})};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();</script>
-<style id="TWITTER_POST_SUPPLIED_ICONS_FINAL_V1">
-.actions .act > img.tw-supplied-post-icon{display:block!important;width:20px!important;height:20px!important;object-fit:contain!important;flex:0 0 20px!important}
-.actions .act{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:0!important}
-.actions .act svg,.actions .act .ico,.actions .act .tw-action-state-icon,.actions .act > img:not(.tw-supplied-post-icon){display:none!important}
+
+<style id="TWITTER_POST_USER_ICONS_FINAL_20260912">
+.actions .act{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:3px!important}
+.actions .act .ico,.actions .act svg{display:none!important}
+.actions .act img.tw-user-action-icon{display:block!important;width:20px!important;height:20px!important;object-fit:contain!important;flex:0 0 20px!important}
 </style>
-<script id="TWITTER_POST_SUPPLIED_ICONS_FINAL_V1_JS">
+<script id="TWITTER_POST_USER_ICONS_FINAL_20260912_JS">
 (()=>{
-  const icons=['twitter-reply.webp','twitter-repost.webp','twitter-like.webp','twitter-views.webp','twitter-bookmark.webp','twitter-share.webp'];
+  const normal=['twitter-reply.webp','twitter-repost.webp','twitter-like.webp','twitter-views.webp','twitter-bookmark.webp','twitter-share.webp'];
+  const filled={1:'twitter-repost-filled.webp',2:'twitter-like-filled.webp',4:'twitter-bookmark-filled.webp'};
   function apply(){
     document.querySelectorAll('.actions').forEach(row=>{
-      const acts=[...row.querySelectorAll(':scope > .act')];
+      const acts=[...row.children].filter(x=>x.classList.contains('act'));
       acts.slice(0,6).forEach((a,i)=>{
-        a.querySelectorAll('svg,.ico,.tw-action-state-icon,img').forEach(n=>n.remove());
-        const img=document.createElement('img');
-        img.className='tw-supplied-post-icon';
-        img.src='이미지/'+icons[i];
-        img.alt='';
-        a.insertBefore(img,a.firstChild);
+        let img=a.querySelector('img.tw-user-action-icon');
+        const active=a.classList.contains('active-repost')||a.classList.contains('active-like')||a.classList.contains('active-bookmark');
+        const file=active&&filled[i]?filled[i]:normal[i];
+        if(!img){img=document.createElement('img');img.className='tw-user-action-icon';img.alt='';a.insertBefore(img,a.firstChild)}
+        const wanted='이미지/'+file;
+        if(img.getAttribute('src')!==wanted) img.src=wanted;
+        a.querySelectorAll('svg,.ico').forEach(n=>n.style.display='none');
       });
     });
   }
   window.addEventListener('DOMContentLoaded',apply);window.addEventListener('load',apply);setTimeout(apply,300);
-  new MutationObserver(apply).observe(document.documentElement,{subtree:true,childList:true});
+  new MutationObserver(apply).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
 })();
 </script>
 
