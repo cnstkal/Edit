@@ -1,0 +1,45 @@
+name: Fix Kakao stray newlines
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-kakao-n-newlines.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove stray literal newlines from Kakao page
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('kakao.html')
+          s=p.read_text(encoding='utf-8')
+          # The visible \n\n\n... at the bottom is stray literal text, not HTML whitespace.
+          fixed=re.sub(r'(?:\\n)+[ \t]*(?=</body>)', '', s)
+          if fixed != s:
+              p.write_text(fixed, encoding='utf-8')
+          else:
+              print('No trailing literal \\n run found')
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add kakao.html
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: remove stray literal newlines from Kakao"
+          git push
+      - name: Remove temporary workflow
+        if: always()
+        run: |
+          rm -f .github/workflows/fix-kakao-n-newlines.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/fix-kakao-n-newlines.yml
+          git diff --cached --quiet || git commit -m "chore: remove temporary Kakao fix workflow"
+          git push || true
