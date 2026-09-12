@@ -1,0 +1,72 @@
+name: Fix Kakao stray text
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-kakao-stray-text.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove visible literal backslash-n text
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('kakao.html')
+          s=p.read_text(encoding='utf-8')
+          out=[]
+          i=0
+          in_code=None
+          changed=False
+          while i < len(s):
+              if in_code:
+                  close='</'+in_code+'>'
+                  j=s.lower().find(close, i)
+                  if j < 0:
+                      out.append(s[i:]); break
+                  out.append(s[i:j+len(close)])
+                  i=j+len(close)
+                  in_code=None
+                  continue
+              low=s.lower()
+              if low.startswith('<script', i):
+                  j=s.find('>', i)
+                  if j < 0:
+                      out.append(s[i:]); break
+                  out.append(s[i:j+1]); i=j+1; in_code='script'; continue
+              if low.startswith('<style', i):
+                  j=s.find('>', i)
+                  if j < 0:
+                      out.append(s[i:]); break
+                  out.append(s[i:j+1]); i=j+1; in_code='style'; continue
+              if s.startswith('\\n', i):
+                  changed=True
+                  i+=2
+                  continue
+              out.append(s[i]); i+=1
+          fixed=''.join(out)
+          if changed:
+              p.write_text(fixed, encoding='utf-8')
+          print('removed visible literal \\n:', changed)
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add kakao.html
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: remove stray Kakao literal text"
+          git push
+      - name: Remove temporary workflow
+        if: always()
+        run: |
+          rm -f .github/workflows/fix-kakao-stray-text.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/fix-kakao-stray-text.yml
+          git diff --cached --quiet || git commit -m "chore: remove temporary Kakao text fix workflow"
+          git push || true
