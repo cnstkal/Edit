@@ -1,5 +1,9 @@
 name: Fix editor topbars
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-news-dispatch-kakao-topbar.yml'
   workflow_dispatch:
 permissions:
   contents: write
@@ -13,7 +17,6 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
 
-          # General news: add a real, functional PNG button in the top-right.
           p = Path('news-editor.html')
           s = p.read_text(encoding='utf-8')
           marker = 'NEWS_REAL_PNG_BUTTON_V1'
@@ -51,7 +54,6 @@ jobs:
               s=s.replace('</head>', block+'\n</head>', 1)
               p.write_text(s,encoding='utf-8')
 
-          # Dispatch + Kakao: force the existing top-left button label to exactly "홈으로".
           for name, marker in [('dispatch-editor.html','DISPATCH_HOME_LABEL_FINAL_V1'),('kakao2.html','KAKAO_HOME_LABEL_FINAL_V1')]:
               p=Path(name); s=p.read_text(encoding='utf-8')
               block = f'''
